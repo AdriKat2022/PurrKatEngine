@@ -1,12 +1,18 @@
-namespace MyGameEngine
-{
-    __declspec(dllimport) void Print();
-}
+#include <MyGameEngine.h>
 
-
-int main(int argc, char* argv[])
+class Sandbox : public MyGameEngine::Application
 {
-    MyGameEngine::Print();
+    public:
+    Sandbox()
+    {
+        
+    }
     
-    return 0;
+    ~Sandbox() { }
+};
+
+int main()
+{
+    Sandbox sandbox;
+    sandbox.Run();
 }
