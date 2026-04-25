@@ -13,8 +13,6 @@ namespace MyGameEngine
     void Application::Run()
     {
         while (true)
-        {
-            
-        }
+        {}
     }
 }

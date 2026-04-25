@@ -3,11 +3,8 @@
 class Sandbox : public MyGameEngine::Application
 {
 public:
-    Sandbox() {}
+    Sandbox() { printf("Hey that's me!"); }
     ~Sandbox() {}
 };
 
-MyGameEngine::Application* MyGameEngine::CreateApplication()
-{
-    return new Sandbox();
-}
+CREATE_APPLICATION_FROM_CLASS(Sandbox)
