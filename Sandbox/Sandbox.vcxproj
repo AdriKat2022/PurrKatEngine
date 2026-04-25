@@ -48,13 +48,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)bin\$(Configuration)-$(Platform)\${ProjectName}\</OutDir>
-    <IntDir>$(SolutionDir)bin-intermediates\$(Configuration)-$(Platform)\${ProjectName}\</IntDir>
+    <OutDir>$(SolutionDir)bin\$(Configuration)-$(Platform)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)bin-intermediates\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)bin\$(Configuration)-$(Platform)\${ProjectName}\</OutDir>
-    <IntDir>$(SolutionDir)bin-intermediates\$(Configuration)-$(Platform)\${ProjectName}\</IntDir>
+    <OutDir>$(SolutionDir)bin\$(Configuration)-$(Platform)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)bin-intermediates\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -93,13 +93,89 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Sandbox.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\CoreEngine\CoreEngine.vcxproj">
       <Project>{bdce3a47-2b76-4734-9c35-b985554db9ad}</Project>
       <Name>CoreEngine</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Sandbox.cpp">
+      <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <Optimization>Disabled</Optimization>
+      <SupportJustMyCode>true</SupportJustMyCode>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <AssemblerListingLocation>D:\Users\AdriKat\Desktop\Projects\Programming\MyGameEngine\bin-intermediates\Debug-x64\${ProjectName}\</AssemblerListingLocation>
+      <UndefineAllPreprocessorDefinitions>false</UndefineAllPreprocessorDefinitions>
+      <BrowseInformation>false</BrowseInformation>
+      <BrowseInformationFile>D:\Users\AdriKat\Desktop\Projects\Programming\MyGameEngine\bin-intermediates\Debug-x64\${ProjectName}\</BrowseInformationFile>
+      <CompileAs>Default</CompileAs>
+      <UseDynamicDebugging>false</UseDynamicDebugging>
+      <ConformanceMode>true</ConformanceMode>
+      <DiagnosticsFormat>Column</DiagnosticsFormat>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <ErrorReporting>Prompt</ErrorReporting>
+      <ExpandAttributedSource>false</ExpandAttributedSource>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <EnableASAN>false</EnableASAN>
+      <EnableFuzzer>false</EnableFuzzer>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <EnableVectorLength>NotSet</EnableVectorLength>
+      <FloatingPointModel>Precise</FloatingPointModel>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <GenerateModuleDependencies>false</GenerateModuleDependencies>
+      <GenerateSourceDependencies>false</GenerateSourceDependencies>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>Default</LanguageStandard_C>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ModuleDependenciesFile>D:\Users\AdriKat\Desktop\Projects\Programming\MyGameEngine\bin-intermediates\Debug-x64\${ProjectName}\</ModuleDependenciesFile>
+      <ModuleOutputFile>D:\Users\AdriKat\Desktop\Projects\Programming\MyGameEngine\bin-intermediates\Debug-x64\${ProjectName}\</ModuleOutputFile>
+      <OmitDefaultLibName>false</OmitDefaultLibName>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <ObjectFileName>D:\Users\AdriKat\Desktop\Projects\Programming\MyGameEngine\bin-intermediates\Debug-x64\${ProjectName}\</ObjectFileName>
+      <CallingConvention>Cdecl</CallingConvention>
+      <ProgramDataBaseFileName>D:\Users\AdriKat\Desktop\Projects\Programming\MyGameEngine\bin-intermediates\Debug-x64\${ProjectName}\vc143.pdb</ProgramDataBaseFileName>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>D:\Users\AdriKat\Desktop\Projects\Programming\MyGameEngine\bin-intermediates\Debug-x64\${ProjectName}\Sandbox.pch</PrecompiledHeaderOutputFile>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessKeepComments>false</PreprocessKeepComments>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+      <RemoveUnreferencedCodeData>true</RemoveUnreferencedCodeData>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+      <ShowIncludes>false</ShowIncludes>
+      <SourceDependenciesFile>D:\Users\AdriKat\Desktop\Projects\Programming\MyGameEngine\bin-intermediates\Debug-x64\${ProjectName}\</SourceDependenciesFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <SmallerTypeCheck>false</SmallerTypeCheck>
+      <SpectreMitigation>false</SpectreMitigation>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <TrackerLogDirectory>D:\Users\AdriKat\Desktop\Projects\Programming\MyGameEngine\bin-intermediates\Debug-x64\${ProjectName}\Sandbox.tlog\</TrackerLogDirectory>
+      <TranslateIncludes>false</TranslateIncludes>
+      <MinimalRebuildFromTracking>true</MinimalRebuildFromTracking>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <UseFullPaths>true</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <XMLDocumentationFileName>D:\Users\AdriKat\Desktop\Projects\Programming\MyGameEngine\bin-intermediates\Debug-x64\${ProjectName}\</XMLDocumentationFileName>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <IntelJCCErratum>false</IntelJCCErratum>
+      <BuildStlModules>false</BuildStlModules>
+      <TreatAngleIncludeAsExternal>false</TreatAngleIncludeAsExternal>
+      <ExternalWarningLevel>InheritWarningLevel</ExternalWarningLevel>
+      <TreatExternalTemplatesAsInternal>true</TreatExternalTemplatesAsInternal>
+      <DisableAnalyzeExternal>false</DisableAnalyzeExternal>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_UNICODE;UNICODE;</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <LinkCompiled>true</LinkCompiled>
+      <AdditionalIncludeDirectories>;D:\Software\vcpkg\installed\x64-windows\include</AdditionalIncludeDirectories>
+    </ClCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
