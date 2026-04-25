@@ -1,6 +1,6 @@
-#include <MyGameEngine.h>
+#include <PurrKatEngine.h>
 
-class Sandbox : public MyGameEngine::Application
+class Sandbox : public PurrKatEngine::Application
 {
 public:
     Sandbox() { printf("Hey that's me!"); }

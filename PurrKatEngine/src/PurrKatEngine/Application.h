@@ -2,7 +2,7 @@
 
 #include "Core.h"
 
-namespace MyGameEngine
+namespace PurrKatEngine
 {
     class MGE_API Application
     {

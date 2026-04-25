@@ -1,6 +1,6 @@
 ﻿#include "Application.h"
 
-namespace MyGameEngine
+namespace PurrKatEngine
 {
     Application::Application()
     {

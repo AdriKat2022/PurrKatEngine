@@ -66,7 +66,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)CoreEngine\src;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)PurrKatEngine\src;$(SolutionDir)PurrKatEngine\vendor\spdlog\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -172,9 +172,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CoreEngine\CoreEngine.vcxproj">
+    <ProjectReference Include="..\PurrKatEngine\PurrKatEngine.vcxproj">
       <Project>{bdce3a47-2b76-4734-9c35-b985554db9ad}</Project>
-      <Name>CoreEngine</Name>
+      <Name>PurrKatEngine</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
