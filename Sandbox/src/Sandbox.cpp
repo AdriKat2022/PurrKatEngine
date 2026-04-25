@@ -2,17 +2,12 @@
 
 class Sandbox : public MyGameEngine::Application
 {
-    public:
-    Sandbox()
-    {
-        
-    }
-    
-    ~Sandbox() { }
+public:
+    Sandbox() {}
+    ~Sandbox() {}
 };
 
-int main()
+MyGameEngine::Application* MyGameEngine::CreateApplication()
 {
-    Sandbox sandbox;
-    sandbox.Run();
+    return new Sandbox();
 }

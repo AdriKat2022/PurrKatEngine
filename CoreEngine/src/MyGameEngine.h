@@ -1,4 +1,6 @@
 ﻿#pragma once
 
-#include "MyGameEngine/Core.h"
 #include "MyGameEngine/Application.h"
+
+// Entry Point
+#include "MyGameEngine/EntryPoint.h"

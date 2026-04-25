@@ -12,4 +12,7 @@ namespace MyGameEngine
 
         void Run();
     };
+
+    // To be defined in a CLIENT.
+    Application* CreateApplication();
 }
