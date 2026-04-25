@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#ifdef MGE_PLATFORM_WINDOWS
+#ifdef PKE_PLATFORM_WINDOWS
 
 extern PurrKatEngine::Application* PurrKatEngine::CreateApplication();
 

@@ -1,0 +1,3 @@
+[submodule "PurrKatEngine/vendor/sdplog"]
+	path = PurrKatEngine/vendor/sdplog
+	url = git@github.com:gabime/spdlog.git

@@ -4,7 +4,7 @@
 
 namespace PurrKatEngine
 {
-    class MGE_API Application
+    class PKE_API Application
     {
     public:
         Application();
