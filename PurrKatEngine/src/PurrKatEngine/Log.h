@@ -6,7 +6,7 @@
 
 namespace PurrKatEngine
 {
-    class Log
+    class PKE_API Log
     {
     public:
         static void Init();

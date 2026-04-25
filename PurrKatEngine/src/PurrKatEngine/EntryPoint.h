@@ -2,11 +2,13 @@
 
 #ifdef PKE_PLATFORM_WINDOWS
 
-extern PurrKatEngine::Application* PurrKatEngine::CreateApplication();
-
 int main(int argc, char** argv)
 {
-    printf("Using PurrKatEngine <1.0>\n");
+    PurrKatEngine::Log::Init();
+    PurrKatEngine::Log::GetCoreLogger()->info("Using PurrKatEngine <2.0>");
+    PurrKatEngine::Log::GetCoreLogger()->warn("Initialized logging.");
+    PurrKatEngine::Log::GetClientLogger()->info("Done.");
+    
     auto app = PurrKatEngine::CreateApplication();
     app->Run();
     return 0;
