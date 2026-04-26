@@ -166,6 +166,8 @@
     <ClInclude Include="src\PurrKatEngine\Events\WindowResizeEvent.h" />
     <ClInclude Include="src\PurrKatEngine\Logs\Log.h" />
     <ClInclude Include="src\pkepch.h" />
+    <ClInclude Include="src\PurrKatEngine\Window\Window.h" />
+    <ClInclude Include="src\PurrKatEngine\Window\WindowsWindow.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\PurrKatEngine\Application.cpp" />
@@ -173,6 +175,7 @@
     <ClCompile Include="src\pkepch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\PurrKatEngine\Window\WindowsWindow.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
