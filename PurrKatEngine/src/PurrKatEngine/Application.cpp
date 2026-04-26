@@ -1,5 +1,9 @@
 ﻿#include "Application.h"
 
+#include "Events/Event.h"
+#include "Events/WindowResizeEvent.h"
+#include "Logs/Log.h"
+
 namespace PurrKatEngine
 {
     Application::Application()
@@ -12,7 +16,12 @@ namespace PurrKatEngine
 
     void Application::Run()
     {
+        WindowResizeEvent windowEvent(1920, 1080);
+
+        PKE_CORE_TRACE(windowEvent);
         while (true)
-        {}
+        {
+            
+        }
     }
 }

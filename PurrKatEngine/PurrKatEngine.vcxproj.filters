@@ -4,6 +4,12 @@
     <Filter Include="PurrKatEngine">
       <UniqueIdentifier>{8461A4F9-F021-2030-B95C-69AD25DC640C}</UniqueIdentifier>
     </Filter>
+    <Filter Include="PurrKatEngine\Events">
+      <UniqueIdentifier>{E8B034C8-D43F-BE91-7D5E-D28C69CCCE37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PurrKatEngine\Logs">
+      <UniqueIdentifier>{6806F01B-54EA-B071-BD4A-ABC4A94D9BF3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\PurrKatEngine.h" />
@@ -16,16 +22,19 @@
     <ClInclude Include="src\PurrKatEngine\EntryPoint.h">
       <Filter>PurrKatEngine</Filter>
     </ClInclude>
-    <ClInclude Include="src\PurrKatEngine\Log.h">
-      <Filter>PurrKatEngine</Filter>
+    <ClInclude Include="src\PurrKatEngine\Events\Event.h">
+      <Filter>PurrKatEngine\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PurrKatEngine\Logs\Log.h">
+      <Filter>PurrKatEngine\Logs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\PurrKatEngine\Application.cpp">
       <Filter>PurrKatEngine</Filter>
     </ClCompile>
-    <ClCompile Include="src\PurrKatEngine\Log.cpp">
-      <Filter>PurrKatEngine</Filter>
+    <ClCompile Include="src\PurrKatEngine\Logs\Log.cpp">
+      <Filter>PurrKatEngine\Logs</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "PurrKatEngine/Application.h"
-#include "PurrKatEngine/Log.h"
+#include "PurrKatEngine/Logs/Log.h"
 #include <cstdio>
 
 // --- Entry Point ---

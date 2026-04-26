@@ -9,6 +9,8 @@ project "PurrKatEngine"
     kind "SharedLib"
     language "C++"
 
+    buildoptions { "/utf-8" }
+
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
@@ -19,7 +21,8 @@ project "PurrKatEngine"
 
     includedirs
     {
-        "%{prj.name}/vendor/spdlog/include"
+        "%{prj.location}/vendor/spdlog/include",
+        "%{prj.location}/src"
     }
 
     filter "system:windows"
@@ -55,6 +58,8 @@ project "Sandbox"
     kind "ConsoleApp"
     language "C++"
 
+    buildoptions { "/utf-8" }
+
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
@@ -65,8 +70,8 @@ project "Sandbox"
 
     includedirs
     {
-        "PurrKatEngine/vendor/spdlog/include",
-        "PurrKatEngine/src"
+        "%{wks.location}/PurrKatEngine/vendor/spdlog/include",
+        "%{wks.location}/PurrKatEngine/src"
     }
 
     links
