@@ -1,2 +1,5 @@
+# Folders
 /bin/*
+/bin-int/*
 /bin-intermediates/*
+.vs/*

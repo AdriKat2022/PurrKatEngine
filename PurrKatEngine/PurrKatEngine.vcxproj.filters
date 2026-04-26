@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="PurrKatEngine">
+      <UniqueIdentifier>{8461A4F9-F021-2030-B95C-69AD25DC640C}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\PurrKatEngine.h" />
+    <ClInclude Include="src\PurrKatEngine\Application.h">
+      <Filter>PurrKatEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PurrKatEngine\Core.h">
+      <Filter>PurrKatEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PurrKatEngine\EntryPoint.h">
+      <Filter>PurrKatEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PurrKatEngine\Log.h">
+      <Filter>PurrKatEngine</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\PurrKatEngine\Application.cpp">
+      <Filter>PurrKatEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PurrKatEngine\Log.cpp">
+      <Filter>PurrKatEngine</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
