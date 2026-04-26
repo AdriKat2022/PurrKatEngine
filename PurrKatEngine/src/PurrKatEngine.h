@@ -2,7 +2,6 @@
 
 #include "PurrKatEngine/Application.h"
 #include "PurrKatEngine/Logs/Log.h"
-#include <cstdio>
 
 // --- Entry Point ---
 #include "PurrKatEngine/EntryPoint.h"

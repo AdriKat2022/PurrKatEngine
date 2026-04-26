@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include <memory>
 #include "PurrKatEngine/Core.h"
 #include "spdlog/spdlog.h"
 

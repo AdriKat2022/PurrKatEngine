@@ -1,9 +1,7 @@
 ﻿#pragma once
 
+#include "pkepch.h"
 #include "PurrKatEngine/Core.h"
-
-#include <string>
-#include <functional>
 
 namespace PurrKatEngine
 {

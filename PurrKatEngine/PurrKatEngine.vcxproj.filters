@@ -25,9 +25,13 @@
     <ClInclude Include="src\PurrKatEngine\Events\Event.h">
       <Filter>PurrKatEngine\Events</Filter>
     </ClInclude>
+    <ClInclude Include="src\PurrKatEngine\Events\WindowResizeEvent.h">
+      <Filter>PurrKatEngine\Events</Filter>
+    </ClInclude>
     <ClInclude Include="src\PurrKatEngine\Logs\Log.h">
       <Filter>PurrKatEngine\Logs</Filter>
     </ClInclude>
+    <ClInclude Include="src\pkepch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\PurrKatEngine\Application.cpp">
@@ -36,5 +40,6 @@
     <ClCompile Include="src\PurrKatEngine\Logs\Log.cpp">
       <Filter>PurrKatEngine\Logs</Filter>
     </ClCompile>
+    <ClCompile Include="src\pkepch.cpp" />
   </ItemGroup>
 </Project>
