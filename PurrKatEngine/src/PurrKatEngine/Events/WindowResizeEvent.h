@@ -13,12 +13,7 @@ namespace PurrKatEngine
         unsigned int GetWidth() const { return m_Width; }
         unsigned int GetHeight() const { return m_Height; }
 
-        std::string ToString() const override
-        {
-            std::stringstream ss;
-            ss << "WindowsResizeEvent: " << m_Width << ", " << m_Height;
-            return ss.str();
-        }
+        EVENT_TO_STRING(WindowResizeEvent, "Width={} Height={}", m_Width, m_Height)
 
         EVENT_CLASS_TYPE(WindowResize)
         EVENT_CLASS_CATEGORY(EventCategoryApplication)

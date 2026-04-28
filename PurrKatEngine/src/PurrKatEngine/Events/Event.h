@@ -31,6 +31,8 @@ namespace PurrKatEngine
                                 virtual const char* GetName() const override { return #type; }
     
 #define EVENT_CLASS_CATEGORY(category) virtual int GetCategoryFlags() const override { return category; }
+
+#define EVENT_TO_STRING(classname, fmt_str, ...) std::string ToString() const override { return std::format("{}: " fmt_str, #classname, __VA_ARGS__); }
     
     // Base class for all events in the engine
     class PKE_API Event

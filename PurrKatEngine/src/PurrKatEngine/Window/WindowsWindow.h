@@ -21,7 +21,8 @@ namespace PurrKatEngine
         
         void SetEventCallback(const EventCallbackFunction& callback) override { m_Data.EventCallback = callback; }
         void SetVSync(const bool enabled) override;
-        
+        void SetupGLFWCallbacks();
+
     private:
         GLFWwindow* m_Window;
 

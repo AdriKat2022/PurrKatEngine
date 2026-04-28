@@ -12,7 +12,8 @@ namespace PurrKatEngine
         virtual ~Application();
 
         void Run();
-
+        void OnEvent(Event& e); // Will be run each time an event is triggered by the window.
+        
     private:
         std::unique_ptr<Window> m_Window;
         bool m_IsRunning = true;

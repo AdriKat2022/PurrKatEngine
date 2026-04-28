@@ -7,6 +7,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <format>
 
 #ifdef PKE_PLATFORM_WINDOWS
     #include <Windows.h>

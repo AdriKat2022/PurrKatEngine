@@ -2,7 +2,13 @@
 #include "WindowsWindow.h"
 
 #include "GLFW/glfw3.h"
+#include "PurrKatEngine/Events/KeyPressedEvent.h"
+#include "PurrKatEngine/Events/KeyReleasedEvent.h"
+#include "PurrKatEngine/Events/WindowCloseEvent.h"
+#include "PurrKatEngine/Events/WindowResizeEvent.h"
 #include "PurrKatEngine/Logs/Log.h"
+
+#define GET_WINDOW_DATA_PTR(window) (WindowData*)glfwGetWindowUserPointer(window)
 
 namespace PurrKatEngine
 {
@@ -27,6 +33,55 @@ namespace PurrKatEngine
         m_Data.VSync = enabled;
     }
 
+    void WindowsWindow::SetupGLFWCallbacks()
+    {
+        glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, int width, int height)
+        {
+            WindowData* data = GET_WINDOW_DATA_PTR(window);
+            data->Height = height;
+            data->Width = width;
+            
+            WindowResizeEvent event(width, height);
+            data->EventCallback(event);
+        });
+
+        glfwSetWindowCloseCallback(m_Window, [](GLFWwindow* window)
+        {
+            WindowData* data = GET_WINDOW_DATA_PTR(window);
+            
+            WindowCloseEvent event;
+            data->EventCallback(event);
+        });
+
+        glfwSetKeyCallback(m_Window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
+        {
+            WindowData* data = GET_WINDOW_DATA_PTR(window);
+
+            switch (action)
+            {
+                case GLFW_RELEASE:
+                {
+                    KeyReleasedEvent event(key);
+                    data->EventCallback(event);
+                    break;
+                }
+                case GLFW_PRESS:
+                {
+                    KeyPressedEvent event(key, false);
+                    data->EventCallback(event);
+                    break;
+                }
+                case GLFW_REPEAT:
+                {
+                    KeyPressedEvent event(key, true);
+                    data->EventCallback(event);
+                    break;
+                }
+                default: ;
+            }
+        });
+    }
+
     void WindowsWindow::Init(const WindowProps& props)
     {
         m_Data.Title = props.Title;
@@ -46,6 +101,8 @@ namespace PurrKatEngine
         glfwMakeContextCurrent(m_Window);
         glfwSetWindowUserPointer(m_Window, &m_Data);
         SetVSync(true);
+        
+        SetupGLFWCallbacks();
     }
 
     void WindowsWindow::OnUpdate()

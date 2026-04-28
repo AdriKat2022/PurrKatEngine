@@ -166,6 +166,10 @@
     <ClInclude Include="src\PurrKatEngine\Core.h" />
     <ClInclude Include="src\PurrKatEngine\EntryPoint.h" />
     <ClInclude Include="src\PurrKatEngine\Events\Event.h" />
+    <ClInclude Include="src\PurrKatEngine\Events\KeyEvent.h" />
+    <ClInclude Include="src\PurrKatEngine\Events\KeyPressedEvent.h" />
+    <ClInclude Include="src\PurrKatEngine\Events\KeyReleasedEvent.h" />
+    <ClInclude Include="src\PurrKatEngine\Events\WindowCloseEvent.h" />
     <ClInclude Include="src\PurrKatEngine\Events\WindowResizeEvent.h" />
     <ClInclude Include="src\PurrKatEngine\Logs\Log.h" />
     <ClInclude Include="src\PurrKatEngine\Window\Window.h" />
