@@ -4,6 +4,12 @@ workspace "PurrKatEngine"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+-- Include directories relative to root folder of solution
+IncludeDirs = {}
+IncludeDirs["GLFW"] = "PurrKatEngine/vendor/GLFW/include"
+
+include "PurrKatEngine/vendor/GLFW"
+
 project "PurrKatEngine"
     location "PurrKatEngine"
     kind "SharedLib"
@@ -25,7 +31,14 @@ project "PurrKatEngine"
     includedirs
     {
         "%{prj.location}/vendor/spdlog/include",
-        "%{prj.location}/src"
+        "%{prj.location}/src",
+        "%{IncludeDirs.GLFW}"
+    }
+
+    links
+    {
+        "GLFW",
+        "opengl32.lib"
     }
 
     filter "system:windows"

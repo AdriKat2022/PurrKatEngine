@@ -10,6 +10,9 @@
     <Filter Include="PurrKatEngine\Logs">
       <UniqueIdentifier>{6806F01B-54EA-B071-BD4A-ABC4A94D9BF3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="PurrKatEngine\Window">
+      <UniqueIdentifier>{EB114BF1-D7A0-D4BA-80BF-E8B56C2DE560}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\PurrKatEngine.h" />
@@ -31,6 +34,12 @@
     <ClInclude Include="src\PurrKatEngine\Logs\Log.h">
       <Filter>PurrKatEngine\Logs</Filter>
     </ClInclude>
+    <ClInclude Include="src\PurrKatEngine\Window\Window.h">
+      <Filter>PurrKatEngine\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PurrKatEngine\Window\WindowsWindow.h">
+      <Filter>PurrKatEngine\Window</Filter>
+    </ClInclude>
     <ClInclude Include="src\pkepch.h" />
   </ItemGroup>
   <ItemGroup>
@@ -39,6 +48,9 @@
     </ClCompile>
     <ClCompile Include="src\PurrKatEngine\Logs\Log.cpp">
       <Filter>PurrKatEngine\Logs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PurrKatEngine\Window\WindowsWindow.cpp">
+      <Filter>PurrKatEngine\Window</Filter>
     </ClCompile>
     <ClCompile Include="src\pkepch.cpp" />
   </ItemGroup>
