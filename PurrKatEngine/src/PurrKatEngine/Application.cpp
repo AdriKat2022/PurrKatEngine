@@ -9,6 +9,7 @@ namespace PurrKatEngine
 {
     Application::Application()
     {
+        m_Window = std::unique_ptr<Window>(Window::Create());
     }
 
     Application::~Application()
@@ -17,16 +18,11 @@ namespace PurrKatEngine
 
     void Application::Run()
     {
-        WindowResizeEvent windowEvent(1920, 1080);
-        PKE_CORE_TRACE(windowEvent);
-
-        WindowProps props{};
-        WindowsWindow window{ WindowProps() };
-        PKE_CORE_TRACE(window.ToString());
-        
-        while (true)
+        while (m_IsRunning)
         {
-            
+            glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT);
+            m_Window->OnUpdate();
         }
     }
 }
