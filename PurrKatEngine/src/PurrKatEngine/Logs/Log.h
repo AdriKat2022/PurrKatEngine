@@ -27,11 +27,10 @@ namespace PurrKatEngine
 #define PKE_CORE_DEBUG(...)     PurrKatEngine::Log::GetCoreLogger()->debug(__VA_ARGS__)
 #define PKE_CORE_TRACE(...)     PurrKatEngine::Log::GetCoreLogger()->trace(__VA_ARGS__)
 
-
 // CLIENT Logs Macros
-#define LOG_CRITICAL(...)  PurrKatEngine::Log::GetClientLogger()->critical(__VA_ARGS__)
-#define LOG_ERROR(...)     PurrKatEngine::Log::GetClientLogger()->error(__VA_ARGS__)
-#define LOG_WARN(...)      PurrKatEngine::Log::GetClientLogger()->warn(__VA_ARGS__)
-#define LOG_INFO(...)      PurrKatEngine::Log::GetClientLogger()->info(__VA_ARGS__)
-#define LOG_DEBUG(...)     PurrKatEngine::Log::GetClientLogger()->debug(__VA_ARGS__)
-#define LOG_TRACE(...)     PurrKatEngine::Log::GetClientLogger()->trace(__VA_ARGS__)
+#define PKE_LOG_CRITICAL(...)  PurrKatEngine::Log::GetClientLogger()->critical(__VA_ARGS__)
+#define PKE_LOG_ERROR(...)     PurrKatEngine::Log::GetClientLogger()->error(__VA_ARGS__)
+#define PKE_LOG_WARN(...)      PurrKatEngine::Log::GetClientLogger()->warn(__VA_ARGS__)
+#define PKE_LOG_INFO(...)      PurrKatEngine::Log::GetClientLogger()->info(__VA_ARGS__)
+#define PKE_LOG_DEBUG(...)     PurrKatEngine::Log::GetClientLogger()->debug(__VA_ARGS__)
+#define PKE_LOG_TRACE(...)     PurrKatEngine::Log::GetClientLogger()->trace(__VA_ARGS__)

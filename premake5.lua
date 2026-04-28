@@ -57,7 +57,7 @@ project "PurrKatEngine"
         }
 
     filter { "configurations:Debug" }
-        defines { "PKE_DEBUG" }
+        defines { "PKE_DEBUG", "PKE_ENABLE_ASSERTS" }
         symbols "On"
 
     filter { "configurations:Release" }

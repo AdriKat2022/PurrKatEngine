@@ -20,7 +20,8 @@ namespace PurrKatEngine
             const unsigned int height = 720)
             : Title(title), Width(width), Height(height) {}
     };
-    
+
+    // Acts as an interface for a window (has to be implemented per platform)
     class PKE_API Window
     {
     public:

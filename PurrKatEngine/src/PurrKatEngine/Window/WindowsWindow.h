@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "Window.h"
+#include "GLFW/glfw3.h"
 
 namespace PurrKatEngine
 {
@@ -19,9 +20,10 @@ namespace PurrKatEngine
         bool IsVSync() const override { return m_Data.VSync; }
         
         void SetEventCallback(const EventCallbackFunction& callback) override { m_Data.EventCallback = callback; }
-        void SetVSync(const bool enabled) override { m_Data.VSync = enabled; }
+        void SetVSync(const bool enabled) override;
         
     private:
+        GLFWwindow* m_Window;
 
         virtual void Init(const WindowProps& props);
         virtual void Shutdown();

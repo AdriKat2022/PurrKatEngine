@@ -3,7 +3,7 @@
 class Sandbox : public PurrKatEngine::Application
 {
 public:
-    Sandbox() { LOG_TRACE("Sandbox application start. Hey, that's me! A log from the client!"); }
+    Sandbox() { PKE_LOG_TRACE("Sandbox application start. Hey, that's me! A log from the client!"); }
     ~Sandbox() {}
 };
 
