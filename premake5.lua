@@ -58,14 +58,17 @@ project "PurrKatEngine"
 
     filter { "configurations:Debug" }
         defines { "PKE_DEBUG", "PKE_ENABLE_ASSERTS" }
+        buildoptions "/MDd"
         symbols "On"
 
     filter { "configurations:Release" }
         defines { "PKE_RELEASE" }
+        buildoptions "/MD"
         optimize "On"
 
     filter { "configurations:Dist" }
         defines { "PKE_DIST" }
+        buildoptions "/MD"
         optimize "On"
 
 
@@ -106,12 +109,15 @@ project "Sandbox"
 
     filter { "configurations:Debug" }
         defines { "PKE_DEBUG" }
+        buildoptions "/MDd"
         symbols "On"
 
     filter { "configurations:Release" }
         defines { "PKE_RELEASE" }
+        buildoptions "/MD"
         optimize "On"
 
     filter { "configurations:Dist" }
         defines { "PKE_DIST" }
+        buildoptions "/MD"
         optimize "On"

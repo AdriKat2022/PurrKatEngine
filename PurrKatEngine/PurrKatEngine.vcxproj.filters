@@ -7,8 +7,14 @@
     <Filter Include="PurrKatEngine\Events">
       <UniqueIdentifier>{E8B034C8-D43F-BE91-7D5E-D28C69CCCE37}</UniqueIdentifier>
     </Filter>
+    <Filter Include="PurrKatEngine\Layers">
+      <UniqueIdentifier>{C39B17D7-AF2A-A1A0-5849-B59B44B7B146}</UniqueIdentifier>
+    </Filter>
     <Filter Include="PurrKatEngine\Logs">
       <UniqueIdentifier>{6806F01B-54EA-B071-BD4A-ABC4A94D9BF3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PurrKatEngine\Utility">
+      <UniqueIdentifier>{C7630B9A-33D0-C694-FCC3-5EF268EFE8FC}</UniqueIdentifier>
     </Filter>
     <Filter Include="PurrKatEngine\Window">
       <UniqueIdentifier>{EB114BF1-D7A0-D4BA-80BF-E8B56C2DE560}</UniqueIdentifier>
@@ -25,14 +31,62 @@
     <ClInclude Include="src\PurrKatEngine\EntryPoint.h">
       <Filter>PurrKatEngine</Filter>
     </ClInclude>
+    <ClInclude Include="src\PurrKatEngine\Events\CursorEnterEvent.h">
+      <Filter>PurrKatEngine\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PurrKatEngine\Events\CursorEvent.h">
+      <Filter>PurrKatEngine\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PurrKatEngine\Events\CursorExitEvent.h">
+      <Filter>PurrKatEngine\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PurrKatEngine\Events\CursorPosEvent.h">
+      <Filter>PurrKatEngine\Events</Filter>
+    </ClInclude>
     <ClInclude Include="src\PurrKatEngine\Events\Event.h">
+      <Filter>PurrKatEngine\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PurrKatEngine\Events\KeyEvent.h">
+      <Filter>PurrKatEngine\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PurrKatEngine\Events\KeyPressedEvent.h">
+      <Filter>PurrKatEngine\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PurrKatEngine\Events\KeyReleasedEvent.h">
+      <Filter>PurrKatEngine\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PurrKatEngine\Events\MouseButtonEvent.h">
+      <Filter>PurrKatEngine\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PurrKatEngine\Events\MouseButtonPressedEvent.h">
+      <Filter>PurrKatEngine\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PurrKatEngine\Events\MouseButtonReleasedEvent.h">
+      <Filter>PurrKatEngine\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PurrKatEngine\Events\MouseScrollEvent.h">
+      <Filter>PurrKatEngine\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PurrKatEngine\Events\WindowCloseEvent.h">
       <Filter>PurrKatEngine\Events</Filter>
     </ClInclude>
     <ClInclude Include="src\PurrKatEngine\Events\WindowResizeEvent.h">
       <Filter>PurrKatEngine\Events</Filter>
     </ClInclude>
+    <ClInclude Include="src\PurrKatEngine\Layers\Layer.h">
+      <Filter>PurrKatEngine\Layers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PurrKatEngine\Layers\LayerStack.h">
+      <Filter>PurrKatEngine\Layers</Filter>
+    </ClInclude>
     <ClInclude Include="src\PurrKatEngine\Logs\Log.h">
       <Filter>PurrKatEngine\Logs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PurrKatEngine\Utility\Mathf.h">
+      <Filter>PurrKatEngine\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PurrKatEngine\Utility\Utility.h">
+      <Filter>PurrKatEngine\Utility</Filter>
     </ClInclude>
     <ClInclude Include="src\PurrKatEngine\Window\Window.h">
       <Filter>PurrKatEngine\Window</Filter>
@@ -46,8 +100,17 @@
     <ClCompile Include="src\PurrKatEngine\Application.cpp">
       <Filter>PurrKatEngine</Filter>
     </ClCompile>
+    <ClCompile Include="src\PurrKatEngine\Layers\Layer.cpp">
+      <Filter>PurrKatEngine\Layers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PurrKatEngine\Layers\LayerStack.cpp">
+      <Filter>PurrKatEngine\Layers</Filter>
+    </ClCompile>
     <ClCompile Include="src\PurrKatEngine\Logs\Log.cpp">
       <Filter>PurrKatEngine\Logs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PurrKatEngine\Utility\Mathf.cpp">
+      <Filter>PurrKatEngine\Utility</Filter>
     </ClCompile>
     <ClCompile Include="src\PurrKatEngine\Window\WindowsWindow.cpp">
       <Filter>PurrKatEngine\Window</Filter>

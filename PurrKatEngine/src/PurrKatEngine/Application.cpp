@@ -7,7 +7,7 @@
 
 namespace PurrKatEngine
 {
-    #define BIND_EVENT_FUNCTION(eventType, fn) [this](eventType& e) { return fn(e); }
+    #define BIND_EVENT_FUNCTION(eventType, fn) [this](eventType& e) { return fn(e); }  // NOLINT(bugprone-macro-parentheses)
     
     Application::Application()
     {
@@ -28,6 +28,13 @@ namespace PurrKatEngine
         dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FUNCTION(WindowCloseEvent, OnWindowClosed));
         dispatcher.Dispatch<CursorPosEvent>(BIND_EVENT_FUNCTION(CursorPosEvent, OnMouseMove));
         dispatcher.Dispatch<MouseScrollEvent>(BIND_EVENT_FUNCTION(MouseScrollEvent, OnMouseScroll));
+
+        for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
+        {
+            // De-increment, as we go backwards
+            (*--it)->OnEvent(e);
+            if (e.IsHandled()) break;
+        }
     }
 
     bool Application::OnWindowClosed(WindowCloseEvent& windowCloseEvent)
@@ -56,13 +63,18 @@ namespace PurrKatEngine
         return true;
     }
 
-
     void Application::Run()
     {
         while (m_IsRunning)
         {
             glClearColor(currentRed, currentGreen, currentBlue, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT);
+
+            for (Layer* layer : m_LayerStack)
+            {
+                layer->OnUpdate();
+            }
+            
             m_Window->OnUpdate();
         }
     }

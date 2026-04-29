@@ -84,7 +84,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/utf-8 /MDd %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
@@ -113,7 +113,7 @@
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/utf-8 /MD %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
@@ -143,7 +143,7 @@
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/utf-8 /MD %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
@@ -179,6 +179,8 @@
     <ClInclude Include="src\PurrKatEngine\Events\MouseScrollEvent.h" />
     <ClInclude Include="src\PurrKatEngine\Events\WindowCloseEvent.h" />
     <ClInclude Include="src\PurrKatEngine\Events\WindowResizeEvent.h" />
+    <ClInclude Include="src\PurrKatEngine\Layers\Layer.h" />
+    <ClInclude Include="src\PurrKatEngine\Layers\LayerStack.h" />
     <ClInclude Include="src\PurrKatEngine\Logs\Log.h" />
     <ClInclude Include="src\PurrKatEngine\Utility\Mathf.h" />
     <ClInclude Include="src\PurrKatEngine\Utility\Utility.h" />
@@ -188,6 +190,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\PurrKatEngine\Application.cpp" />
+    <ClCompile Include="src\PurrKatEngine\Layers\Layer.cpp" />
+    <ClCompile Include="src\PurrKatEngine\Layers\LayerStack.cpp" />
     <ClCompile Include="src\PurrKatEngine\Logs\Log.cpp" />
     <ClCompile Include="src\PurrKatEngine\Utility\Mathf.cpp" />
     <ClCompile Include="src\PurrKatEngine\Window\WindowsWindow.cpp" />
@@ -199,9 +203,6 @@
     <ProjectReference Include="vendor\GLFW\GLFW.vcxproj">
       <Project>{154B857C-0182-860D-AA6E-6C109684020F}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="src\PurrKatEngine\Layers\" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
