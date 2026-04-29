@@ -1,7 +1,7 @@
 ﻿#include "pkepch.h"
 #include "WindowsWindow.h"
 
-#include "GLFW/glfw3.h"
+#include "glad/glad.h"
 #include "PurrKatEngine/Events/CursorEnterEvent.h"
 #include "PurrKatEngine/Events/CursorExitEvent.h"
 #include "PurrKatEngine/Events/CursorPosEvent.h"
@@ -63,6 +63,11 @@ namespace PurrKatEngine
 
         m_Window = glfwCreateWindow(m_Data.Width, m_Data.Height, m_Data.Title.c_str(), nullptr, nullptr);
         glfwMakeContextCurrent(m_Window);
+
+        // Initial use of glad
+        int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+        PKE_CORE_ASSERT(status, "Failed to initialize GLAD");
+        
         glfwSetWindowUserPointer(m_Window, &m_Data);
         SetVSync(true);
         

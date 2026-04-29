@@ -2,8 +2,6 @@
 
 #include "Application.h"
 #include "Logs/Log.h"
-#include "Utility/Mathf.h"
-#include "Window/WindowsWindow.h"
 
 namespace PurrKatEngine
 {
@@ -21,7 +19,7 @@ namespace PurrKatEngine
     
     void Application::OnEvent(Event& e)
     {
-        PKE_CORE_INFO("EVENT: {}", e.ToString());
+        // PKE_CORE_INFO("EVENT: {}", e.ToString());
         
         EventDispatcher dispatcher(e);
 
@@ -57,8 +55,6 @@ namespace PurrKatEngine
     {
         currentBlue += scrollEvent.GetYOffset() / 10.f;
         currentBlue = MATHF_CLAMP_01(currentBlue);
-        
-        PKE_CORE_DEBUG("BLUE: {}", currentBlue);
 
         return true;
     }

@@ -7,8 +7,10 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 -- Include directories relative to root folder of solution
 IncludeDirs = {}
 IncludeDirs["GLFW"] = "PurrKatEngine/vendor/GLFW/include"
+IncludeDirs["glad"] = "PurrKatEngine/vendor/glad/include"
 
 include "PurrKatEngine/vendor/GLFW"
+include "PurrKatEngine/vendor/glad"
 
 project "PurrKatEngine"
     location "PurrKatEngine"
@@ -23,7 +25,8 @@ project "PurrKatEngine"
     pchheader "pkepch.h"
     pchsource "PurrKatEngine/src/pkepch.cpp"
 
-    files {
+    files
+    {
         "%{prj.name}/src/**.h",
         "%{prj.name}/src/**.cpp"
     }
@@ -32,12 +35,14 @@ project "PurrKatEngine"
     {
         "%{prj.location}/vendor/spdlog/include",
         "%{prj.location}/src",
-        "%{IncludeDirs.GLFW}"
+        "%{IncludeDirs.GLFW}",
+        "%{IncludeDirs.glad}"
     }
 
     links
     {
         "GLFW",
+        "glad",
         "opengl32.lib"
     }
 
@@ -48,7 +53,8 @@ project "PurrKatEngine"
 
         defines {
             "PKE_PLATFORM_WINDOWS",
-            "PKE_BUILD_DLL"
+            "PKE_BUILD_DLL",
+            "GLFW_INCLUDE_NONE"
         }
 
         postbuildcommands
