@@ -9,6 +9,8 @@ namespace PurrKatEngine
     {
     public:
         explicit KeyEvent(int keyCode) : m_KeyCode(keyCode) {}
+
+        int GetKeyCode() const { return m_KeyCode; }
         
         EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
 

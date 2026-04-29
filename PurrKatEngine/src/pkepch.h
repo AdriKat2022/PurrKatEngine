@@ -9,6 +9,8 @@
 #include <vector>
 #include <format>
 
+#include "PurrKatEngine/Utility/Utility.h"
+
 #ifdef PKE_PLATFORM_WINDOWS
     #include <Windows.h>
 #endif

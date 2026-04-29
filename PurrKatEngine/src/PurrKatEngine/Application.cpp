@@ -2,15 +2,16 @@
 
 #include "Application.h"
 #include "Logs/Log.h"
-#include "Events/WindowResizeEvent.h"
 #include "Window/WindowsWindow.h"
 
 namespace PurrKatEngine
 {
+    #define BIND_EVENT_FUNCTION(eventType, fn) [this](eventType& e) { return fn(e); }
+    
     Application::Application()
     {
         m_Window = std::unique_ptr<Window>(Window::Create());
-        m_Window->SetEventCallback([this](Event& e) { OnEvent(e); });
+        m_Window->SetEventCallback(BIND_EVENT_FUNCTION(Event, OnEvent));
     }
 
     Application::~Application()
@@ -20,10 +21,18 @@ namespace PurrKatEngine
     void Application::OnEvent(Event& e)
     {
         PKE_CORE_INFO("EVENT: {0}", e.ToString());
+        
+        EventDispatcher dispatcher(e);
 
-        // TODO: Dispatch the event.
+        dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FUNCTION(WindowCloseEvent, OnWindowClosed));
     }
-    
+
+    bool Application::OnWindowClosed(WindowCloseEvent& windowCloseEvent)
+    {
+        m_IsRunning = false;
+        return true;
+    }
+
     void Application::Run()
     {
         while (m_IsRunning)

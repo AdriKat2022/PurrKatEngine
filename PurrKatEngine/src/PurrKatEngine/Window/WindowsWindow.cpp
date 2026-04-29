@@ -2,8 +2,14 @@
 #include "WindowsWindow.h"
 
 #include "GLFW/glfw3.h"
+#include "PurrKatEngine/Events/CursorEnterEvent.h"
+#include "PurrKatEngine/Events/CursorExitEvent.h"
+#include "PurrKatEngine/Events/CursorPosEvent.h"
 #include "PurrKatEngine/Events/KeyPressedEvent.h"
 #include "PurrKatEngine/Events/KeyReleasedEvent.h"
+#include "PurrKatEngine/Events/MouseButtonPressedEvent.h"
+#include "PurrKatEngine/Events/MouseButtonReleasedEvent.h"
+#include "PurrKatEngine/Events/MouseScrollEvent.h"
 #include "PurrKatEngine/Events/WindowCloseEvent.h"
 #include "PurrKatEngine/Events/WindowResizeEvent.h"
 #include "PurrKatEngine/Logs/Log.h"
@@ -13,6 +19,11 @@
 namespace PurrKatEngine
 {
     static bool s_GLFWInitialized = false;
+
+    static void GLFWErrorCallback(int errorCode, const char* description)
+    {
+        PKE_CORE_ERROR("GLFW Error (%d) %s", errorCode, description);
+    }
     
     CREATE_WINDOW_SETUP(WindowsWindow)
 
@@ -33,7 +44,31 @@ namespace PurrKatEngine
         m_Data.VSync = enabled;
     }
 
-    void WindowsWindow::SetupGLFWCallbacks()
+    void WindowsWindow::Init(const WindowProps& props)
+    {
+        m_Data.Title = props.Title;
+        m_Data.Width = props.Width;
+        m_Data.Height = props.Height;
+
+        PKE_CORE_DEBUG("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
+
+        if (!s_GLFWInitialized)
+        {
+            int success = glfwInit();
+            PKE_CORE_ASSERT(success, "Could not initialize GLFW")
+            glfwSetErrorCallback(GLFWErrorCallback);
+            s_GLFWInitialized = true;
+        }
+
+        m_Window = glfwCreateWindow(m_Data.Width, m_Data.Height, m_Data.Title.c_str(), nullptr, nullptr);
+        glfwMakeContextCurrent(m_Window);
+        glfwSetWindowUserPointer(m_Window, &m_Data);
+        SetVSync(true);
+        
+        SetupGLFWCallbacks();
+    }
+    
+    void WindowsWindow::SetupGLFWCallbacks() const
     {
         glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, int width, int height)
         {
@@ -77,32 +112,63 @@ namespace PurrKatEngine
                     data->EventCallback(event);
                     break;
                 }
-                default: ;
             }
         });
-    }
 
-    void WindowsWindow::Init(const WindowProps& props)
-    {
-        m_Data.Title = props.Title;
-        m_Data.Width = props.Width;
-        m_Data.Height = props.Height;
-
-        PKE_CORE_DEBUG("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
-
-        if (!s_GLFWInitialized)
+        glfwSetMouseButtonCallback(m_Window, [](GLFWwindow* window, int button, int action, int mods)
         {
-            int success = glfwInit();
-            PKE_CORE_ASSERT(success, "Could not initialize GLFW")
-            s_GLFWInitialized = true;
-        }
+            WindowData* data = GET_WINDOW_DATA_PTR(window);
 
-        m_Window = glfwCreateWindow(m_Data.Width, m_Data.Height, m_Data.Title.c_str(), nullptr, nullptr);
-        glfwMakeContextCurrent(m_Window);
-        glfwSetWindowUserPointer(m_Window, &m_Data);
-        SetVSync(true);
-        
-        SetupGLFWCallbacks();
+            switch (action)
+            {
+                case GLFW_PRESS:
+                {
+                    MouseButtonPressedEvent pressedEvent(button);
+                    data->EventCallback(pressedEvent);
+                    break;
+                }
+                case GLFW_RELEASE:
+                {
+                    MouseButtonReleasedEvent releasedEvent(button);
+                    data->EventCallback(releasedEvent);
+                    break;
+                }
+            }
+        });
+
+        glfwSetScrollCallback(m_Window, [](GLFWwindow* window, double xOffset, double yOffset)
+        {
+            WindowData* data = GET_WINDOW_DATA_PTR(window);
+            
+            MouseScrollEvent event(xOffset, yOffset);
+            data->EventCallback(event);
+        });
+
+        glfwSetCursorEnterCallback(m_Window, [](GLFWwindow* window, int entered)
+        {
+            WindowData* data = GET_WINDOW_DATA_PTR(window);
+
+            if (entered)
+            {
+                CursorEnterEvent event;
+                data->EventCallback(event);
+            }
+            else
+            {
+                CursorExitEvent event;
+                data->EventCallback(event);
+            }
+
+            
+        });
+
+        glfwSetCursorPosCallback(m_Window, [](GLFWwindow* window, double xPos, double yPos)
+        {
+            WindowData* data = GET_WINDOW_DATA_PTR(window);
+
+            CursorPosEvent event(xPos, yPos);
+            data->EventCallback(event);
+        });
     }
 
     void WindowsWindow::OnUpdate()

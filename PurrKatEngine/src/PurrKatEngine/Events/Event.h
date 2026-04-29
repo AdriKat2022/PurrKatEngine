@@ -11,7 +11,8 @@ namespace PurrKatEngine
         WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoved,
         AppTick, AppUpdate, AppRender,
         KeyPressed, KeyReleased, KeyTyped,
-        MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
+        MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled,
+        CursorEnter, CursorExit
     };
 
     // Bit field for event categories allowing for multiple categories to be applied to a single event
@@ -32,7 +33,7 @@ namespace PurrKatEngine
     
 #define EVENT_CLASS_CATEGORY(category) virtual int GetCategoryFlags() const override { return category; }
 
-#define EVENT_TO_STRING(classname, fmt_str, ...) std::string ToString() const override { return std::format("{}: " fmt_str, #classname, __VA_ARGS__); }
+#define EVENT_TO_STRING(classname, fmt_str, ...) std::string ToString() const override { return std::format("{} " fmt_str, #classname, __VA_ARGS__); }
     
     // Base class for all events in the engine
     class PKE_API Event

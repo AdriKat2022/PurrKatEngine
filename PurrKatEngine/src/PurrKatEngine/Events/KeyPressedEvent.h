@@ -11,6 +11,8 @@ namespace PurrKatEngine
     public:
         explicit KeyPressedEvent(int keyCode, bool isRepeat = false) : KeyEvent(keyCode), m_IsRepeat(isRepeat) {}
 
+        bool IsRepeat() const { return m_IsRepeat; }
+        
         EVENT_TO_STRING(KeyPressedEvent, "KeyCode={} IsRepeat={}", m_KeyCode, m_IsRepeat)
         EVENT_CLASS_TYPE(KeyPressed)
 

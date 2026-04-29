@@ -19,6 +19,9 @@ namespace PurrKatEngine
     };
 }
 
+// #define FORMAT_VARS(...) std::format(Make_Fmt(#__VA_ARGS__), __VA_ARGS__)
+// #define FORMAT_VARS_STRING(...) Make_Fmt(#__VA_ARGS__), __VA_ARGS__
+
 // CORE Logs Macros
 #define PKE_CORE_CRITICAL(...)  PurrKatEngine::Log::GetCoreLogger()->critical(__VA_ARGS__)
 #define PKE_CORE_ERROR(...)     PurrKatEngine::Log::GetCoreLogger()->error(__VA_ARGS__)
