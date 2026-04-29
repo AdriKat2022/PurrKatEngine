@@ -180,6 +180,7 @@
     <ClInclude Include="src\PurrKatEngine\Events\WindowCloseEvent.h" />
     <ClInclude Include="src\PurrKatEngine\Events\WindowResizeEvent.h" />
     <ClInclude Include="src\PurrKatEngine\Logs\Log.h" />
+    <ClInclude Include="src\PurrKatEngine\Utility\Mathf.h" />
     <ClInclude Include="src\PurrKatEngine\Utility\Utility.h" />
     <ClInclude Include="src\PurrKatEngine\Window\Window.h" />
     <ClInclude Include="src\PurrKatEngine\Window\WindowsWindow.h" />
@@ -188,6 +189,7 @@
   <ItemGroup>
     <ClCompile Include="src\PurrKatEngine\Application.cpp" />
     <ClCompile Include="src\PurrKatEngine\Logs\Log.cpp" />
+    <ClCompile Include="src\PurrKatEngine\Utility\Mathf.cpp" />
     <ClCompile Include="src\PurrKatEngine\Window\WindowsWindow.cpp" />
     <ClCompile Include="src\pkepch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
@@ -197,6 +199,9 @@
     <ProjectReference Include="vendor\GLFW\GLFW.vcxproj">
       <Project>{154B857C-0182-860D-AA6E-6C109684020F}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="src\PurrKatEngine\Layers\" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -2,6 +2,7 @@
 
 #include "Application.h"
 #include "Logs/Log.h"
+#include "Utility/Mathf.h"
 #include "Window/WindowsWindow.h"
 
 namespace PurrKatEngine
@@ -20,11 +21,13 @@ namespace PurrKatEngine
     
     void Application::OnEvent(Event& e)
     {
-        PKE_CORE_INFO("EVENT: {0}", e.ToString());
+        PKE_CORE_INFO("EVENT: {}", e.ToString());
         
         EventDispatcher dispatcher(e);
 
         dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FUNCTION(WindowCloseEvent, OnWindowClosed));
+        dispatcher.Dispatch<CursorPosEvent>(BIND_EVENT_FUNCTION(CursorPosEvent, OnMouseMove));
+        dispatcher.Dispatch<MouseScrollEvent>(BIND_EVENT_FUNCTION(MouseScrollEvent, OnMouseScroll));
     }
 
     bool Application::OnWindowClosed(WindowCloseEvent& windowCloseEvent)
@@ -33,11 +36,32 @@ namespace PurrKatEngine
         return true;
     }
 
+    float currentRed, currentGreen, currentBlue;
+    
+    bool Application::OnMouseMove(const CursorPosEvent& cursorPosEvent)
+    {
+        currentRed = cursorPosEvent.GetX() / m_Window->GetWidth();
+        currentGreen = cursorPosEvent.GetY() / m_Window->GetHeight();
+        
+        return true;
+    }
+
+    bool Application::OnMouseScroll(const MouseScrollEvent& scrollEvent)
+    {
+        currentBlue += scrollEvent.GetYOffset() / 10.f;
+        currentBlue = MATHF_CLAMP_01(currentBlue);
+        
+        PKE_CORE_DEBUG("BLUE: {}", currentBlue);
+
+        return true;
+    }
+
+
     void Application::Run()
     {
         while (m_IsRunning)
         {
-            glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+            glClearColor(currentRed, currentGreen, currentBlue, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT);
             m_Window->OnUpdate();
         }

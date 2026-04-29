@@ -8,10 +8,10 @@ namespace PurrKatEngine
     class MouseScrollEvent : public Event
     {
     public:
-        MouseScrollEvent(const double xOffset, const double yOffset) : m_XOffset(xOffset), m_YOffset(yOffset) { }
+        MouseScrollEvent(const float xOffset, const float yOffset) : m_XOffset(xOffset), m_YOffset(yOffset) { }
 
-        double GetXOffset() const { return m_XOffset; }
-        double GetYOffset() const { return m_YOffset; }
+        float GetXOffset() const { return m_XOffset; }
+        float GetYOffset() const { return m_YOffset; }
 
         EVENT_TO_STRING(MouseScrollEvent, "XOffset={} YOffset={}", m_XOffset, m_YOffset)
 
@@ -19,6 +19,6 @@ namespace PurrKatEngine
         EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
         
     private:
-        double m_XOffset, m_YOffset;
+        float m_XOffset, m_YOffset;
     };
 }

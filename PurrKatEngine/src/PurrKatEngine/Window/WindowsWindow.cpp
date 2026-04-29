@@ -22,7 +22,7 @@ namespace PurrKatEngine
 
     static void GLFWErrorCallback(int errorCode, const char* description)
     {
-        PKE_CORE_ERROR("GLFW Error (%d) %s", errorCode, description);
+        PKE_CORE_ERROR("GLFW Error ({}) {}", errorCode, description);
     }
     
     CREATE_WINDOW_SETUP(WindowsWindow)
@@ -57,6 +57,7 @@ namespace PurrKatEngine
             int success = glfwInit();
             PKE_CORE_ASSERT(success, "Could not initialize GLFW")
             glfwSetErrorCallback(GLFWErrorCallback);
+            GLFWErrorCallback(1,"TEST ERROR");
             s_GLFWInitialized = true;
         }
 
