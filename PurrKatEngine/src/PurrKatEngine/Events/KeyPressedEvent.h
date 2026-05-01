@@ -9,7 +9,7 @@ namespace PurrKatEngine
     class KeyPressedEvent : public KeyEvent
     {
     public:
-        explicit KeyPressedEvent(int keyCode, bool isRepeat = false) : KeyEvent(keyCode), m_IsRepeat(isRepeat) {}
+        explicit KeyPressedEvent(unsigned int keyCode, bool isRepeat = false) : KeyEvent(keyCode), m_IsRepeat(isRepeat) {}
 
         bool IsRepeat() const { return m_IsRepeat; }
         

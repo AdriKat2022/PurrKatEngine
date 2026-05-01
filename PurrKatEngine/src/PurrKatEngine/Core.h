@@ -19,3 +19,6 @@
 #endif
 
 #define BIT(x) (1 << (x))
+
+#define PKE_BIND_FUNCTION(memberFunction) [this](auto&&... args) -> decltype(auto) \
+    { return this->memberFunction(std::forward<decltype(args)>(args)...); }

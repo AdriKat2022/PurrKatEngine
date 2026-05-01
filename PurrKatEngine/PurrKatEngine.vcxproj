@@ -169,7 +169,8 @@
     <ClInclude Include="src\PurrKatEngine\Events\CursorEnterEvent.h" />
     <ClInclude Include="src\PurrKatEngine\Events\CursorEvent.h" />
     <ClInclude Include="src\PurrKatEngine\Events\CursorExitEvent.h" />
-    <ClInclude Include="src\PurrKatEngine\Events\CursorPosEvent.h" />
+    <ClInclude Include="src\PurrKatEngine\Events\KeyTypedEvent.h" />
+    <ClInclude Include="src\PurrKatEngine\Events\MouseMovedEvent.h" />
     <ClInclude Include="src\PurrKatEngine\Events\Event.h" />
     <ClInclude Include="src\PurrKatEngine\Events\KeyEvent.h" />
     <ClInclude Include="src\PurrKatEngine\Events\KeyPressedEvent.h" />
@@ -181,6 +182,7 @@
     <ClInclude Include="src\PurrKatEngine\Events\WindowCloseEvent.h" />
     <ClInclude Include="src\PurrKatEngine\Events\WindowResizeEvent.h" />
     <ClInclude Include="src\PurrKatEngine\ImGui\ImGuiLayer.h" />
+    <ClInclude Include="src\PurrKatEngine\Inputs\Keys.h" />
     <ClInclude Include="src\PurrKatEngine\Layers\Layer.h" />
     <ClInclude Include="src\PurrKatEngine\Layers\LayerStack.h" />
     <ClInclude Include="src\PurrKatEngine\Logs\Log.h" />
@@ -194,6 +196,7 @@
     <ClCompile Include="src\Platforms\OpenGL\ImgGuiOpenGLRenderer.cpp" />
     <ClCompile Include="src\PurrKatEngine\Application.cpp" />
     <ClCompile Include="src\PurrKatEngine\ImGui\ImGuiLayer.cpp" />
+    <ClCompile Include="src\PurrKatEngine\Inputs\Keys.cpp" />
     <ClCompile Include="src\PurrKatEngine\Layers\Layer.cpp" />
     <ClCompile Include="src\PurrKatEngine\Layers\LayerStack.cpp" />
     <ClCompile Include="src\PurrKatEngine\Logs\Log.cpp" />

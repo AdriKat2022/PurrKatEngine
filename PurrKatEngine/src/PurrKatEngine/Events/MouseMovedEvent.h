@@ -7,10 +7,10 @@
 
 namespace PurrKatEngine
 {
-    class CursorPosEvent : public CursorEvent
+    class MouseMovedEvent : public CursorEvent
     {
     public:
-        CursorPosEvent(double mouseX, double mouseY): m_MouseX(mouseX), m_MouseY(mouseY) {}
+        MouseMovedEvent(double mouseX, double mouseY): m_MouseX(mouseX), m_MouseY(mouseY) {}
 
         double GetX() const { return m_MouseX; }
         double GetY() const { return m_MouseY; }

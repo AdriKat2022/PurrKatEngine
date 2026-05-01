@@ -4,9 +4,10 @@
 #include "glad/glad.h"
 #include "PurrKatEngine/Events/CursorEnterEvent.h"
 #include "PurrKatEngine/Events/CursorExitEvent.h"
-#include "PurrKatEngine/Events/CursorPosEvent.h"
+#include "PurrKatEngine/Events/MouseMovedEvent.h"
 #include "PurrKatEngine/Events/KeyPressedEvent.h"
 #include "PurrKatEngine/Events/KeyReleasedEvent.h"
+#include "PurrKatEngine/Events/KeyTypedEvent.h"
 #include "PurrKatEngine/Events/MouseButtonPressedEvent.h"
 #include "PurrKatEngine/Events/MouseButtonReleasedEvent.h"
 #include "PurrKatEngine/Events/MouseScrollEvent.h"
@@ -57,7 +58,6 @@ namespace PurrKatEngine
             int success = glfwInit();
             PKE_CORE_ASSERT(success, "Could not initialize GLFW")
             glfwSetErrorCallback(GLFWErrorCallback);
-            GLFWErrorCallback(1,"TEST ERROR");
             s_GLFWInitialized = true;
         }
 
@@ -66,7 +66,7 @@ namespace PurrKatEngine
 
         // Initial use of glad
         int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-        PKE_CORE_ASSERT(status, "Failed to initialize GLAD");
+        PKE_CORE_ASSERT(status, "Failed to initialize GLAD")
         
         glfwSetWindowUserPointer(m_Window, &m_Data);
         SetVSync(true);
@@ -94,7 +94,7 @@ namespace PurrKatEngine
             data->EventCallback(event);
         });
 
-        glfwSetKeyCallback(m_Window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
+        glfwSetKeyCallback(m_Window, [](GLFWwindow* window, int keyCode, int scancode, int action, int mods)
         {
             WindowData* data = GET_WINDOW_DATA_PTR(window);
 
@@ -102,25 +102,33 @@ namespace PurrKatEngine
             {
                 case GLFW_RELEASE:
                 {
-                    KeyReleasedEvent event(key);
+                    KeyReleasedEvent event(keyCode);
                     data->EventCallback(event);
                     break;
                 }
                 case GLFW_PRESS:
                 {
-                    KeyPressedEvent event(key, false);
+                    KeyPressedEvent event(keyCode, false);
                     data->EventCallback(event);
                     break;
                 }
                 case GLFW_REPEAT:
                 {
-                    KeyPressedEvent event(key, true);
+                    KeyPressedEvent event(keyCode, true);
                     data->EventCallback(event);
                     break;
                 }
             }
         });
 
+        glfwSetCharCallback(m_Window, [](GLFWwindow* window, unsigned int keyCode)
+        {
+            WindowData* data = GET_WINDOW_DATA_PTR(window);
+
+            KeyTypedEvent event(keyCode);
+            data->EventCallback(event);
+        });
+        
         glfwSetMouseButtonCallback(m_Window, [](GLFWwindow* window, int button, int action, int mods)
         {
             WindowData* data = GET_WINDOW_DATA_PTR(window);
@@ -164,15 +172,13 @@ namespace PurrKatEngine
                 CursorExitEvent event;
                 data->EventCallback(event);
             }
-
-            
         });
 
         glfwSetCursorPosCallback(m_Window, [](GLFWwindow* window, double xPos, double yPos)
         {
             WindowData* data = GET_WINDOW_DATA_PTR(window);
 
-            CursorPosEvent event(xPos, yPos);
+            MouseMovedEvent event(xPos, yPos);
             data->EventCallback(event);
         });
     }

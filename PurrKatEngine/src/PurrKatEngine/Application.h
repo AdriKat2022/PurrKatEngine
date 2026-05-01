@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "Core.h"
-#include "Events/CursorPosEvent.h"
+#include "Events/MouseMovedEvent.h"
 #include "Events/MouseScrollEvent.h"
 #include "Events/WindowCloseEvent.h"
 #include "Layers/Layer.h"
@@ -28,7 +28,7 @@ namespace PurrKatEngine
         
     protected:
         virtual bool OnWindowClosed(WindowCloseEvent& windowCloseEvent);
-        virtual bool OnMouseMove(const CursorPosEvent& cursorPosEvent);
+        virtual bool OnMouseMove(const MouseMovedEvent& cursorPosEvent);
         virtual bool OnMouseScroll(const MouseScrollEvent& scrollEvent);
 
     private:

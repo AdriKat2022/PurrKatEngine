@@ -34,6 +34,8 @@ namespace PurrKatEngine
 #define EVENT_CLASS_CATEGORY(category) virtual int GetCategoryFlags() const override { return category; }
 
 #define EVENT_TO_STRING(classname, fmt_str, ...) std::string ToString() const override { return std::format("{} " fmt_str, #classname, __VA_ARGS__); }
+
+#define DECLARE_EVENT_TYPE(eventType) bool On##eventType(eventType& e);
     
     // Base class for all events in the engine
     class PKE_API Event
@@ -60,6 +62,9 @@ namespace PurrKatEngine
 
     class EventDispatcher
     {
+#define DISPATCH(eventName, functionName) Dispatch<eventName>(PKE_BIND_FUNCTION(functionName))
+#define DISPATCH_ON(eventName) Dispatch<eventName>(PKE_BIND_FUNCTION(On##eventName))
+        
         template<typename T>
         using EventFunction = std::function<bool(T&)>;
 

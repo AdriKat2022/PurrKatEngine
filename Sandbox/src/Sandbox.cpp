@@ -12,7 +12,7 @@ public:
 
     void OnEvent(PurrKatEngine::Event& e) override
     {
-        PKE_LOG_DEBUG("ExampleSandboxLayer::OnEvent {}", e.ToString());
+        // PKE_LOG_DEBUG("ExampleSandboxLayer::OnEvent {}", e.ToString());
     }
 };
 

@@ -1,7 +1,9 @@
 ﻿#pragma once
-#include "PurrKatEngine/Events/CursorPosEvent.h"
+#include "PurrKatEngine/Events/CursorEnterEvent.h"
+#include "PurrKatEngine/Events/MouseMovedEvent.h"
 #include "PurrKatEngine/Events/KeyPressedEvent.h"
 #include "PurrKatEngine/Events/KeyReleasedEvent.h"
+#include "PurrKatEngine/Events/KeyTypedEvent.h"
 #include "PurrKatEngine/Events/MouseButtonPressedEvent.h"
 #include "PurrKatEngine/Events/MouseButtonReleasedEvent.h"
 #include "PurrKatEngine/Events/MouseScrollEvent.h"
@@ -14,7 +16,7 @@ namespace PurrKatEngine
     {
     public:
         ImGuiLayer();
-        ~ImGuiLayer();
+        ~ImGuiLayer() override;
 
         void OnAttach() override;
         void OnDetach() override;
@@ -22,13 +24,14 @@ namespace PurrKatEngine
         void OnEvent(Event& e) override;
 
     private:
-        void OnMouseButtonPressedEvent(MouseButtonPressedEvent& e);
-        void OnMouseButtonReleasedEvent(MouseButtonReleasedEvent& e);
-        void OnMouseMovedEvent(CursorPosEvent& e);
-        void OnMouseScrollEvent(MouseScrollEvent& e);
-        void OnKeyPressedEvent(KeyPressedEvent& e);
-        void OnKeyReleasedEvent(KeyReleasedEvent& e);
-        void OnWindowResize(WindowResizeEvent& e);
+        bool OnMouseButtonPressedEvent(MouseButtonPressedEvent& e);
+        bool OnMouseButtonReleasedEvent(MouseButtonReleasedEvent& e);
+        bool OnMouseMovedEvent(MouseMovedEvent& e);
+        bool OnMouseScrollEvent(MouseScrollEvent& e);
+        bool OnKeyPressedEvent(KeyPressedEvent& e);
+        bool OnKeyReleasedEvent(KeyReleasedEvent& e);
+        bool OnKeyTypedEvent(KeyTypedEvent& e);
+        bool OnWindowResizeEvent(WindowResizeEvent& e);
         
     private:
         float m_Time = 0.0f;

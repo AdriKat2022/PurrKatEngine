@@ -3,6 +3,7 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/PurrKatEngine/vendor/GLFW" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/PurrKatEngine/vendor/imgui" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/PurrKatEngine/vendor/spdlog" vcs="Git" />
   </component>
 </project>
