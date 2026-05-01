@@ -8,7 +8,7 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 IncludeDirs = {}
 IncludeDirs["GLFW"] = "PurrKatEngine/vendor/GLFW/include"
 IncludeDirs["Glad"] = "PurrKatEngine/vendor/glad/include"
-IncludeDirs["ImGui"] = "PurrKatEngine/vendor/imgui/include"
+IncludeDirs["ImGui"] = "PurrKatEngine/vendor/imgui"
 
 include "PurrKatEngine/vendor/GLFW"
 include "PurrKatEngine/vendor/glad"
@@ -46,7 +46,7 @@ project "PurrKatEngine"
     {
         "GLFW",
         "Glad",
-        --"ImGui",
+        "ImGui",
         "opengl32.lib"
     }
 

@@ -8,9 +8,13 @@
 namespace PurrKatEngine
 {
     #define BIND_EVENT_FUNCTION(eventType, fn) [this](eventType& e) { return fn(e); }  // NOLINT(bugprone-macro-parentheses)
+
+    Application* Application::s_Instance = nullptr;
     
     Application::Application()
     {
+        PKE_CORE_ASSERT(s_Instance == nullptr, "An application already exists.")
+        s_Instance = this;
         m_Window = std::unique_ptr<Window>(Window::Create());
         m_Window->SetEventCallback(BIND_EVENT_FUNCTION(Event, OnEvent));
     }
@@ -35,6 +39,18 @@ namespace PurrKatEngine
             (*--it)->OnEvent(e);
             if (e.IsHandled()) break;
         }
+    }
+
+    void Application::PushLayer(Layer* layer)
+    {
+        m_LayerStack.PushLayer(layer);
+        layer->OnAttach();
+    }
+
+    void Application::PushOverlay(Layer* overlay)
+    {
+        m_LayerStack.PushOverlay(overlay);
+        overlay->OnAttach();
     }
 
     bool Application::OnWindowClosed(WindowCloseEvent& windowCloseEvent)

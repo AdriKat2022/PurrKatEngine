@@ -80,7 +80,7 @@
       <PrecompiledHeaderFile>pkepch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>PKE_PLATFORM_WINDOWS;PKE_BUILD_DLL;GLFW_INCLUDE_NONE;PKE_DEBUG;PKE_ENABLE_ASSERTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>vendor\spdlog\include;src;vendor\GLFW\include;vendor\glad\include;vendor\imgui\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>vendor\spdlog\include;src;vendor\GLFW\include;vendor\glad\include;vendor\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -106,7 +106,7 @@
       <PrecompiledHeaderFile>pkepch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>PKE_PLATFORM_WINDOWS;PKE_BUILD_DLL;GLFW_INCLUDE_NONE;PKE_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>vendor\spdlog\include;src;vendor\GLFW\include;vendor\glad\include;vendor\imgui\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>vendor\spdlog\include;src;vendor\GLFW\include;vendor\glad\include;vendor\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -136,7 +136,7 @@
       <PrecompiledHeaderFile>pkepch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>PKE_PLATFORM_WINDOWS;PKE_BUILD_DLL;GLFW_INCLUDE_NONE;PKE_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>vendor\spdlog\include;src;vendor\GLFW\include;vendor\glad\include;vendor\imgui\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>vendor\spdlog\include;src;vendor\GLFW\include;vendor\glad\include;vendor\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -161,6 +161,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Platforms\OpenGL\ImgGuiOpenGLRenderer.h" />
     <ClInclude Include="src\PurrKatEngine.h" />
     <ClInclude Include="src\PurrKatEngine\Application.h" />
     <ClInclude Include="src\PurrKatEngine\Core.h" />
@@ -179,6 +180,7 @@
     <ClInclude Include="src\PurrKatEngine\Events\MouseScrollEvent.h" />
     <ClInclude Include="src\PurrKatEngine\Events\WindowCloseEvent.h" />
     <ClInclude Include="src\PurrKatEngine\Events\WindowResizeEvent.h" />
+    <ClInclude Include="src\PurrKatEngine\ImGui\ImGuiLayer.h" />
     <ClInclude Include="src\PurrKatEngine\Layers\Layer.h" />
     <ClInclude Include="src\PurrKatEngine\Layers\LayerStack.h" />
     <ClInclude Include="src\PurrKatEngine\Logs\Log.h" />
@@ -189,7 +191,9 @@
     <ClInclude Include="src\pkepch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Platforms\OpenGL\ImgGuiOpenGLRenderer.cpp" />
     <ClCompile Include="src\PurrKatEngine\Application.cpp" />
+    <ClCompile Include="src\PurrKatEngine\ImGui\ImGuiLayer.cpp" />
     <ClCompile Include="src\PurrKatEngine\Layers\Layer.cpp" />
     <ClCompile Include="src\PurrKatEngine\Layers\LayerStack.cpp" />
     <ClCompile Include="src\PurrKatEngine\Logs\Log.cpp" />
@@ -205,6 +209,9 @@
     </ProjectReference>
     <ProjectReference Include="vendor\glad\Glad.vcxproj">
       <Project>{BDD6857C-A90D-870D-52FA-6C103E10030F}</Project>
+    </ProjectReference>
+    <ProjectReference Include="vendor\imgui\ImGui.vcxproj">
+      <Project>{C0FF640D-2C14-8DBE-F595-301E616989EF}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

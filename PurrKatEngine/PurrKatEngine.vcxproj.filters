@@ -1,11 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <Filter Include="Platforms">
+      <UniqueIdentifier>{DDACA145-4917-56BC-9255-0762FEFE3311}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platforms\OpenGL">
+      <UniqueIdentifier>{719BB998-5D94-D8EA-86C6-BD6F721EB8F6}</UniqueIdentifier>
+    </Filter>
     <Filter Include="PurrKatEngine">
       <UniqueIdentifier>{8461A4F9-F021-2030-B95C-69AD25DC640C}</UniqueIdentifier>
     </Filter>
     <Filter Include="PurrKatEngine\Events">
       <UniqueIdentifier>{E8B034C8-D43F-BE91-7D5E-D28C69CCCE37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PurrKatEngine\ImGui">
+      <UniqueIdentifier>{AEE9B899-1A4B-96A7-A3B8-DC590F19CD66}</UniqueIdentifier>
     </Filter>
     <Filter Include="PurrKatEngine\Layers">
       <UniqueIdentifier>{C39B17D7-AF2A-A1A0-5849-B59B44B7B146}</UniqueIdentifier>
@@ -21,6 +30,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Platforms\OpenGL\ImgGuiOpenGLRenderer.h">
+      <Filter>Platforms\OpenGL</Filter>
+    </ClInclude>
     <ClInclude Include="src\PurrKatEngine.h" />
     <ClInclude Include="src\PurrKatEngine\Application.h">
       <Filter>PurrKatEngine</Filter>
@@ -73,6 +85,9 @@
     <ClInclude Include="src\PurrKatEngine\Events\WindowResizeEvent.h">
       <Filter>PurrKatEngine\Events</Filter>
     </ClInclude>
+    <ClInclude Include="src\PurrKatEngine\ImGui\ImGuiLayer.h">
+      <Filter>PurrKatEngine\ImGui</Filter>
+    </ClInclude>
     <ClInclude Include="src\PurrKatEngine\Layers\Layer.h">
       <Filter>PurrKatEngine\Layers</Filter>
     </ClInclude>
@@ -97,8 +112,14 @@
     <ClInclude Include="src\pkepch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Platforms\OpenGL\ImgGuiOpenGLRenderer.cpp">
+      <Filter>Platforms\OpenGL</Filter>
+    </ClCompile>
     <ClCompile Include="src\PurrKatEngine\Application.cpp">
       <Filter>PurrKatEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PurrKatEngine\ImGui\ImGuiLayer.cpp">
+      <Filter>PurrKatEngine\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="src\PurrKatEngine\Layers\Layer.cpp">
       <Filter>PurrKatEngine\Layers</Filter>

@@ -13,14 +13,18 @@ namespace PurrKatEngine
     class PKE_API Application
     {
     public:
+        static Application& Get() { return *s_Instance; }
+        
         Application();
         virtual ~Application();
 
         void Run();
         void OnEvent(Event& e); // Will be run each time an event is triggered by the window.
 
-        void PushLayer(Layer* layer) { m_LayerStack.PushLayer(layer); }
-        void PushOverlay(Layer* overlay) { m_LayerStack.PushOverlay(overlay); }
+        void PushLayer(Layer* layer);
+        void PushOverlay(Layer* overlay);
+
+        Window& GetWindow() const { return *m_Window; }
         
     protected:
         virtual bool OnWindowClosed(WindowCloseEvent& windowCloseEvent);
@@ -28,6 +32,8 @@ namespace PurrKatEngine
         virtual bool OnMouseScroll(const MouseScrollEvent& scrollEvent);
 
     private:
+        static Application* s_Instance;
+        
         std::unique_ptr<Window> m_Window;
         bool m_IsRunning = true;
         

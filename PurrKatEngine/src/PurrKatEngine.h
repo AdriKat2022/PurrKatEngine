@@ -1,7 +1,9 @@
 ﻿#pragma once
 
 #include "PurrKatEngine/Application.h"
+#include "PurrKatEngine/Layers/Layer.h"
 #include "PurrKatEngine/Logs/Log.h"
+#include "PurrKatEngine/ImGui/ImGuiLayer.h"
 
 // --- Entry Point ---
 #include "PurrKatEngine/EntryPoint.h"

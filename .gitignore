@@ -1,8 +1,9 @@
 # Folders
-bin/*
-bin-int/*
-bin-intermediates/*
+**/bin/*
+**/bin-*/*
+
 .vs/*
 
+# Files
 *.vcxproj
 *.log
