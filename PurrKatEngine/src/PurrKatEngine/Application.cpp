@@ -1,6 +1,8 @@
 ﻿#include "pkepch.h"
 
 #include "Application.h"
+
+#include "glad/glad.h"
 #include "Logs/Log.h"
 
 namespace PurrKatEngine
@@ -45,8 +47,8 @@ namespace PurrKatEngine
     
     bool Application::OnMouseMove(const CursorPosEvent& cursorPosEvent)
     {
-        currentRed = cursorPosEvent.GetX() / m_Window->GetWidth();
-        currentGreen = cursorPosEvent.GetY() / m_Window->GetHeight();
+        currentRed = (float)cursorPosEvent.GetX() / (float)m_Window->GetWidth();
+        currentGreen = (float)cursorPosEvent.GetY() / (float)m_Window->GetHeight();
         
         return true;
     }

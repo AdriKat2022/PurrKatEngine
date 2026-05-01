@@ -146,7 +146,7 @@ namespace PurrKatEngine
         {
             WindowData* data = GET_WINDOW_DATA_PTR(window);
             
-            MouseScrollEvent event(xOffset, yOffset);
+            MouseScrollEvent event((float)xOffset, (float)yOffset);
             data->EventCallback(event);
         });
 

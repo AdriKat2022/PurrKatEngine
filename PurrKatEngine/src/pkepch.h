@@ -8,7 +8,6 @@
 #include <sstream>
 #include <vector>
 #include <format>
-#include <glad/glad.h>
 
 #include "PurrKatEngine/Utility/Utility.h"
 #include "PurrKatEngine/Utility/Mathf.h"
