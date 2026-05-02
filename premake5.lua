@@ -11,6 +11,7 @@ IncludeDirs = {}
 IncludeDirs["GLFW"] = "PurrKatEngine/vendor/GLFW/include"
 IncludeDirs["Glad"] = "PurrKatEngine/vendor/glad/include"
 IncludeDirs["ImGui"] = "PurrKatEngine/vendor/imgui"
+IncludeDirs["Glm"] = "PurrKatEngine/vendor/glm"
 
 group "Dependencies"
     include "PurrKatEngine/vendor"
@@ -42,6 +43,7 @@ project "PurrKatEngine"
         "%{IncludeDirs.GLFW}",
         "%{IncludeDirs.Glad}",
         "%{IncludeDirs.ImGui}",
+        "%{IncludeDirs.Glm}",
     }
 
     links
@@ -102,7 +104,8 @@ project "Sandbox"
     includedirs
     {
         "%{wks.location}/PurrKatEngine/vendor/spdlog/include",
-        "%{wks.location}/PurrKatEngine/src"
+        "%{wks.location}/PurrKatEngine/src",
+        "%{IncludeDirs.Glm}",
     }
 
     links

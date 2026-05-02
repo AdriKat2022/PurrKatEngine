@@ -22,23 +22,23 @@ namespace PurrKatEngine
         return state == GLFW_PRESS;
     }
 
-    Vector2d WindowsInput::GetMousePositionImpl()
+    glm::dvec2 WindowsInput::GetMousePositionImpl()
     {
         GLFWwindow* window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
         double xpos, ypos;
         glfwGetCursorPos(window, &xpos, &ypos);
-        return Vector2d(xpos, ypos);
+        return {xpos, ypos};
     }
 
     double WindowsInput::GetMouseXImpl()
     {
-        auto[x,y] = GetMousePositionImpl();
-        return x;
+        glm::dvec2 pos = GetMousePositionImpl();
+        return pos.x;
     }
 
     double WindowsInput::GetMouseYImpl()
     {
-        auto[x,y] = GetMousePositionImpl();
-        return y;
+        glm::dvec2 pos = GetMousePositionImpl();
+        return pos.y;
     }
 }

@@ -12,6 +12,8 @@ public:
         if (isTabPressed)
         {
             PKE_LOG_DEBUG("Keypad 0 is pressed!");
+            glm::vec2 mousePos = PurrKatEngine::Input::GetMousePosition();
+            PKE_LOG_INFO("Mouse Position: ({0}, {1})", mousePos.x, mousePos.y);
         }
     }
 

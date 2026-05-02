@@ -10,6 +10,6 @@ namespace PurrKatEngine
         bool IsMouseButtonPressedImpl(int button) override;
         double GetMouseXImpl() override;
         double GetMouseYImpl() override;
-        Vector2d GetMousePositionImpl() override;
+        glm::dvec2 GetMousePositionImpl() override;
     };
 }

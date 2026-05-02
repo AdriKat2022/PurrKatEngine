@@ -7,3 +7,6 @@
 [submodule "PurrKatEngine/vendor/imgui"]
 	path = PurrKatEngine/vendor/imgui
 	url = git@github.com:ocornut/imgui.git
+[submodule "PurrKatEngine/vendor/glm"]
+	path = PurrKatEngine/vendor/glm
+	url = https://github.com/g-truc/glm

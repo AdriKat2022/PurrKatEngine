@@ -9,6 +9,7 @@
 #include <vector>
 #include <format>
 
+#include "glm/glm.hpp"
 #include "PurrKatEngine/Utility/Utility.h"
 #include "PurrKatEngine/Utility/Mathf.h"
 
