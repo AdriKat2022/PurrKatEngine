@@ -2,9 +2,11 @@
 
 #include "Application.h"
 
+#include "imgui.h"
 #include "glad/glad.h"
 #include "Inputs/Input.h"
 #include "Logs/InternalLog.h"
+#include "Window/Window.h"
 
 namespace PurrKatEngine
 {
@@ -16,6 +18,9 @@ namespace PurrKatEngine
         s_Instance = this;
         m_Window = std::unique_ptr<Window>(Window::Create());
         m_Window->SetEventCallback(PKE_BIND_FUNCTION(OnEvent));
+
+        m_ImGuiLayer = new ImGuiLayer();
+        PushOverlay(m_ImGuiLayer);
     }
 
     Application::~Application()
@@ -24,13 +29,11 @@ namespace PurrKatEngine
     
     void Application::OnEvent(Event& e)
     {
-        PKE_CORE_TRACE("EVENT: {}", e.ToString());
+        // PKE_CORE_TRACE("EVENT: {}", e.ToString());
         
         EventDispatcher dispatcher(e);
 
         dispatcher.Dispatch<WindowCloseEvent>(PKE_BIND_FUNCTION(OnWindowClosed));
-        dispatcher.Dispatch<MouseMovedEvent>(PKE_BIND_FUNCTION(OnMouseMove));
-        dispatcher.Dispatch<MouseScrollEvent>(PKE_BIND_FUNCTION(OnMouseScroll));
         
         for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
         {
@@ -58,38 +61,20 @@ namespace PurrKatEngine
         return true;
     }
 
-    float currentRed, currentGreen, currentBlue;
-    
-    bool Application::OnMouseMove(const MouseMovedEvent& cursorPosEvent)
-    {
-        currentRed = (float)cursorPosEvent.GetX() / (float)m_Window->GetWidth();
-        currentGreen = (float)cursorPosEvent.GetY() / (float)m_Window->GetHeight();
-        
-        return true;
-    }
-
-    bool Application::OnMouseScroll(const MouseScrollEvent& scrollEvent)
-    {
-        currentBlue += scrollEvent.GetYOffset() / 10.f;
-        currentBlue = MATHF_CLAMP_01(currentBlue);
-
-        return true;
-    }
-
     void Application::Run()
     {
         while (m_IsRunning)
         {
+            static float currentRed, currentGreen, currentBlue; 
             glClearColor(currentRed, currentGreen, currentBlue, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT);
 
-            // auto[x,y] = Input::GetMousePosition();
-            // PKE_CORE_TRACE("Mouse Position: ({0}, {1})", x, y);
-            
+            m_ImGuiLayer->Begin();
             for (Layer* layer : m_LayerStack)
             {
-                layer->OnUpdate();
+                layer->OnImGuiRender();
             }
+            m_ImGuiLayer->End();
             
             m_Window->OnUpdate();
         }

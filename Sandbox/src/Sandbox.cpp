@@ -1,9 +1,28 @@
 #include <PurrKatEngine.h>
+#include "imgui/imgui.h"
 
-class ExampleSandboxLayer : public PurrKatEngine::Layer
+class ExampleSandboxLayer : public PurrKatEngine::ImGuiLayer
 {
 public:
-    ExampleSandboxLayer() : Layer("ExampleSandboxLayer") {}
+    ExampleSandboxLayer() = default;
+
+    void OnImGuiRender() override
+    {
+        ImGui::Begin("Hello, I'm a window!");
+        ImGui::Text("This is some text in the window.");
+        static bool showBelowTest = false;
+        ImGui::Checkbox("Demo Window", &showBelowTest);
+
+        if (showBelowTest)
+        {
+            static ImColor testColor = ImColor(0.4f, 0.7f, 0.0f, 1.0f);
+            ImGui::ColorButton("Test Color Button", ImVec4(0.4f, 0.7f, 0.0f, 1.0f));
+            ImGui::ColorPicker3("Test Color Picker", (float*)&testColor);
+            ImGui::TextColored(testColor, "WOW!");
+        }
+        
+        ImGui::End();
+    }
 
     void OnUpdate() override
     {
@@ -30,7 +49,6 @@ public:
     {
         PurrKatEngine::Log::LogTrace("Sandbox application start. Hey, that's me! A log from the client!");
         PushLayer(new ExampleSandboxLayer());
-        PushOverlay(new PurrKatEngine::ImGuiLayer());
     }
 };
 

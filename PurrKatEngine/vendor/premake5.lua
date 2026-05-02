@@ -3,6 +3,9 @@ project "ImGui"
     kind "StaticLib"
     language "C++"
 
+    -- The following is required to export the ImGui functions when building as a shared library
+    defines { "IMGUI_API=__declspec(dllexport)" }
+
     targetdir ("bin/" .. outputdir .. "/%{prjName}")
     objdir ("bin-int/" .. outputdir .. "/%{prjName}")
 

@@ -1,10 +1,8 @@
 ﻿#pragma once
 
 #include "Core.h"
-#include "Events/MouseMovedEvent.h"
-#include "Events/MouseScrollEvent.h"
-#include "Events/WindowCloseEvent.h"
-#include "Layers/Layer.h"
+#include "Events/ApplicationEvents.h"
+#include "ImGui/ImGuiLayer.h"
 #include "Layers/LayerStack.h"
 #include "Window/Window.h"
 
@@ -28,13 +26,12 @@ namespace PurrKatEngine
         
     protected:
         virtual bool OnWindowClosed(WindowCloseEvent& windowCloseEvent);
-        virtual bool OnMouseMove(const MouseMovedEvent& cursorPosEvent);
-        virtual bool OnMouseScroll(const MouseScrollEvent& scrollEvent);
 
     private:
         static Application* s_Instance;
         
         std::unique_ptr<Window> m_Window;
+        ImGuiLayer* m_ImGuiLayer;
         bool m_IsRunning = true;
         
         LayerStack m_LayerStack;

@@ -1,7 +1,7 @@
 workspace "PurrKatEngine"
     architecture "x64"
     configurations { "Debug", "Release", "Dist" }
-    staticruntime "Off"
+    staticruntime "on"
     startproject "Sandbox"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
@@ -104,13 +104,14 @@ project "Sandbox"
     includedirs
     {
         "%{wks.location}/PurrKatEngine/vendor/spdlog/include",
+        "%{wks.location}/PurrKatEngine/vendor",
         "%{wks.location}/PurrKatEngine/src",
         "%{IncludeDirs.Glm}",
     }
 
     links
     {
-        "PurrKatEngine"
+        "PurrKatEngine",
     }
 
     filter "system:windows"

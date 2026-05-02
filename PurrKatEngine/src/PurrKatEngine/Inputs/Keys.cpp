@@ -1,8 +1,8 @@
 ﻿#include "pkepch.h"
 #include "Keys.h"
 
+#include "imgui.h"
 #include "GLFW/glfw3.h"
-#include "Platforms/OpenGL/ImgGuiOpenGLRenderer.h"
 
 namespace PurrKatEngine
 {
