@@ -12,7 +12,7 @@ IncludeDirs["ImGui"] = "PurrKatEngine/vendor/imgui"
 
 include "PurrKatEngine/vendor/GLFW"
 include "PurrKatEngine/vendor/glad"
-include "PurrKatEngine/vendor/imgui"
+include "PurrKatEngine/vendor"
 
 project "PurrKatEngine"
     location "PurrKatEngine"
