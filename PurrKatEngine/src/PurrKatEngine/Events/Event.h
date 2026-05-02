@@ -77,7 +77,7 @@ namespace PurrKatEngine
         {
             if (m_Event.GetEventType() == T::GetStaticType())
             {
-                m_Event.m_Handled = eventFunction(*(T*)&m_Event);
+                m_Event.m_Handled = eventFunction(static_cast<T&>(m_Event));
                 return true;
             }
             return false;

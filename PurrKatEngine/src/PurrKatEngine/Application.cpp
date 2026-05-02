@@ -3,7 +3,7 @@
 #include "Application.h"
 
 #include "glad/glad.h"
-#include "Logs/Log.h"
+#include "Logs/InternalLog.h"
 
 namespace PurrKatEngine
 {
@@ -23,13 +23,12 @@ namespace PurrKatEngine
     
     void Application::OnEvent(Event& e)
     {
-        // PKE_CORE_INFO("EVENT: {}", e.ToString());
+        InternalLog::GetCoreLogger()->info("EVENT: {}", e.ToString());
         
         EventDispatcher dispatcher(e);
 
         dispatcher.Dispatch<WindowCloseEvent>(PKE_BIND_FUNCTION(OnWindowClosed));
         dispatcher.Dispatch<MouseMovedEvent>(PKE_BIND_FUNCTION(OnMouseMove));
-        dispatcher.Dispatch<MouseScrollEvent>(PKE_BIND_FUNCTION(OnMouseScroll));
         dispatcher.Dispatch<MouseScrollEvent>(PKE_BIND_FUNCTION(OnMouseScroll));
         
         for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )

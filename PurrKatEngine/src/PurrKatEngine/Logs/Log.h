@@ -1,39 +1,74 @@
 ﻿#pragma once
 
+#include "pkepch.h"
 #include "PurrKatEngine/Core.h"
-#include "spdlog/spdlog.h"
+#include "PurrKatEngine/Logs/InternalLog.h"
+#include <spdlog/common.h>
 
 namespace PurrKatEngine
 {
     class PKE_API Log
     {
     public:
-        static void Init();
-
-        static std::shared_ptr<spdlog::logger>& GetCoreLogger() { return m_CoreLogger; }
-        static std::shared_ptr<spdlog::logger>& GetClientLogger() { return m_ClientLogger; }
-
-    private:
-        static std::shared_ptr<spdlog::logger> m_CoreLogger;
-        static std::shared_ptr<spdlog::logger> m_ClientLogger;
+        template <typename... Args>
+        static void LogCritical(spdlog::format_string_t<Args...> fmt, Args &&...args);
+        template <typename... Args>
+        static void LogError(spdlog::format_string_t<Args...> fmt, Args &&...args);
+        template <typename... Args>
+        static void LogWarn(spdlog::format_string_t<Args...> fmt, Args &&...args);
+        template <typename... Args>
+        static void LogInfo(spdlog::format_string_t<Args...> fmt, Args &&...args);
+        template <typename... Args>
+        static void LogDebug(spdlog::format_string_t<Args...> fmt, Args &&...args);
+        template <typename... Args>
+        static void LogTrace(spdlog::format_string_t<Args...> fmt, Args &&...args);
     };
 }
 
-// #define FORMAT_VARS(...) std::format(Make_Fmt(#__VA_ARGS__), __VA_ARGS__)
-// #define FORMAT_VARS_STRING(...) Make_Fmt(#__VA_ARGS__), __VA_ARGS__
+// Template implementations must be in header for client instantiation
+namespace PurrKatEngine
+{
+    template <typename ... Args>
+    void Log::LogCritical(spdlog::format_string_t<Args...> fmt, Args&&... args)
+    {
+        InternalLog::GetCoreLogger()->critical(fmt, std::forward<Args>(args)...);
+    }
 
-// CORE Logs Macros
-#define PKE_CORE_CRITICAL(...)  PurrKatEngine::Log::GetCoreLogger()->critical(__VA_ARGS__)
-#define PKE_CORE_ERROR(...)     PurrKatEngine::Log::GetCoreLogger()->error(__VA_ARGS__)
-#define PKE_CORE_WARN(...)      PurrKatEngine::Log::GetCoreLogger()->warn(__VA_ARGS__)
-#define PKE_CORE_INFO(...)      PurrKatEngine::Log::GetCoreLogger()->info(__VA_ARGS__)
-#define PKE_CORE_DEBUG(...)     PurrKatEngine::Log::GetCoreLogger()->debug(__VA_ARGS__)
-#define PKE_CORE_TRACE(...)     PurrKatEngine::Log::GetCoreLogger()->trace(__VA_ARGS__)
+    template <typename ... Args>
+    void Log::LogError(spdlog::format_string_t<Args...> fmt, Args&&... args)
+    {
+        InternalLog::GetCoreLogger()->error(fmt, std::forward<Args>(args)...);
+    }
+
+    template <typename ... Args>
+    void Log::LogWarn(spdlog::format_string_t<Args...> fmt, Args&&... args)
+    {
+        InternalLog::GetCoreLogger()->warn(fmt, std::forward<Args>(args)...);
+    }
+
+    template <typename ... Args>
+    void Log::LogInfo(spdlog::format_string_t<Args...> fmt, Args&&... args)
+    {
+        InternalLog::GetCoreLogger()->info(fmt, std::forward<Args>(args)...);
+    }
+
+    template <typename ... Args>
+    void Log::LogDebug(spdlog::format_string_t<Args...> fmt, Args&&... args)
+    {
+        InternalLog::GetClientLogger()->debug(fmt, std::forward<Args>(args)...);
+    }
+
+    template <typename ... Args>
+    void Log::LogTrace(spdlog::format_string_t<Args...> fmt, Args&&... args)
+    {
+        InternalLog::GetClientLogger()->trace(fmt, std::forward<Args>(args)...);
+    }
+}
 
 // CLIENT Logs Macros
-#define PKE_LOG_CRITICAL(...)  PurrKatEngine::Log::GetClientLogger()->critical(__VA_ARGS__)
-#define PKE_LOG_ERROR(...)     PurrKatEngine::Log::GetClientLogger()->error(__VA_ARGS__)
-#define PKE_LOG_WARN(...)      PurrKatEngine::Log::GetClientLogger()->warn(__VA_ARGS__)
-#define PKE_LOG_INFO(...)      PurrKatEngine::Log::GetClientLogger()->info(__VA_ARGS__)
-#define PKE_LOG_DEBUG(...)     PurrKatEngine::Log::GetClientLogger()->debug(__VA_ARGS__)
-#define PKE_LOG_TRACE(...)     PurrKatEngine::Log::GetClientLogger()->trace(__VA_ARGS__)
+#define PKE_LOG_CRITICAL(...)  PurrKatEngine::Log::LogCritical(__VA_ARGS__)
+#define PKE_LOG_ERROR(...)     PurrKatEngine::Log::LogError(__VA_ARGS__)
+#define PKE_LOG_WARN(...)      PurrKatEngine::Log::LogWarn(__VA_ARGS__)
+#define PKE_LOG_INFO(...)      PurrKatEngine::Log::LogInfo(__VA_ARGS__)
+#define PKE_LOG_DEBUG(...)     PurrKatEngine::Log::LogDebug(__VA_ARGS__)
+#define PKE_LOG_TRACE(...)     PurrKatEngine::Log::LogTrace(__VA_ARGS__)

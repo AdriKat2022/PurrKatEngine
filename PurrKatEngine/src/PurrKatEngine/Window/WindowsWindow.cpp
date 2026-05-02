@@ -13,7 +13,7 @@
 #include "PurrKatEngine/Events/MouseScrollEvent.h"
 #include "PurrKatEngine/Events/WindowCloseEvent.h"
 #include "PurrKatEngine/Events/WindowResizeEvent.h"
-#include "PurrKatEngine/Logs/Log.h"
+#include "PurrKatEngine/Logs/InternalLog.h"
 
 #define GET_WINDOW_DATA_PTR(window) (WindowData*)glfwGetWindowUserPointer(window)
 

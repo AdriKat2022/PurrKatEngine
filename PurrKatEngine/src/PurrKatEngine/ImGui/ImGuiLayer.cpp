@@ -4,7 +4,7 @@
 #include "GLFW/glfw3.h"
 #include "Platforms/OpenGL/ImgGuiOpenGLRenderer.h"
 #include "PurrKatEngine/Application.h"
-#include "PurrKatEngine/Logs/Log.h"
+#include "PurrKatEngine/Logs/InternalLog.h"
 
 namespace PurrKatEngine
 {
@@ -23,7 +23,7 @@ namespace PurrKatEngine
         ImGui::CreateContext();
         ImGui::StyleColorsDark();
 
-        ImGuiIO io = ImGui::GetIO();
+        ImGuiIO& io = ImGui::GetIO();
         io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
         io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
         io.BackendPlatformName = "imgui_impl_glfw";
@@ -108,7 +108,7 @@ namespace PurrKatEngine
     bool ImGuiLayer::OnKeyPressedEvent(KeyPressedEvent& e)
     {
         ImGuiIO& io = ImGui::GetIO();
-        ImGuiKey imGuiKey = e.GetImGuiKey();
+        ImGuiKey imGuiKey = static_cast<ImGuiKey>(GlfwCharCodeToImGuiKey(e.GetCharCode()));
         io.AddKeyEvent(imGuiKey, true);
 
         if (ImGuiKey_LeftCtrl == imGuiKey || ImGuiKey_RightCtrl == imGuiKey)
@@ -123,14 +123,14 @@ namespace PurrKatEngine
         {
             io.AddKeyEvent(ImGuiMod_Alt, true);
         }
-        
+
         return false;
     }
 
     bool ImGuiLayer::OnKeyReleasedEvent(KeyReleasedEvent& e)
     {
         ImGuiIO& io = ImGui::GetIO();
-        ImGuiKey imGuiKey = e.GetImGuiKey();
+        ImGuiKey imGuiKey = static_cast<ImGuiKey>(GlfwCharCodeToImGuiKey(e.GetCharCode()));
         io.AddKeyEvent(imGuiKey, false);
 
         if (ImGuiKey_LeftCtrl == imGuiKey || ImGuiKey_RightCtrl == imGuiKey)
@@ -145,7 +145,7 @@ namespace PurrKatEngine
         {
             io.AddKeyEvent(ImGuiMod_Alt, false);
         }
-        
+
         return false;
     }
 

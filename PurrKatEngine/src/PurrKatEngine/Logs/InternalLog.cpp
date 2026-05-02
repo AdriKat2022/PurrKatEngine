@@ -1,13 +1,13 @@
 ﻿#include "pkepch.h"
-#include "Log.h"
+#include "InternalLog.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 
 namespace PurrKatEngine
 {
-    std::shared_ptr<spdlog::logger> Log::m_CoreLogger;
-    std::shared_ptr<spdlog::logger> Log::m_ClientLogger;
+    std::shared_ptr<spdlog::logger> InternalLog::m_CoreLogger;
+    std::shared_ptr<spdlog::logger> InternalLog::m_ClientLogger;
     
-    void Log::Init()
+    void InternalLog::Init()
     {
         spdlog::set_pattern("%^[%T] %n: %v%$");
         

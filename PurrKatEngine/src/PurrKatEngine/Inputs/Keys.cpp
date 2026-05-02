@@ -6,190 +6,21 @@
 
 namespace PurrKatEngine
 {
-    enum class KeyCode : std::uint32_t
-    {
-        None = ImGuiKey_None,
-        Tab = ImGuiKey_Tab,
-        LeftArrow = ImGuiKey_LeftArrow,
-        RightArrow = ImGuiKey_RightArrow,
-        UpArrow = ImGuiKey_UpArrow,
-        DownArrow = ImGuiKey_DownArrow,
-        PageUp = ImGuiKey_PageUp,
-        PageDown = ImGuiKey_PageDown,
-        Home = ImGuiKey_Home,
-        End = ImGuiKey_End,
-        Insert = ImGuiKey_Insert,
-        Delete = ImGuiKey_Delete,
-        Backspace = ImGuiKey_Backspace,
-        Space = ImGuiKey_Space,
-        Enter = ImGuiKey_Enter,
-        Escape = ImGuiKey_Escape,
-        LeftCtrl = ImGuiKey_LeftCtrl,
-        LeftShift = ImGuiKey_LeftShift,
-        LeftAlt = ImGuiKey_LeftAlt,
-        LeftSuper = ImGuiKey_LeftSuper,
-        RightCtrl = ImGuiKey_RightCtrl,
-        RightShift = ImGuiKey_RightShift,
-        RightAlt = ImGuiKey_RightAlt,
-        RightSuper = ImGuiKey_RightSuper,
-        Menu = ImGuiKey_Menu,
-        Key0 = ImGuiKey_0,
-        Key1 = ImGuiKey_1,
-        Key2 = ImGuiKey_2,
-        Key3 = ImGuiKey_3,
-        Key4 = ImGuiKey_4,
-        Key5 = ImGuiKey_5,
-        Key6 = ImGuiKey_6,
-        Key7 = ImGuiKey_7,
-        Key8 = ImGuiKey_8,
-        Key9 = ImGuiKey_9,
-        A = ImGuiKey_A,
-        B = ImGuiKey_B,
-        C = ImGuiKey_C,
-        D = ImGuiKey_D,
-        E = ImGuiKey_E,
-        F = ImGuiKey_F,
-        G = ImGuiKey_G,
-        H = ImGuiKey_H,
-        I = ImGuiKey_I,
-        J = ImGuiKey_J,
-        K = ImGuiKey_K,
-        L = ImGuiKey_L,
-        M = ImGuiKey_M,
-        N = ImGuiKey_N,
-        O = ImGuiKey_O,
-        P = ImGuiKey_P,
-        Q = ImGuiKey_Q,
-        R = ImGuiKey_R,
-        S = ImGuiKey_S,
-        T = ImGuiKey_T,
-        U = ImGuiKey_U,
-        V = ImGuiKey_V,
-        W = ImGuiKey_W,
-        X = ImGuiKey_X,
-        Y = ImGuiKey_Y,
-        Z = ImGuiKey_Z,
-        F1 = ImGuiKey_F1,
-        F2 = ImGuiKey_F2,
-        F3 = ImGuiKey_F3,
-        F4 = ImGuiKey_F4,
-        F5 = ImGuiKey_F5,
-        F6 = ImGuiKey_F6,
-        F7 = ImGuiKey_F7,
-        F8 = ImGuiKey_F8,
-        F9 = ImGuiKey_F9,
-        F10 = ImGuiKey_F10,
-        F11 = ImGuiKey_F11,
-        F12 = ImGuiKey_F12,
-        F13 = ImGuiKey_F13,
-        F14 = ImGuiKey_F14,
-        F15 = ImGuiKey_F15,
-        F16 = ImGuiKey_F16,
-        F17 = ImGuiKey_F17,
-        F18 = ImGuiKey_F18,
-        F19 = ImGuiKey_F19,
-        F20 = ImGuiKey_F20,
-        F21 = ImGuiKey_F21,
-        F22 = ImGuiKey_F22,
-        F23 = ImGuiKey_F23,
-        F24 = ImGuiKey_F24,
-        Apostrophe = ImGuiKey_Apostrophe,
-        Comma = ImGuiKey_Comma,
-        Minus = ImGuiKey_Minus,
-        Period = ImGuiKey_Period,
-        Slash = ImGuiKey_Slash,
-        Semicolon = ImGuiKey_Semicolon,
-        Equal = ImGuiKey_Equal,
-        LeftBracket = ImGuiKey_LeftBracket,
-        Backslash = ImGuiKey_Backslash,
-        RightBracket = ImGuiKey_RightBracket,
-        GraveAccent = ImGuiKey_GraveAccent,
-        CapsLock = ImGuiKey_CapsLock,
-        ScrollLock = ImGuiKey_ScrollLock,
-        NumLock = ImGuiKey_NumLock,
-        PrintScreen = ImGuiKey_PrintScreen,
-        Pause = ImGuiKey_Pause,
-        Keypad0 = ImGuiKey_Keypad0,
-        Keypad1 = ImGuiKey_Keypad1,
-        Keypad2 = ImGuiKey_Keypad2,
-        Keypad3 = ImGuiKey_Keypad3,
-        Keypad4 = ImGuiKey_Keypad4,
-        Keypad5 = ImGuiKey_Keypad5,
-        Keypad6 = ImGuiKey_Keypad6,
-        Keypad7 = ImGuiKey_Keypad7,
-        Keypad8 = ImGuiKey_Keypad8,
-        Keypad9 = ImGuiKey_Keypad9,
-        KeypadDecimal = ImGuiKey_KeypadDecimal,
-        KeypadDivide = ImGuiKey_KeypadDivide,
-        KeypadMultiply = ImGuiKey_KeypadMultiply,
-        KeypadSubtract = ImGuiKey_KeypadSubtract,
-        KeypadAdd = ImGuiKey_KeypadAdd,
-        KeypadEnter = ImGuiKey_KeypadEnter,
-        KeypadEqual = ImGuiKey_KeypadEqual,
-        AppBack = ImGuiKey_AppBack,
-        AppForward = ImGuiKey_AppForward,
-        Oem102 = ImGuiKey_Oem102,
-
-        // Gamepad
-        GamepadStart = ImGuiKey_GamepadStart,
-        GamepadBack = ImGuiKey_GamepadBack,
-        GamepadFaceLeft = ImGuiKey_GamepadFaceLeft,
-        GamepadFaceRight = ImGuiKey_GamepadFaceRight,
-        GamepadFaceUp = ImGuiKey_GamepadFaceUp,
-        GamepadFaceDown = ImGuiKey_GamepadFaceDown,
-        GamepadDpadLeft = ImGuiKey_GamepadDpadLeft,
-        GamepadDpadRight = ImGuiKey_GamepadDpadRight,
-        GamepadDpadUp = ImGuiKey_GamepadDpadUp,
-        GamepadDpadDown = ImGuiKey_GamepadDpadDown,
-        GamepadL1 = ImGuiKey_GamepadL1,
-        GamepadR1 = ImGuiKey_GamepadR1,
-        GamepadL2 = ImGuiKey_GamepadL2,
-        GamepadR2 = ImGuiKey_GamepadR2,
-        GamepadL3 = ImGuiKey_GamepadL3,
-        GamepadR3 = ImGuiKey_GamepadR3,
-        GamepadLStickLeft = ImGuiKey_GamepadLStickLeft,
-        GamepadLStickRight = ImGuiKey_GamepadLStickRight,
-        GamepadLStickUp = ImGuiKey_GamepadLStickUp,
-        GamepadLStickDown = ImGuiKey_GamepadLStickDown,
-        GamepadRStickLeft = ImGuiKey_GamepadRStickLeft,
-        GamepadRStickRight = ImGuiKey_GamepadRStickRight,
-        GamepadRStickUp = ImGuiKey_GamepadRStickUp,
-        GamepadRStickDown = ImGuiKey_GamepadRStickDown,
-
-        // Mouse aliases
-        MouseLeft = ImGuiKey_MouseLeft,
-        MouseRight = ImGuiKey_MouseRight,
-        MouseMiddle = ImGuiKey_MouseMiddle,
-        MouseX1 = ImGuiKey_MouseX1,
-        MouseX2 = ImGuiKey_MouseX2,
-        MouseWheelX = ImGuiKey_MouseWheelX,
-        MouseWheelY = ImGuiKey_MouseWheelY,
-
-        // Reserved / internal
-        ReservedForModCtrl = ImGuiKey_ReservedForModCtrl,
-        ReservedForModShift = ImGuiKey_ReservedForModShift,
-        ReservedForModAlt = ImGuiKey_ReservedForModAlt,
-        ReservedForModSuper = ImGuiKey_ReservedForModSuper,
-
-        // NamedKey range helpers
-        NamedKey_END = ImGuiKey_NamedKey_END,
-        NamedKey_COUNT = ImGuiKey_NamedKey_COUNT,
-
-        // Modifiers (ImGuiMod_XXX values exist in the same enum space)
-        Mod_None = ImGuiMod_None,
-        Mod_Ctrl = ImGuiMod_Ctrl,
-        Mod_Shift = ImGuiMod_Shift,
-        Mod_Alt = ImGuiMod_Alt,
-        Mod_Super = ImGuiMod_Super,
-        Mod_Mask = ImGuiMod_Mask_
-    };
-
     const char* to_string(KeyCode k)
     {
-        return ImGui::GetKeyName(static_cast<ImGuiKey>(k));
+        // Simple implementation for now: This function is primarily for debugging.
+        switch (k)
+        {
+            case KeyCode::None: return "None";
+            case KeyCode::Tab: return "Tab";
+            case KeyCode::Space: return "Space";
+            case KeyCode::Enter: return "Enter";
+            case KeyCode::Escape: return "Escape";
+            default: return "Unknown";
+        }
     }
     
-    ImGuiKey GlfwCharCodeToImGuiKey(unsigned int charCode)
+    int GlfwCharCodeToImGuiKey(unsigned int charCode)
     {
         switch (charCode)
         {
@@ -312,7 +143,7 @@ namespace PurrKatEngine
             case GLFW_KEY_F22: return ImGuiKey_F22;
             case GLFW_KEY_F23: return ImGuiKey_F23;
             case GLFW_KEY_F24: return ImGuiKey_F24;
-            default: return ImGuiKey_None;
+            default: return static_cast<int>(ImGuiKey_None);
         }
     }
     

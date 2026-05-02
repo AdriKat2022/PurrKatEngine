@@ -13,7 +13,6 @@ namespace PurrKatEngine
 
         unsigned int GetCharCode() const { return m_KeyCode; }
         KeyCode GetKeyCode() const { return GlfwCharCodeToKeyCode(m_KeyCode); }
-        ImGuiKey GetImGuiKey() const { return GlfwCharCodeToImGuiKey(m_KeyCode); }
         
         EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
 
