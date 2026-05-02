@@ -3,16 +3,190 @@ project "ImGui"
     kind "StaticLib"
     language "C++"
 
-    targetdir ("imgui/bin/" .. outputdir .. "/%{prjName}")
-    objdir ("imgui/bin-int/" .. outputdir .. "/%{prjName}")
+    targetdir ("bin/" .. outputdir .. "/%{prjName}")
+    objdir ("bin-int/" .. outputdir .. "/%{prjName}")
+
+    projectFolder = "imgui"
 
     files
     {
-        "imgui/*.h",
-        "imgui/*.cpp"
+        projectFolder.."/*.h",
+        projectFolder.."/*.cpp"
     }
 
     filter "system:windows"
         systemversion "latest"
         cppdialect "C++20"
         staticruntime "off"
+
+
+project "GLFW"
+    location "GLFW"
+    kind "StaticLib"
+    language "C"
+    staticruntime "off"
+    warnings "off"
+    
+    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+    objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+
+    projectFolder = "GLFW"
+
+    files
+    {
+        projectFolder.."/include/GLFW/glfw3.h",
+        projectFolder.."/include/GLFW/glfw3native.h",
+        projectFolder.."/src/context.c",
+        projectFolder.."/src/init.c",
+        projectFolder.."/src/input.c",
+        projectFolder.."/src/monitor.c",
+        projectFolder.."/src/null_init.c",
+        projectFolder.."/src/null_joystick.c",
+        projectFolder.."/src/null_monitor.c",
+        projectFolder.."/src/null_window.c",
+        projectFolder.."/src/platform.c",
+        projectFolder.."/src/vulkan.c",
+        projectFolder.."/src/window.c",
+    }
+    
+    filter "system:linux"
+        pic "On"
+        
+        systemversion "latest"
+        
+        files
+        {
+            projectFolder.."/src/x11_init.c",
+            projectFolder.."/src/x11_monitor.c",
+            projectFolder.."/src/x11_window.c",
+            projectFolder.."/src/xkb_unicode.c",
+            projectFolder.."/src/posix_module.c",
+            projectFolder.."/src/posix_time.c",
+            projectFolder.."/src/posix_thread.c",
+            projectFolder.."/src/posix_module.c",
+            projectFolder.."/src/glx_context.c",
+            projectFolder.."/src/egl_context.c",
+            projectFolder.."/src/osmesa_context.c",
+            projectFolder.."/src/linux_joystick.c"
+        }
+        
+        defines
+        {
+            "_GLFW_X11"
+        }
+    
+    filter "system:macosx"
+        pic "On"
+        
+        files
+        {
+            projectFolder.."/src/cocoa_init.m",
+            projectFolder.."/src/cocoa_monitor.m",
+            projectFolder.."/src/cocoa_window.m",
+            projectFolder.."/src/cocoa_joystick.m",
+            projectFolder.."/src/cocoa_time.c",
+            projectFolder.."/src/nsgl_context.m",
+            projectFolder.."/src/posix_thread.c",
+            projectFolder.."/src/posix_module.c",
+            projectFolder.."/src/osmesa_context.c",
+            projectFolder.."/src/egl_context.c"
+        }
+    
+        defines
+        {
+            "_GLFW_COCOA"
+        }
+    
+    filter "system:windows"
+        systemversion "latest"
+    
+        files
+        {
+            projectFolder.."/src/win32_init.c",
+            projectFolder.."/src/win32_joystick.c",
+            projectFolder.."/src/win32_module.c",
+            projectFolder.."/src/win32_monitor.c",
+            projectFolder.."/src/win32_time.c",
+            projectFolder.."/src/win32_thread.c",
+            projectFolder.."/src/win32_window.c",
+            projectFolder.."/src/wgl_context.c",
+            projectFolder.."/src/egl_context.c",
+            projectFolder.."/src/osmesa_context.c"
+        }
+        
+        defines
+        {
+            "_GLFW_WIN32",
+            "_CRT_SECURE_NO_WARNINGS"
+        }
+    
+    filter "configurations:Debug"
+        runtime "Debug"
+        symbols "on"
+    
+    filter { "system:windows", "configurations:Debug-AS" }
+        runtime "Debug"
+        symbols "on"
+        sanitize { "Address" }
+    
+    filter "configurations:Release"
+        runtime "Release"
+        optimize "speed"
+    
+    filter "configurations:Dist"
+        runtime "Release"
+        optimize "speed"
+        symbols "off"
+
+
+project "Glad"
+    location "glad"
+	kind "StaticLib"
+	language "C"
+	staticruntime "on"
+	warnings "off"
+
+	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+
+    projectFolder = "glad"
+
+	files
+	{
+		projectFolder.."/include/glad/glad.h",
+		projectFolder.."/include/KHR/khrplatform.h",
+        projectFolder.."/src/glad.c"
+	}
+
+	includedirs
+	{
+        projectFolder.."/include"
+	}
+
+	filter "system:linux"
+		pic "On"
+		systemversion "latest"
+
+	filter "system:macosx"
+		pic "On"
+
+	filter "system:windows"
+		systemversion "latest"
+
+	filter "configurations:Debug"
+		runtime "Debug"
+		symbols "on"
+
+	filter { "system:windows", "configurations:Debug-AS" }	
+		runtime "Debug"
+		symbols "on"
+		sanitize { "Address" }
+
+	filter "configurations:Release"
+		runtime "Release"
+		optimize "speed"
+
+    filter "configurations:Dist"
+		runtime "Release"
+		optimize "speed"
+        symbols "off"
