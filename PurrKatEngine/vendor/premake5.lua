@@ -17,14 +17,25 @@ project "ImGui"
     filter "system:windows"
         systemversion "latest"
         cppdialect "C++20"
-        staticruntime "off"
+        
+    filter "configurations:Debug"
+        runtime "Debug"
+        symbols "on"
+
+    filter "configurations:Release"
+        runtime "Release"
+        optimize "speed"
+
+    filter "configurations:Dist"
+        runtime "Release"
+        optimize "on"
+        symbols "off"
 
 
 project "GLFW"
     location "GLFW"
     kind "StaticLib"
     language "C"
-    staticruntime "off"
     warnings "off"
     
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
@@ -124,18 +135,13 @@ project "GLFW"
         runtime "Debug"
         symbols "on"
     
-    filter { "system:windows", "configurations:Debug-AS" }
-        runtime "Debug"
-        symbols "on"
-        sanitize { "Address" }
-    
     filter "configurations:Release"
         runtime "Release"
         optimize "speed"
     
     filter "configurations:Dist"
         runtime "Release"
-        optimize "speed"
+        optimize "on"
         symbols "off"
 
 
@@ -143,7 +149,6 @@ project "Glad"
     location "glad"
 	kind "StaticLib"
 	language "C"
-	staticruntime "on"
 	warnings "off"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
@@ -177,16 +182,11 @@ project "Glad"
 		runtime "Debug"
 		symbols "on"
 
-	filter { "system:windows", "configurations:Debug-AS" }	
-		runtime "Debug"
-		symbols "on"
-		sanitize { "Address" }
-
 	filter "configurations:Release"
 		runtime "Release"
 		optimize "speed"
 
     filter "configurations:Dist"
 		runtime "Release"
-		optimize "speed"
+		optimize "on"
         symbols "off"

@@ -1,6 +1,7 @@
 workspace "PurrKatEngine"
     architecture "x64"
     configurations { "Debug", "Release", "Dist" }
+    staticruntime "Off"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
@@ -50,7 +51,6 @@ project "PurrKatEngine"
 
     filter "system:windows"
         cppdialect "C++20"
-        staticruntime "On"
         systemversion "latest"
 
         defines {
@@ -67,17 +67,17 @@ project "PurrKatEngine"
 
     filter { "configurations:Debug" }
         defines { "PKE_DEBUG", "PKE_ENABLE_ASSERTS" }
-        buildoptions "/MDd"
+        runtime "Debug"
         symbols "On"
 
     filter { "configurations:Release" }
         defines { "PKE_RELEASE" }
-        buildoptions "/MD"
+        runtime "Release"
         optimize "On"
 
     filter { "configurations:Dist" }
         defines { "PKE_DIST" }
-        buildoptions "/MD"
+        runtime "Release"
         optimize "On"
 
 
@@ -109,7 +109,6 @@ project "Sandbox"
 
     filter "system:windows"
         cppdialect "C++20"
-        staticruntime "On"
         systemversion "latest"
 
         defines {
@@ -118,15 +117,15 @@ project "Sandbox"
 
     filter { "configurations:Debug" }
         defines { "PKE_DEBUG" }
-        buildoptions "/MDd"
+        runtime "Debug"
         symbols "On"
 
     filter { "configurations:Release" }
         defines { "PKE_RELEASE" }
-        buildoptions "/MD"
+        runtime "Release"
         optimize "On"
 
     filter { "configurations:Dist" }
         defines { "PKE_DIST" }
-        buildoptions "/MD"
+        runtime "Release"
         optimize "On"
