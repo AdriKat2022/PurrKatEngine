@@ -68,10 +68,11 @@ namespace PurrKatEngine
         ImGui::DestroyContext();
     }
 
+    static bool show = true;
+    
     void ImGuiLayer::OnImGuiRender()
     {
         Layer::OnImGuiRender();
-        static bool show = true;
         ImGui::ShowDemoWindow(&show);
     }
 

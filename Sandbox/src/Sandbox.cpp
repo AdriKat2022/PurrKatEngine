@@ -8,19 +8,26 @@ public:
 
     void OnImGuiRender() override
     {
-        ImGui::Begin("Hello, I'm a window!");
-        ImGui::Text("This is some text in the window.");
-        static bool showBelowTest = false;
-        ImGui::Checkbox("Demo Window", &showBelowTest);
-
-        if (showBelowTest)
+        static bool showWindow = true;
+        ImGui::Begin("Hello, I'm a window!", &showWindow, ImGuiWindowFlags_AlwaysAutoResize);
         {
-            static ImColor testColor = ImColor(0.4f, 0.7f, 0.0f, 1.0f);
-            ImGui::ColorButton("Test Color Button", ImVec4(0.4f, 0.7f, 0.0f, 1.0f));
-            ImGui::ColorPicker3("Test Color Picker", (float*)&testColor);
-            ImGui::TextColored(testColor, "WOW!");
+            ImGui::Text("This is some text in the window.");
+            static bool showBelowTest = false;
+            ImGui::Checkbox("Demo Window", &showBelowTest);
+
+            if (showBelowTest)
+            {
+                static ImColor testColor = ImColor(0.4f, 0.7f, 0.0f, 1.0f);
+                ImGui::ColorButton("Test Color Button", ImVec4(0.4f, 0.7f, 0.0f, 1.0f));
+                ImGui::ColorPicker3("Test Color Picker", (float*)&testColor);
+                ImGui::TextColored(testColor, "WOW!");
+                if (ImGui::ArrowButton("Test Arrow Button", ImGuiDir_Right))
+                {
+                    showWindow = !showWindow;
+                    PKE_LOG_INFO("Arrow button clicked! {}", showWindow);
+                }
+            }
         }
-        
         ImGui::End();
     }
 
