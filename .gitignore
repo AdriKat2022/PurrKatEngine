@@ -1,9 +1,11 @@
 # Folders
-**/bin/*
-**/bin-*/*
+**/bin/**
+**/bin-*/**
 .idea/**
 .vs/*
 
 # Files
 *.vcxproj
+*.vcxproj.filters
 *.log
+*.sln
