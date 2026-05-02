@@ -2,6 +2,7 @@ workspace "PurrKatEngine"
     architecture "x64"
     configurations { "Debug", "Release", "Dist" }
     staticruntime "Off"
+    startproject "Sandbox"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
@@ -11,7 +12,9 @@ IncludeDirs["GLFW"] = "PurrKatEngine/vendor/GLFW/include"
 IncludeDirs["Glad"] = "PurrKatEngine/vendor/glad/include"
 IncludeDirs["ImGui"] = "PurrKatEngine/vendor/imgui"
 
-include "PurrKatEngine/vendor"
+group "Dependencies"
+    include "PurrKatEngine/vendor"
+group ""
 
 project "PurrKatEngine"
     location "PurrKatEngine"

@@ -7,12 +7,17 @@ public:
 
     void OnUpdate() override
     {
-        PurrKatEngine::Log::LogDebug("ExampleSandboxLayer::OnUpdate");
+        // PurrKatEngine::Log::LogDebug("ExampleSandboxLayer::OnUpdate");
+        bool isTabPressed = PurrKatEngine::Input::IsKeyPressed(PKE_KEY_Keypad0);
+        if (isTabPressed)
+        {
+            PKE_LOG_DEBUG("Keypad 0 is pressed!");
+        }
     }
 
     void OnEvent(PurrKatEngine::Event& e) override
     {
-        PKE_LOG_DEBUG("ExampleSandboxLayer::OnEvent {}", e.ToString());
+        // PKE_LOG_DEBUG("ExampleSandboxLayer::OnEvent {}", e.ToString());
     }
 };
 

@@ -9,14 +9,14 @@ namespace PurrKatEngine
     class KeyEvent : public Event
     {
     public:
-        explicit KeyEvent(unsigned int keyCode) : m_KeyCode(keyCode) {}
+        explicit KeyEvent(int keyCode) : m_KeyCode(keyCode) {}
 
-        unsigned int GetCharCode() const { return m_KeyCode; }
+        int GetCharCode() const { return m_KeyCode; }
         KeyCode GetKeyCode() const { return GlfwCharCodeToKeyCode(m_KeyCode); }
         
         EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
 
     protected:
-        unsigned int m_KeyCode;
+        int m_KeyCode;
     };
 }

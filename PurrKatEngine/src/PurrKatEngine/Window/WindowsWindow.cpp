@@ -125,7 +125,7 @@ namespace PurrKatEngine
         {
             WindowData* data = GET_WINDOW_DATA_PTR(window);
 
-            KeyTypedEvent event(keyCode);
+            KeyTypedEvent event((int)keyCode);
             data->EventCallback(event);
         });
         

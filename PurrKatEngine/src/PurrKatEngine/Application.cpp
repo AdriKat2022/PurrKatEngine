@@ -3,6 +3,7 @@
 #include "Application.h"
 
 #include "glad/glad.h"
+#include "Inputs/Input.h"
 #include "Logs/InternalLog.h"
 
 namespace PurrKatEngine
@@ -23,7 +24,7 @@ namespace PurrKatEngine
     
     void Application::OnEvent(Event& e)
     {
-        InternalLog::GetCoreLogger()->info("EVENT: {}", e.ToString());
+        PKE_CORE_TRACE("EVENT: {}", e.ToString());
         
         EventDispatcher dispatcher(e);
 
@@ -82,6 +83,9 @@ namespace PurrKatEngine
             glClearColor(currentRed, currentGreen, currentBlue, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT);
 
+            // auto[x,y] = Input::GetMousePosition();
+            // PKE_CORE_TRACE("Mouse Position: ({0}, {1})", x, y);
+            
             for (Layer* layer : m_LayerStack)
             {
                 layer->OnUpdate();

@@ -3,6 +3,8 @@
 #include "PurrKatEngine/Application.h"
 #include "PurrKatEngine/Logs/Log.h"
 #include "PurrKatEngine/ImGui/ImGuiLayer.h"
+#include "PurrKatEngine/Inputs/Input.h"
+#include "PurrKatEngine/Inputs/KeyCodes.h"
 
 // --- Entry Point ---
 #include "PurrKatEngine/EntryPoint.h"

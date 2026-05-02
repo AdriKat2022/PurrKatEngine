@@ -18,6 +18,8 @@ namespace PurrKatEngine
 
         std::string ToString() const { return (std::stringstream()<<m_Data.Title<<" Window : "<<GetWidth()<<"x"<<GetHeight()).str(); }
         bool IsVSync() const override { return m_Data.VSync; }
+
+        void* GetNativeWindow() const override { return m_Window; }
         
         void SetEventCallback(const EventCallbackFunction& callback) override { m_Data.EventCallback = callback; }
         void SetVSync(const bool enabled) override;
