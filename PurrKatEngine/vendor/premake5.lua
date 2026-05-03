@@ -2,6 +2,7 @@ project "ImGui"
     location "imgui"
     kind "StaticLib"
     language "C++"
+    cppdialect "C++20"
 
     -- The following is required to export the ImGui functions when building as a shared library
     defines { "IMGUI_API=__declspec(dllexport)" }
@@ -19,7 +20,6 @@ project "ImGui"
 
     filter "system:windows"
         systemversion "latest"
-        cppdialect "C++20"
         
     filter "configurations:Debug"
         runtime "Debug"
@@ -27,12 +27,11 @@ project "ImGui"
 
     filter "configurations:Release"
         runtime "Release"
-        optimize "speed"
+        optimize "on"
 
     filter "configurations:Dist"
         runtime "Release"
         optimize "on"
-        symbols "off"
 
 
 project "GLFW"
@@ -140,12 +139,11 @@ project "GLFW"
     
     filter "configurations:Release"
         runtime "Release"
-        optimize "speed"
+        optimize "on"
     
     filter "configurations:Dist"
         runtime "Release"
         optimize "on"
-        symbols "off"
 
 
 project "Glad"
@@ -187,9 +185,8 @@ project "Glad"
 
 	filter "configurations:Release"
 		runtime "Release"
-		optimize "speed"
+		optimize "on"
 
     filter "configurations:Dist"
 		runtime "Release"
 		optimize "on"
-        symbols "off"

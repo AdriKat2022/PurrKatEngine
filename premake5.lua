@@ -19,8 +19,9 @@ group ""
 
 project "PurrKatEngine"
     location "PurrKatEngine"
-    kind "SharedLib"
+    kind "StaticLib"
     language "C++"
+    cppdialect "C++20"
 
     buildoptions { "/utf-8" }
 
@@ -29,6 +30,8 @@ project "PurrKatEngine"
 
     pchheader "pkepch.h"
     pchsource "PurrKatEngine/src/pkepch.cpp"
+
+    defines { "_CRT_SECURE_NO_WARNINGS" }
 
     files
     {
@@ -55,7 +58,6 @@ project "PurrKatEngine"
     }
 
     filter "system:windows"
-        cppdialect "C++20"
         systemversion "latest"
 
         defines {
@@ -78,18 +80,19 @@ project "PurrKatEngine"
     filter { "configurations:Release" }
         defines { "PKE_RELEASE" }
         runtime "Release"
-        optimize "On"
+        optimize "on"
 
     filter { "configurations:Dist" }
         defines { "PKE_DIST" }
         runtime "Release"
-        optimize "On"
+        optimize "on"
 
 
 project "Sandbox"
     location "Sandbox"
     kind "ConsoleApp"
     language "C++"
+    cppdialect "C++20"
 
     buildoptions { "/utf-8" }
 
@@ -115,7 +118,6 @@ project "Sandbox"
     }
 
     filter "system:windows"
-        cppdialect "C++20"
         systemversion "latest"
 
         defines {
@@ -130,9 +132,9 @@ project "Sandbox"
     filter { "configurations:Release" }
         defines { "PKE_RELEASE" }
         runtime "Release"
-        optimize "On"
+        optimize "on"
 
     filter { "configurations:Dist" }
         defines { "PKE_DIST" }
         runtime "Release"
-        optimize "On"
+        optimize "on"

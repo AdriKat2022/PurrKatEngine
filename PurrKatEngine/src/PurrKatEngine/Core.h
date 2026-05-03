@@ -1,10 +1,14 @@
 ﻿#pragma once
 
 #ifdef PKE_PLATFORM_WINDOWS
-    #ifdef PKE_BUILD_DLL
-        #define PKE_API __declspec(dllexport)
+    #if PKE_DYNAMIC_LIBRARY
+        #ifdef PKE_BUILD_DLL
+            #define PKE_API __declspec(dllexport)
+        #else
+            #define PKE_API __declspec(dllimport)
+        #endif
     #else
-        #define PKE_API __declspec(dllimport)
+        #define PKE_API
     #endif
 #else
     #error MyGameEngine only supports windows for now!

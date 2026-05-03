@@ -156,6 +156,7 @@ namespace PurrKatEngine
             case KeyCode::GamepadRStickUp: return "GamepadRStickUp";
             case KeyCode::GamepadRStickDown: return "GamepadRStickDown";
         }
+        return "Unknown KeyCode";
     }
     
     int GlfwCharCodeToImGuiKey(int charCode)
