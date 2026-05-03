@@ -30,11 +30,13 @@ namespace PurrKatEngine
     private:
         static Application* s_Instance;
         
-        std::unique_ptr<Window> m_Window;
-        ImGuiLayer* m_ImGuiLayer;
         bool m_IsRunning = true;
         
+        std::unique_ptr<Window> m_Window;
         LayerStack m_LayerStack;
+        ImGuiLayer* m_ImGuiLayer;
+
+        unsigned int m_VertexArray, m_VertexBuffer, m_IndexBuffer;
     };
 
     // To be defined in a CLIENT.

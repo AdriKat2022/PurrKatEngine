@@ -19,17 +19,16 @@ namespace PurrKatEngine
 
         // Initial use of glad
         int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-        PKE_CORE_ASSERT(status, "Failed to initialize GLAD")
+        PKE_CORE_ASSERT(status, "Failed to initialize GLAD.")
+
+        PKE_CORE_INFO("Initialized OpenGL successfully: {} | {} | {}",
+            (const char*)glGetString(GL_VERSION),
+            (const char*)glGetString(GL_VENDOR),
+            (const char*)glGetString(GL_RENDERER));
     }
 
     void OpenGLContext::SwapBuffers()
     {
-        glBegin(GL_TRIANGLES);
-        glVertex2f(-0.5f, -0.5f);
-        glVertex2f(0.5f, -0.5f);
-        glVertex2f(0.5f, 0.5f);
-        glVertex2f(-0.5f, 0.5f);
-        glEnd();
         glfwSwapBuffers(m_WindowHandle);
     }
     
