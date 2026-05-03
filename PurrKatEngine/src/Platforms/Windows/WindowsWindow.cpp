@@ -1,19 +1,11 @@
 ﻿#include "pkepch.h"
 #include "WindowsWindow.h"
+#include "PurrKatEngine/Window/Window.h"
 
-#include "glad/glad.h"
-#include "PurrKatEngine/Events/CursorEnterEvent.h"
-#include "PurrKatEngine/Events/CursorExitEvent.h"
-#include "PurrKatEngine/Events/MouseMovedEvent.h"
-#include "PurrKatEngine/Events/KeyPressedEvent.h"
-#include "PurrKatEngine/Events/KeyReleasedEvent.h"
-#include "PurrKatEngine/Events/KeyTypedEvent.h"
-#include "PurrKatEngine/Events/MouseButtonPressedEvent.h"
-#include "PurrKatEngine/Events/MouseButtonReleasedEvent.h"
-#include "PurrKatEngine/Events/MouseScrollEvent.h"
-#include "PurrKatEngine/Events/WindowCloseEvent.h"
-#include "PurrKatEngine/Events/WindowResizeEvent.h"
+#include "Platforms/OpenGL/OpenGLContext.h" // Can be changed for a different context (Vulkan for example).
+#include "PurrKatEngine/Events/ApplicationEvents.h"
 #include "PurrKatEngine/Logs/InternalLog.h"
+#include "PurrKatEngine/Renderer/GraphicsContext.h"
 
 #define GET_WINDOW_DATA_PTR(window) (WindowData*)glfwGetWindowUserPointer(window)
 
@@ -52,7 +44,7 @@ namespace PurrKatEngine
         m_Data.Height = props.Height;
 
         PKE_CORE_DEBUG("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
-
+        
         if (!s_GLFWInitialized)
         {
             int success = glfwInit();
@@ -62,11 +54,9 @@ namespace PurrKatEngine
         }
 
         m_Window = glfwCreateWindow(m_Data.Width, m_Data.Height, m_Data.Title.c_str(), nullptr, nullptr);
-        glfwMakeContextCurrent(m_Window);
-
-        // Initial use of glad
-        int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-        PKE_CORE_ASSERT(status, "Failed to initialize GLAD")
+        
+        m_Context = new OpenGLContext(m_Window); // Can swap OpenGL context for another context (e.g. Vulkan) by changing this line and the include.
+        m_Context->Init();
         
         glfwSetWindowUserPointer(m_Window, &m_Data);
         SetVSync(true);
@@ -147,6 +137,7 @@ namespace PurrKatEngine
                     data->EventCallback(releasedEvent);
                     break;
                 }
+                default: ;
             }
         });
 
@@ -186,7 +177,7 @@ namespace PurrKatEngine
     void WindowsWindow::OnUpdate()
     {
         glfwPollEvents();
-        glfwSwapBuffers(m_Window);
+        m_Context->SwapBuffers();
     }
 
     void WindowsWindow::Shutdown()

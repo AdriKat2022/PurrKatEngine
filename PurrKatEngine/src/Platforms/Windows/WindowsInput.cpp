@@ -1,8 +1,9 @@
 ﻿#include "pkepch.h"
 #include "WindowsInput.h"
 
+#include "WindowsWindow.h"
 #include "PurrKatEngine/Application.h"
-#include "PurrKatEngine/Window/WindowsWindow.h"
+#include "PurrKatEngine/Inputs/Input.h"
 
 namespace PurrKatEngine
 {

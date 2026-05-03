@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #ifdef PKE_PLATFORM_WINDOWS
-    #if PKE_DYNAMIC_LIBRARY
+    #ifdef PKE_DYNAMIC_LIBRARY
         #ifdef PKE_BUILD_DLL
             #define PKE_API __declspec(dllexport)
         #else

@@ -1,10 +1,12 @@
 ﻿#pragma once
 
-#include "Window.h"
+#include "PurrKatEngine/Window/Window.h"
 #include "GLFW/glfw3.h"
 
 namespace PurrKatEngine
 {
+    class GraphicsContext;
+
     class WindowsWindow : public Window
     {
     public:
@@ -27,6 +29,7 @@ namespace PurrKatEngine
 
     private:
         GLFWwindow* m_Window;
+        GraphicsContext* m_Context;
 
         virtual void Init(const WindowProps& props);
         virtual void Shutdown();

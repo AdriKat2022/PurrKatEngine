@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Input.h"
+#include "PurrKatEngine/Inputs/Input.h"
 
 namespace PurrKatEngine
 {
