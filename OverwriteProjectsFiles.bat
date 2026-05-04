@@ -1,6 +1,10 @@
 @echo off
 setlocal
 
+echo This will delete the solution file and ALL *.vcxproj *.vcxproj.filters *.vcxproj.user files within this entire folder.
+
+pause
+
 echo Cleaning Visual Studio generated files...
 
 REM Delete solution file
