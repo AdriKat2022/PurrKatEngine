@@ -7,10 +7,34 @@
 #include "Logs/InternalLog.h"
 #include "Platforms/OpenGL/OpenGLBuffer.h"
 #include "Platforms/OpenGL/OpenGLShader.h"
+#include "Renderer/BufferLayout.h"
 #include "Window/Window.h"
 
 namespace PurrKatEngine
 {
+    // TO MOVE ELSEWHERE
+    static GLenum ShaderDataTypeToOpenGL(ShaderDataType type)
+    {
+        switch (type)
+        {
+            case ShaderDataType::None: return GL_NONE;
+            case ShaderDataType::Bool: return GL_BOOL;
+            case ShaderDataType::Float: return GL_FLOAT;
+            case ShaderDataType::Float2: return GL_FLOAT;
+            case ShaderDataType::Float3: return GL_FLOAT;
+            case ShaderDataType::Float4: return GL_FLOAT;
+            case ShaderDataType::Mat3: return GL_FLOAT;
+            case ShaderDataType::Mat4: return GL_FLOAT;
+            case ShaderDataType::Int: return GL_INT;
+            case ShaderDataType::Int2: return GL_INT;
+            case ShaderDataType::Int3: return GL_INT;
+            case ShaderDataType::Int4: return GL_INT;
+        }
+
+        PKE_CORE_ASSERT(false, "Unknown ShaderDataType.")
+        return GL_NONE;
+    }
+    
     Application* Application::s_Instance = nullptr;
 
     Application::Application()
@@ -28,16 +52,36 @@ namespace PurrKatEngine
         glBindVertexArray(m_VertexArray);
         
         // Create points (vertices) and store them into the vertex array buffer.
-        float vertices[3 * 3] = {
-            -0.5f, -0.5f, 0.0f,
-            0.5f, -0.5f, 0.0f,
-            0.0f, 0.5f, 0.0f,
+        float vertices[3 * 7] = {
+            -0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 0.f, 0.f,
+            0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.f, 0.f,
+            0.0f, 0.5f, 0.0f, 1.0f, 0.0f, 1.f, 0.f,
         };
         
         m_VertexBuffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
+
+        {
+            BufferLayout layout = {
+                {ShaderDataType::Float3, "a_Position"},
+                {ShaderDataType::Float4, "a_Color"},
+            };
+            m_VertexBuffer->SetLayout(layout);
+        }
         
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+        uint32_t index = 0;
+        auto bufferLayout = m_VertexBuffer->GetLayout();
+        for (const auto& element : bufferLayout)
+        {
+            glEnableVertexAttribArray(index);
+            glVertexAttribPointer(index,
+                element.GetElementCount(),
+                ShaderDataTypeToOpenGL(element.type),
+                element.normalized ? GL_TRUE : GL_FALSE,
+                bufferLayout.GetStride(),
+                (const void*)element.offset);
+            index++;
+        }
+        
         
         // Create a shape with the indices of the previously stored vertices.
         uint32_t indices[3] = {0, 1, 2};
@@ -49,9 +93,12 @@ namespace PurrKatEngine
 #version 330 core
 
 layout(location = 0) in vec3 a_Position;
+layout(location = 1) in vec4 a_Color;
 out vec3 v_Position;
+out vec4 v_Color;
 void main()
 {
+    v_Color = a_Color;
     v_Position = a_Position;
     gl_Position = vec4(a_Position*2, 1.0);
 }
@@ -63,10 +110,12 @@ void main()
 layout(location = 0) out vec4 color;
 
 in vec3 v_Position;
+in vec4 v_Color;
 
 void main()
 {
-    color = vec4(v_Position + vec3(0.5, 0.5, 0), 1.0);
+    color = v_Color;
+    // color = vec4(v_Position + vec3(0.5, 0.5, 0), 1.0);
 }
 )";
         m_Shader.reset(new OpenGLShader(vertexSrc, fragmentSrc));
