@@ -6,12 +6,13 @@
 #include "glad/glad.h"
 #include "Inputs/Input.h"
 #include "Logs/InternalLog.h"
+#include "Platforms/OpenGL/OpenGLShader.h"
 #include "Window/Window.h"
 
 namespace PurrKatEngine
 {
     Application* Application::s_Instance = nullptr;
-    
+
     Application::Application()
     {
         PKE_CORE_ASSERT(s_Instance == nullptr, "An application already exists.")
@@ -42,28 +43,78 @@ namespace PurrKatEngine
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexBuffer);
 
         // Create a shape with the indices of the previously stored vertices.
-        unsigned int indices[3] = { 0, 1, 2 };
+        unsigned int indices[3] = {0, 1, 2};
 
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+        // Test shader code.
+        std::string vertexSrc = R"(
+#version 330 core
+
+layout(location = 0) in vec3 a_Position;
+out vec3 v_Position;
+void main()
+{
+    v_Position = a_Position;
+    gl_Position = vec4(a_Position*2, 1.0);
+}
+)";
+
+        std::string fragmentSrc = R"(
+#version 330 core
+
+layout(location = 0) out vec4 color;
+
+in vec3 v_Position;
+
+void main()
+{
+    color = vec4(v_Position + vec3(0.5, 0.5, 0), 1.0);
+}
+)";
+        m_Shader.reset(new OpenGLShader(vertexSrc, fragmentSrc));
     }
 
     Application::~Application()
     {
     }
-    
+
     void Application::OnEvent(Event& e)
     {
         // PKE_CORE_TRACE("EVENT: {}", e.ToString());
-        
+
         EventDispatcher dispatcher(e);
 
         dispatcher.Dispatch<WindowCloseEvent>(PKE_BIND_FUNCTION(OnWindowClosed));
-        
-        for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
+
+        for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();)
         {
             // De-increment, as we go backwards, starting at the top of the stack.
             (*--it)->OnEvent(e);
             if (e.IsHandled()) break;
+        }
+    }
+
+    void Application::Run()
+    {
+        while (m_IsRunning)
+        {
+            // static float currentRed, currentGreen, currentBlue; 
+            // glClearColor(currentRed, currentGreen, currentBlue, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT);
+
+            m_Shader->Bind();
+            glBindVertexArray(m_VertexArray);
+            glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
+
+            m_ImGuiLayer->Begin();
+            for (Layer* layer : m_LayerStack)
+            {
+                layer->OnImGuiRender();
+            }
+            m_ImGuiLayer->End();
+
+            m_Window->OnUpdate();
         }
     }
 
@@ -83,27 +134,5 @@ namespace PurrKatEngine
     {
         m_IsRunning = false;
         return true;
-    }
-
-    void Application::Run()
-    {
-        while (m_IsRunning)
-        {
-            // static float currentRed, currentGreen, currentBlue; 
-            // glClearColor(currentRed, currentGreen, currentBlue, 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT);
-
-            glBindVertexArray(m_VertexArray);
-            glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
-            
-            m_ImGuiLayer->Begin();
-            for (Layer* layer : m_LayerStack)
-            {
-                layer->OnImGuiRender();
-            }
-            m_ImGuiLayer->End();
-            
-            m_Window->OnUpdate();
-        }
     }
 }

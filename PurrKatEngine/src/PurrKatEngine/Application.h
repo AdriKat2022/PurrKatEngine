@@ -4,6 +4,7 @@
 #include "Events/ApplicationEvents.h"
 #include "ImGui/ImGuiLayer.h"
 #include "Layers/LayerStack.h"
+#include "Renderer/Shader.h"
 #include "Window/Window.h"
 
 namespace PurrKatEngine
@@ -37,6 +38,8 @@ namespace PurrKatEngine
         ImGuiLayer* m_ImGuiLayer;
 
         unsigned int m_VertexArray, m_VertexBuffer, m_IndexBuffer;
+
+        std::unique_ptr<Shader> m_Shader;
     };
 
     // To be defined in a CLIENT.
