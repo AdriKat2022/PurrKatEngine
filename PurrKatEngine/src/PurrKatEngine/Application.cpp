@@ -26,7 +26,7 @@ namespace PurrKatEngine
         m_ImGuiLayer = new ImGuiLayer();
         PushOverlay(m_ImGuiLayer);
 
-        m_VertexArray.reset(VertexArray::Create());
+        m_TriangleVertexArray.reset(VertexArray::Create());
         
         // Create points (vertices) and store them into the vertex array buffer.
         float vertices[3 * 7] = {
@@ -34,22 +34,45 @@ namespace PurrKatEngine
             0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.f, 0.f,
             0.0f, 0.5f, 0.0f, 1.0f, 0.0f, 1.f, 0.f,
         };
-        
-        m_VertexBuffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
+
+        std::shared_ptr<VertexBuffer> triangleVB;
+        triangleVB.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
 
         BufferLayout layout = {
             {ShaderDataType::Float3, "a_Position"},
             {ShaderDataType::Float4, "a_Color"},
         };
-        m_VertexBuffer->SetLayout(layout);
-        m_VertexArray->AddVertexBuffer(m_VertexBuffer);
-        
+        triangleVB->SetLayout(layout);
+        m_TriangleVertexArray->AddVertexBuffer(triangleVB);
         
         // Create a shape with the indices of the previously stored vertices.
         uint32_t indices[3] = {0, 1, 2};
+        std::shared_ptr<IndexBuffer> triangleIB;
+        triangleIB.reset(IndexBuffer::Create(indices, 3));
+        m_TriangleVertexArray->SetIndexBuffer(triangleIB);
 
-        m_IndexBuffer.reset(IndexBuffer::Create(indices, 3));
-        m_VertexArray->SetIndexBuffer(m_IndexBuffer);
+        m_SquareVertexArray.reset(VertexArray::Create());
+        
+        uint32_t squareIndices[6] = {0, 1, 2, 2, 3, 0};
+        float squareVertices[4 * 7] = {
+            -0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 0.f, 0.f,
+            0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.f, 0.f,
+            0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.f, 0.f,
+            -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.f, 0.f,
+        };
+        BufferLayout squareLayout = {
+            {ShaderDataType::Float3, "a_Position"},
+            {ShaderDataType::Float4, "a_Color"},
+        };
+
+        std::shared_ptr<VertexBuffer> squareVB;
+        squareVB.reset(VertexBuffer::Create(squareVertices, sizeof(squareVertices)));
+        squareVB->SetLayout(squareLayout);
+        std::shared_ptr<IndexBuffer> squareIB;
+        squareIB.reset(IndexBuffer::Create(squareIndices, 6));
+        
+        m_SquareVertexArray->AddVertexBuffer(squareVB);
+        m_SquareVertexArray->SetIndexBuffer(squareIB);
         
         // Test shader code.
         std::string vertexSrc = R"(
@@ -111,10 +134,14 @@ void main()
             static float currentRed, currentGreen, currentBlue = 0.1f; 
             glClearColor(currentRed, currentGreen, currentBlue, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT);
-
+            
             m_Shader->Bind();
-            m_VertexArray->Bind();
-            glDrawElements(GL_TRIANGLES, m_IndexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);
+
+            m_SquareVertexArray->Bind();
+            glDrawElements(GL_TRIANGLES, m_SquareVertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
+            
+            m_TriangleVertexArray->Bind();
+            glDrawElements(GL_TRIANGLES, m_TriangleVertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 
             m_ImGuiLayer->Begin();
             for (Layer* layer : m_LayerStack)
