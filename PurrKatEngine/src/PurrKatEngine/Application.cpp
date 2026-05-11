@@ -12,28 +12,6 @@
 
 namespace PurrKatEngine
 {
-    // TO MOVE ELSEWHERE
-    static GLenum ShaderDataTypeToOpenGL(ShaderDataType type)
-    {
-        switch (type)
-        {
-            case ShaderDataType::None: return GL_NONE;
-            case ShaderDataType::Bool: return GL_BOOL;
-            case ShaderDataType::Float: return GL_FLOAT;
-            case ShaderDataType::Float2: return GL_FLOAT;
-            case ShaderDataType::Float3: return GL_FLOAT;
-            case ShaderDataType::Float4: return GL_FLOAT;
-            case ShaderDataType::Mat3: return GL_FLOAT;
-            case ShaderDataType::Mat4: return GL_FLOAT;
-            case ShaderDataType::Int: return GL_INT;
-            case ShaderDataType::Int2: return GL_INT;
-            case ShaderDataType::Int3: return GL_INT;
-            case ShaderDataType::Int4: return GL_INT;
-        }
-
-        PKE_CORE_ASSERT(false, "Unknown ShaderDataType.")
-        return GL_NONE;
-    }
     
     Application* Application::s_Instance = nullptr;
 
@@ -48,8 +26,7 @@ namespace PurrKatEngine
         m_ImGuiLayer = new ImGuiLayer();
         PushOverlay(m_ImGuiLayer);
 
-        glGenVertexArrays(1, &m_VertexArray);
-        glBindVertexArray(m_VertexArray);
+        m_VertexArray.reset(VertexArray::Create());
         
         // Create points (vertices) and store them into the vertex array buffer.
         float vertices[3 * 7] = {
@@ -60,34 +37,20 @@ namespace PurrKatEngine
         
         m_VertexBuffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
 
-        {
-            BufferLayout layout = {
-                {ShaderDataType::Float3, "a_Position"},
-                {ShaderDataType::Float4, "a_Color"},
-            };
-            m_VertexBuffer->SetLayout(layout);
-        }
-        
-        uint32_t index = 0;
-        auto bufferLayout = m_VertexBuffer->GetLayout();
-        for (const auto& element : bufferLayout)
-        {
-            glEnableVertexAttribArray(index);
-            glVertexAttribPointer(index,
-                element.GetElementCount(),
-                ShaderDataTypeToOpenGL(element.type),
-                element.normalized ? GL_TRUE : GL_FALSE,
-                bufferLayout.GetStride(),
-                (const void*)element.offset);
-            index++;
-        }
+        BufferLayout layout = {
+            {ShaderDataType::Float3, "a_Position"},
+            {ShaderDataType::Float4, "a_Color"},
+        };
+        m_VertexBuffer->SetLayout(layout);
+        m_VertexArray->AddVertexBuffer(m_VertexBuffer);
         
         
         // Create a shape with the indices of the previously stored vertices.
         uint32_t indices[3] = {0, 1, 2};
 
         m_IndexBuffer.reset(IndexBuffer::Create(indices, 3));
-
+        m_VertexArray->SetIndexBuffer(m_IndexBuffer);
+        
         // Test shader code.
         std::string vertexSrc = R"(
 #version 330 core
@@ -150,7 +113,7 @@ void main()
             glClear(GL_COLOR_BUFFER_BIT);
 
             m_Shader->Bind();
-            glBindVertexArray(m_VertexArray);
+            m_VertexArray->Bind();
             glDrawElements(GL_TRIANGLES, m_IndexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);
 
             m_ImGuiLayer->Begin();
