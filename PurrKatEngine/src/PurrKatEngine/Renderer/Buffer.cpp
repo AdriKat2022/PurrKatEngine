@@ -12,8 +12,8 @@ namespace PurrKatEngine
     {
         switch (Renderer::GetAPI())
         {
-            case RendererAPI::None:     PKE_CORE_ASSERT(false, "Having No RendererAPI is currently not supported.") return nullptr;
-            case RendererAPI::OpenGL:   return new OpenGLVertexBuffer(vertices, size);
+            case RendererAPI::API::None:     PKE_CORE_ASSERT(false, "Having No RendererAPI is currently not supported.") return nullptr;
+            case RendererAPI::API::OpenGL:   return new OpenGLVertexBuffer(vertices, size);
         }
 
         PKE_CORE_ASSERT(false, "Invalid RendererAPI.")
@@ -24,8 +24,8 @@ namespace PurrKatEngine
     {
         switch (Renderer::GetAPI())
         {
-            case RendererAPI::None:     PKE_CORE_ASSERT(false, "No RendererAPI is currently not supported.") return nullptr;
-            case RendererAPI::OpenGL:   return new OpenGLIndexBuffer(indices, count);
+            case RendererAPI::API::None:     PKE_CORE_ASSERT(false, "No RendererAPI is currently not supported.") return nullptr;
+            case RendererAPI::API::OpenGL:   return new OpenGLIndexBuffer(indices, count);
         }
         
         PKE_CORE_ASSERT(false, "Invalid RendererAPI.")

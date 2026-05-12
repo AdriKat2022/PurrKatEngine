@@ -2,12 +2,13 @@
 
 #include "Application.h"
 
-#include "glad/glad.h"
 #include "Inputs/Input.h"
 #include "Logs/InternalLog.h"
 #include "Platforms/OpenGL/OpenGLBuffer.h"
 #include "Platforms/OpenGL/OpenGLShader.h"
 #include "Renderer/BufferLayout.h"
+#include "Renderer/RenderCommand.h"
+#include "Renderer/Renderer.h"
 #include "Window/Window.h"
 
 namespace PurrKatEngine
@@ -131,17 +132,24 @@ void main()
     {
         while (m_IsRunning)
         {
-            static float currentRed, currentGreen, currentBlue = 0.1f; 
-            glClearColor(currentRed, currentGreen, currentBlue, 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT);
+            RenderCommand::SetClearColor(glm::vec4(0.2f, 0.2f, 0.2f, 1.0f));
+            RenderCommand::Clear();
             
+            Renderer::BeginScene(); // Cameras lights and all others things.
             m_Shader->Bind();
-
-            m_SquareVertexArray->Bind();
-            glDrawElements(GL_TRIANGLES, m_SquareVertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
+            Renderer::SubmitGeometry(m_SquareVertexArray); // Submitting the geometry to be rendered, with the shader and all the other stuff.
+            Renderer::EndScene();
             
-            m_TriangleVertexArray->Bind();
-            glDrawElements(GL_TRIANGLES, m_TriangleVertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
+            // m_SquareVertexArray->Bind();
+            // glDrawElements(GL_TRIANGLES, m_SquareVertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
+
+            Renderer::BeginScene(); // Cameras lights and all others things.
+            // m_Shader->Bind();
+            Renderer::SubmitGeometry(m_TriangleVertexArray); // Submitting the geometry to be rendered, with the shader and all the other stuff.
+            Renderer::EndScene();
+            
+            // m_TriangleVertexArray->Bind();
+            // glDrawElements(GL_TRIANGLES, m_TriangleVertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 
             m_ImGuiLayer->Begin();
             for (Layer* layer : m_LayerStack)

@@ -1,21 +1,15 @@
 ﻿#pragma once
+#include "RendererAPI.h"
 
 namespace PurrKatEngine
 {
-    enum class RendererAPI
-    {
-        None = 0,
-        OpenGL = 1,
-        // DirectX = 2,
-        // Vulkan = 3,
-    };
-
     class Renderer
     {
     public:
-        static RendererAPI GetAPI() { return s_RendererAPI; }
-        
-    private:
-        static RendererAPI s_RendererAPI;
+        static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
+
+        static void BeginScene();
+        static void SubmitGeometry(const std::shared_ptr<VertexArray>& vertexArray);
+        static void EndScene();
     };
 }
