@@ -3,6 +3,7 @@
 #include "Core.h"
 #include "Events/ApplicationEvents.h"
 #include "ImGui/ImGuiLayer.h"
+#include "Inputs/Time.h"
 #include "Layers/LayerStack.h"
 #include "Renderer/Buffer.h"
 #include "Renderer/OrthographicCamera.h"
@@ -39,8 +40,9 @@ namespace PurrKatEngine
         std::unique_ptr<Window> m_Window;
         LayerStack m_LayerStack;
         ImGuiLayer* m_ImGuiLayer;
+        TimeManagerLayer* m_TimeManagerLayer;
 
-        std::unique_ptr<Shader> m_Shader;
+        std::shared_ptr<Shader> m_Shader;
         std::shared_ptr<VertexArray> m_TriangleVertexArray;
         std::shared_ptr<VertexArray> m_SquareVertexArray;
         

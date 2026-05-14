@@ -1,5 +1,7 @@
 ﻿#pragma once
+#include "OrthographicCamera.h"
 #include "RendererAPI.h"
+#include "Shader.h"
 
 namespace PurrKatEngine
 {
@@ -8,8 +10,17 @@ namespace PurrKatEngine
     public:
         static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 
-        static void BeginScene();
-        static void SubmitGeometry(const std::shared_ptr<VertexArray>& vertexArray);
+        static void BeginScene(OrthographicCamera& camera);
+        static void SubmitGeometry(const std::shared_ptr<VertexArray>& vertexArray, const std::shared_ptr<Shader>& shader);
         static void EndScene();
+        
+    private:
+        // Following is temporary to allow the renderer to have states.
+        struct SceneData
+        {
+            glm::mat4 ViewProjectionMatrix;
+        };
+        
+        static SceneData* s_SceneData;
     };
 }

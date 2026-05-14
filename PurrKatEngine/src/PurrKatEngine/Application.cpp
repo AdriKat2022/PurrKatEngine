@@ -2,7 +2,9 @@
 
 #include "Application.h"
 
+#include "Components/StandardInputController.h"
 #include "Inputs/Input.h"
+#include "Inputs/Time.h"
 #include "Logs/InternalLog.h"
 #include "Platforms/OpenGL/OpenGLBuffer.h"
 #include "Platforms/OpenGL/OpenGLShader.h"
@@ -26,6 +28,17 @@ namespace PurrKatEngine
 
         m_ImGuiLayer = new ImGuiLayer();
         PushOverlay(m_ImGuiLayer);
+        m_TimeManagerLayer = new TimeManagerLayer();
+        PushOverlay(m_TimeManagerLayer);
+        auto standardInputController = new StandardInputController([this](float x, float y)
+        {
+            auto camPos = m_Camera.GetPosition();
+            camPos.x += x;
+            camPos.y += y;
+            m_Camera.SetPosition(camPos);
+        });
+        standardInputController->SetSpeed(0.01f);
+        PushOverlay(standardInputController);
 
         m_TriangleVertexArray.reset(VertexArray::Create());
         
@@ -136,20 +149,21 @@ void main()
             RenderCommand::SetClearColor(glm::vec4(0.2f, 0.2f, 0.2f, 1.0f));
             RenderCommand::Clear();
             
-            Renderer::BeginScene(); // Cameras lights and all others things.
-            m_Shader->Bind();
-            m_Shader->UploadUniformMat4("u_ViewProjection", m_Camera.GetViewProjectionMatrix()); // This shader will render the camera's view
-            Renderer::SubmitGeometry(m_SquareVertexArray); // Submitting the geometry to be rendered, with the shader and all the other stuff.
+            // m_Camera.SetPosition({sin((float)Time::time) * 0.5f, sin((float)Time::time * 0.8f) * 0.5f, 0}); // Move the camera left and right with a sine wave.
+            m_Camera.SetRotation(sin((float)Time::time) * 0.5f); // Rotate the camera with a sine wave.
+            
+            Renderer::BeginScene(m_Camera); // Cameras lights and all others things.
+            Renderer::SubmitGeometry(m_SquareVertexArray, m_Shader); // Submitting the geometry to be rendered, with the shader and all the other stuff.
             Renderer::EndScene();
             
-            Renderer::BeginScene(); // Cameras lights and all others things.
-            // m_Shader->Bind();
-            Renderer::SubmitGeometry(m_TriangleVertexArray); // Submitting the geometry to be rendered, with the shader and all the other stuff.
+            Renderer::BeginScene(m_Camera); // Cameras lights and all others things.
+            Renderer::SubmitGeometry(m_TriangleVertexArray, m_Shader); // Submitting the geometry to be rendered, with the shader and all the other stuff.
             Renderer::EndScene();
             
             m_ImGuiLayer->Begin();
             for (Layer* layer : m_LayerStack)
             {
+                layer->OnUpdate();
                 layer->OnImGuiRender();
             }
             m_ImGuiLayer->End();
