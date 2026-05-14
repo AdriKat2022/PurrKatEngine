@@ -5,6 +5,7 @@
 #include "ImGui/ImGuiLayer.h"
 #include "Layers/LayerStack.h"
 #include "Renderer/Buffer.h"
+#include "Renderer/OrthographicCamera.h"
 #include "Renderer/Shader.h"
 #include "Renderer/VertexArray.h"
 #include "Window/Window.h"
@@ -42,6 +43,8 @@ namespace PurrKatEngine
         std::unique_ptr<Shader> m_Shader;
         std::shared_ptr<VertexArray> m_TriangleVertexArray;
         std::shared_ptr<VertexArray> m_SquareVertexArray;
+        
+        OrthographicCamera m_Camera;
     };
 
     // To be defined in a CLIENT.

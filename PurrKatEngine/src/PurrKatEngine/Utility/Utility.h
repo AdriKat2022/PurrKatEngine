@@ -2,6 +2,16 @@
 
 namespace PurrKatEngine
 {
+    // ------- GLM Extensions --------
+    inline std::string to_string(const glm::mat4& mat)
+    {
+        return std::to_string(mat[0][0]) + ", " + std::to_string(mat[0][1]) + ", " + std::to_string(mat[0][2]) + ", " + std::to_string(mat[0][3]) + "\n" +
+               std::to_string(mat[1][0]) + ", " + std::to_string(mat[1][1]) + ", " + std::to_string(mat[1][2]) + ", " + std::to_string(mat[1][3]) + "\n" +
+               std::to_string(mat[2][0]) + ", " + std::to_string(mat[2][1]) + ", " + std::to_string(mat[2][2]) + ", " + std::to_string(mat[2][3]) + "\n" +
+               std::to_string(mat[3][0]) + ", " + std::to_string(mat[3][1]) + ", " + std::to_string(mat[3][2]) + ", " + std::to_string(mat[3][3]);
+    }
+    inline std::string format_as(const glm::mat4& mat) { return to_string(mat); }
+    
     /**
      * Makes a format string that can displays all passed variables.
      * @param names All names separated by spaces.

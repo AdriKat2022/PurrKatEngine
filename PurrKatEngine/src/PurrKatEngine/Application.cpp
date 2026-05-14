@@ -16,7 +16,7 @@ namespace PurrKatEngine
     
     Application* Application::s_Instance = nullptr;
 
-    Application::Application()
+    Application::Application() : m_Camera(-1.6f, 1.6f, -0.9f, 0.9f) // 16:9 Aspect ratio
     {
         PKE_CORE_ASSERT(s_Instance == nullptr, "An application already exists.")
         s_Instance = this;
@@ -81,13 +81,14 @@ namespace PurrKatEngine
 
 layout(location = 0) in vec3 a_Position;
 layout(location = 1) in vec4 a_Color;
+uniform mat4 u_ViewProjection;
 out vec3 v_Position;
 out vec4 v_Color;
 void main()
 {
     v_Color = a_Color;
     v_Position = a_Position;
-    gl_Position = vec4(a_Position*2, 1.0);
+    gl_Position = u_ViewProjection * vec4(a_Position*2, 1.0);
 }
 )";
 
@@ -137,20 +138,15 @@ void main()
             
             Renderer::BeginScene(); // Cameras lights and all others things.
             m_Shader->Bind();
+            m_Shader->UploadUniformMat4("u_ViewProjection", m_Camera.GetViewProjectionMatrix()); // This shader will render the camera's view
             Renderer::SubmitGeometry(m_SquareVertexArray); // Submitting the geometry to be rendered, with the shader and all the other stuff.
             Renderer::EndScene();
             
-            // m_SquareVertexArray->Bind();
-            // glDrawElements(GL_TRIANGLES, m_SquareVertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
-
             Renderer::BeginScene(); // Cameras lights and all others things.
             // m_Shader->Bind();
             Renderer::SubmitGeometry(m_TriangleVertexArray); // Submitting the geometry to be rendered, with the shader and all the other stuff.
             Renderer::EndScene();
             
-            // m_TriangleVertexArray->Bind();
-            // glDrawElements(GL_TRIANGLES, m_TriangleVertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
-
             m_ImGuiLayer->Begin();
             for (Layer* layer : m_LayerStack)
             {
