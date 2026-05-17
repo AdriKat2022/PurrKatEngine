@@ -6,7 +6,8 @@
 namespace PurrKatEngine
 {
     double Time::time = 0;
-    // double Time::deltaTime = 0;
+    double Time::deltaTime = 0;
+    double Time::lastFrameTime = 0;
     
     TimeManagerLayer::~TimeManagerLayer()
     {
@@ -26,6 +27,8 @@ namespace PurrKatEngine
     {
         Layer::OnUpdate();
         Time::time = glfwGetTime();
+        Time::deltaTime = Time::time - Time::lastFrameTime;
+        Time::lastFrameTime = Time::time;
         // PKE_CORE_DEBUG("Time: {}, Delta Time: {}", Time::time, Time::deltaTime);
     }
 

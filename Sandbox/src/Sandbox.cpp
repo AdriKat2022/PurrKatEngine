@@ -111,6 +111,7 @@ void main()
         static bool showWindow = true;
         ImGui::Begin("Hello, I'm a window!", &showWindow, ImGuiWindowFlags_AlwaysAutoResize);
         {
+            ImGui::Text("Framerate: %.2f", 1/PurrKatEngine::Time::deltaTime);
             ImGui::Text("This is some text in the window.");
             static bool showBelowTest = false;
             ImGui::Checkbox("Demo Window", &showBelowTest);

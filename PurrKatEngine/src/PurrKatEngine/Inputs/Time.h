@@ -7,7 +7,8 @@ namespace PurrKatEngine
     {
     public:
         static double time; // Time since application startup.
-        // static double deltaTime;
+        static double deltaTime;
+        static double lastFrameTime;
     };
     
     class TimeManagerLayer : public Layer
