@@ -7,15 +7,22 @@ class ExampleSandboxLayer : public PurrKatEngine::ImGuiLayer
 public:
     ExampleSandboxLayer() : m_Camera(std::make_shared<PurrKatEngine::OrthographicCamera>(-1.6f, 1.6f, -0.9f, 0.9f)) // 16:9 Aspect ratio
     {
-        auto standardInputController = new PurrKatEngine::StandardInputController([this](float x, float y)
+        auto cameraRotationController = new PurrKatEngine::Standard2DInputController([this](float x, float _)
+        {
+            m_Camera->SetRotation(m_Camera->GetRotation() + x);
+        }, PurrKatEngine::KeyCode::Q, PurrKatEngine::KeyCode::E, PurrKatEngine::KeyCode::None, PurrKatEngine::KeyCode::None);
+        cameraRotationController->SetSpeed(0.01f);
+        PurrKatEngine::Application::Get().PushOverlay(cameraRotationController);
+        
+        auto cameraTranslateController = new PurrKatEngine::Standard2DInputController([this](float x, float y)
         {
             auto camPos = m_Camera->GetPosition();
             camPos.x += x;
             camPos.y += y;
             m_Camera->SetPosition(camPos);
         });
-        standardInputController->SetSpeed(0.01f);
-        PurrKatEngine::Application::Get().PushOverlay(standardInputController);
+        cameraTranslateController->SetSpeed(0.01f);
+        PurrKatEngine::Application::Get().PushOverlay(cameraTranslateController);
 
         // -- TRIANGLE --
         
@@ -137,7 +144,7 @@ void main()
         PurrKatEngine::RenderCommand::SetClearColor({0.1f, 0.1f, 0.1f, 1.0f});
         PurrKatEngine::RenderCommand::Clear();
         
-        m_Camera->SetRotation(PurrKatEngine::Time::time * 1.f);
+        // m_Camera->SetRotation(PurrKatEngine::Time::time * 1.f);
         
         PurrKatEngine::Renderer::BeginScene(*m_Camera);
         PurrKatEngine::Renderer::SubmitGeometry(m_SquareVertexArray, m_Shader);
@@ -164,6 +171,8 @@ public:
     {
         PurrKatEngine::Log::LogTrace("Sandbox application start. Hey, that's me! A log from the client!");
         PushLayer(new ExampleSandboxLayer());
+        
+        // GetWindow().SetVSync(false);
     }
 };
 

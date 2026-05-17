@@ -2,7 +2,7 @@
 
 #include "Application.h"
 
-#include "Components/StandardInputController.h"
+#include "Components/Standard2DInputController.h"
 #include "Inputs/Input.h"
 #include "Inputs/Time.h"
 #include "Logs/InternalLog.h"

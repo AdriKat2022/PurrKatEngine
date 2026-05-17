@@ -13,7 +13,7 @@
 #include "PurrKatEngine/Renderer/OrthographicCamera.h"
 #include "PurrKatEngine/Renderer/VertexArray.h"
 
-#include "PurrKatEngine/Components/StandardInputController.h"
+#include "PurrKatEngine/Components/Standard2DInputController.h"
 
 // --- Entry Point ---
 #include "PurrKatEngine/EntryPoint.h"

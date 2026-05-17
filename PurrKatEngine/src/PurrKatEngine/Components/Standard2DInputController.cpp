@@ -1,5 +1,5 @@
 ﻿#include "pkepch.h"
-#include "StandardInputController.h"
+#include "Standard2DInputController.h"
 
 #include "PurrKatEngine/Events/KeyPressedEvent.h"
 #include "PurrKatEngine/Events/KeyReleasedEvent.h"
@@ -8,7 +8,7 @@
 
 namespace PurrKatEngine
 {
-    void StandardInputController::OnEvent(Event& event)
+    void Standard2DInputController::OnEvent(Event& event)
     {
         Layer::OnEvent(event);
         
@@ -16,19 +16,19 @@ namespace PurrKatEngine
         {
             KeyPressedEvent& keyPressedEvent = (KeyPressedEvent&)event;
             if (keyPressedEvent.IsRepeat()) return;
-            if (keyPressedEvent.GetKeyCode() == KeyCode::W)
+            if (keyPressedEvent.GetKeyCode() == m_VerticalPositiveKey)
             {
                 m_CurrentInput.y += 1;
             }
-            if (keyPressedEvent.GetKeyCode() == KeyCode::S)
+            if (keyPressedEvent.GetKeyCode() == m_VerticalNegativeKey)
             {
                 m_CurrentInput.y += -1;
             }
-            if (keyPressedEvent.GetKeyCode() == KeyCode::A)
+            if (keyPressedEvent.GetKeyCode() == m_HorizontalNegativeKey)
             {
                 m_CurrentInput.x += -1;
             }
-            if (keyPressedEvent.GetKeyCode() == KeyCode::D)
+            if (keyPressedEvent.GetKeyCode() == m_HorizontalPositiveKey)
             {
                 m_CurrentInput.x += 1;
             }
@@ -37,26 +37,26 @@ namespace PurrKatEngine
         if (event.GetEventType() == EventType::KeyReleased)
         {
             KeyReleasedEvent& keyPressedEvent = (KeyReleasedEvent&)event;
-            if (keyPressedEvent.GetKeyCode() == KeyCode::W)
+            if (keyPressedEvent.GetKeyCode() == m_VerticalPositiveKey)
             {
                 m_CurrentInput.y -= 1;
             }
-            if (keyPressedEvent.GetKeyCode() == KeyCode::S)
+            if (keyPressedEvent.GetKeyCode() == m_VerticalNegativeKey)
             {
                 m_CurrentInput.y -= -1;
             }
-            if (keyPressedEvent.GetKeyCode() == KeyCode::A)
+            if (keyPressedEvent.GetKeyCode() == m_HorizontalNegativeKey)
             {
                 m_CurrentInput.x -= -1;
             }
-            if (keyPressedEvent.GetKeyCode() == KeyCode::D)
+            if (keyPressedEvent.GetKeyCode() == m_HorizontalPositiveKey)
             {
                 m_CurrentInput.x -= 1;
             }
         }
     }
 
-    void StandardInputController::OnUpdate()
+    void Standard2DInputController::OnUpdate()
     {
         Layer::OnUpdate();
         
