@@ -7,7 +7,7 @@ namespace PurrKatEngine
     class StandardInputController : public Layer
     {
     public:
-        StandardInputController(const std::function<void(float,float)>& onInputCallback) : m_OnInputCallback(onInputCallback) {}
+        explicit StandardInputController(const std::function<void(float,float)>& onInputCallback) : m_OnInputCallback(onInputCallback) {}
         
         void SetSpeed(float speed) { m_Speed = speed; }
 

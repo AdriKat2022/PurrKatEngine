@@ -27,6 +27,7 @@ namespace PurrKatEngine
         void PushLayer(Layer* layer);
         void PushOverlay(Layer* overlay);
 
+        // OrthographicCamera& GetMainCamera() { return m_Camera; }
         Window& GetWindow() const { return *m_Window; }
         
     protected:
@@ -41,12 +42,8 @@ namespace PurrKatEngine
         LayerStack m_LayerStack;
         ImGuiLayer* m_ImGuiLayer;
         TimeManagerLayer* m_TimeManagerLayer;
-
-        std::shared_ptr<Shader> m_Shader;
-        std::shared_ptr<VertexArray> m_TriangleVertexArray;
-        std::shared_ptr<VertexArray> m_SquareVertexArray;
         
-        OrthographicCamera m_Camera;
+        // OrthographicCamera m_Camera;
     };
 
     // To be defined in a CLIENT.

@@ -3,8 +3,17 @@
 #include "PurrKatEngine/Application.h"
 #include "PurrKatEngine/Logs/Log.h"
 #include "PurrKatEngine/ImGui/ImGuiLayer.h"
+
 #include "PurrKatEngine/Inputs/Input.h"
 #include "PurrKatEngine/Inputs/KeyCodes.h"
+#include "PurrKatEngine/Inputs/Time.h"
+
+#include "PurrKatEngine/Renderer/Renderer.h"
+#include "PurrKatEngine/Renderer/RenderCommand.h"
+#include "PurrKatEngine/Renderer/OrthographicCamera.h"
+#include "PurrKatEngine/Renderer/VertexArray.h"
+
+#include "PurrKatEngine/Components/StandardInputController.h"
 
 // --- Entry Point ---
 #include "PurrKatEngine/EntryPoint.h"
