@@ -108,6 +108,7 @@ out vec4 v_Color;
 void main()
 {
     v_Color = a_Color;
+
     v_Position = a_Position;
     gl_Position = u_ViewProjection * u_Transform * vec4(a_Position*2, 1.0);
 }
@@ -120,15 +121,15 @@ layout(location = 0) out vec4 color;
 
 in vec3 v_Position;
 in vec4 v_Color;
+uniform vec4 u_Color;
 
 void main()
 {
-    color = v_Color;
-    // color = vec4(v_Position + vec3(0.5, 0.5, 0), 1.0);
+    color = u_Color;
 }
 )";
         
-        m_Shader.reset(PurrKatEngine::Shader::Create(vertexSrc, fragmentSrc));
+        m_FlatColorShader.reset(PurrKatEngine::Shader::Create(vertexSrc, fragmentSrc));
     }
 
     void OnImGuiRender() override
@@ -188,8 +189,37 @@ void main()
         // m_Camera->SetRotation(PurrKatEngine::Time::time * 1.f);
         
         PurrKatEngine::Renderer::BeginScene(*m_Camera);
-        PurrKatEngine::Renderer::SubmitGeometry(m_SquareVertexArray, m_Shader, m_SquareTransform.GetTransformMatrix());
-        PurrKatEngine::Renderer::SubmitGeometry(m_TriangleVertexArray, m_Shader);
+        PurrKatEngine::Renderer::SubmitGeometry(m_SquareVertexArray, m_FlatColorShader, m_SquareTransform.GetTransformMatrix());
+        PurrKatEngine::Renderer::SubmitGeometry(m_TriangleVertexArray, m_FlatColorShader);
+        
+        glm::vec4 redColor = {1.f, 0.f, 0.f, 1.f};
+        glm::vec4 greenColor = {0.f, 1.f, 0.f, 1.f};
+        
+        glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.5f));
+        
+        float triCount = 8;
+        float speed = 2;
+        for (int i = 0; i < triCount; i++)
+        {
+            if (i % 2 == 0)
+            {
+                m_FlatColorShader->UploadUniformFloat4("u_Color", redColor / (float)(i+1));
+            }
+            else
+            {
+                m_FlatColorShader->UploadUniformFloat4("u_Color", greenColor / (float)(i+1));
+            }
+            glm::vec3 position = {
+                glm::sin(PurrKatEngine::Time::time*speed + 2*glm::pi<float>() * i/triCount) * (i/triCount),
+                glm::cos(PurrKatEngine::Time::time*speed + 2*glm::pi<float>() * i/triCount) * (i/triCount),
+                0
+            };
+            glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+            // * glm::rotate(glm::mat4(1.0f), -(float)PurrKatEngine::Time::time*speed - 2*glm::pi<float>() * (i/triCount), glm::vec3(0, 0, 1))
+            * scale;
+            PurrKatEngine::Renderer::SubmitGeometry(m_TriangleVertexArray, m_FlatColorShader, transform);
+        }
+        
         PurrKatEngine::Renderer::EndScene();
     }
 
@@ -213,7 +243,7 @@ void main()
     
 private:
     std::shared_ptr<PurrKatEngine::OrthographicCamera> m_Camera;
-    std::shared_ptr<PurrKatEngine::Shader> m_Shader;
+    std::shared_ptr<PurrKatEngine::Shader> m_FlatColorShader;
     std::shared_ptr<PurrKatEngine::VertexArray> m_TriangleVertexArray;
     std::shared_ptr<PurrKatEngine::VertexArray> m_SquareVertexArray;
 

@@ -17,6 +17,7 @@ namespace PurrKatEngine
         
         void UploadUniformInt(const std::string& name, int value) const override;
         void UploadUniformFloat(const std::string& name, float value) const override;
+        void UploadUniformFloat4(const std::string& name, glm::vec4 color) const override;
         void UploadUniformMat4(const std::string& name, const glm::mat4& matrix) const override;
     };
 }

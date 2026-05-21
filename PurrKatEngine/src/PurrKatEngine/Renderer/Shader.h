@@ -14,6 +14,7 @@ namespace PurrKatEngine
         
         virtual void UploadUniformInt(const std::string& name, int value) const = 0;
         virtual void UploadUniformFloat(const std::string& name, float value) const = 0;
+        virtual void UploadUniformFloat4(const std::string& str, glm::vec4 color) const = 0;
         virtual void UploadUniformMat4(const std::string& name, const glm::mat4& matrix) const = 0;
 
         static Shader* Create(const std::string& vertexSource, const std::string& fragmentSrc);

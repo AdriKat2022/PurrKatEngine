@@ -135,6 +135,12 @@ namespace PurrKatEngine
     	glUniform1f(location, value);
     }
 
+    void OpenGLShader::UploadUniformFloat4(const std::string& name, glm::vec4 color) const
+    {
+    	GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+    	glUniform4f(location, color.r, color.g, color.b, color.a);
+    }
+
     void OpenGLShader::UploadUniformMat4(const std::string& name, const glm::mat4& matrix) const
     {
     	GLint location = glGetUniformLocation(m_RendererID, name.c_str());
