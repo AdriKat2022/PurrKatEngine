@@ -9,6 +9,9 @@ public:
     {
         auto& application = PurrKatEngine::Application::Get();
         
+        // Bind Inputs to do some logic
+        
+        // Camera Rotation Controller
         auto cameraRotationController = new PurrKatEngine::Standard2DInputController([this](float x, float _)
         {
             m_Camera->SetZRotation(m_Camera->GetZRotation() + x * PurrKatEngine::Time::deltaTime);
@@ -16,6 +19,7 @@ public:
         cameraRotationController->SetSpeed(1.f);
         application.PushOverlay(cameraRotationController);
         
+        // Camera Translation Controller
         auto cameraTranslateController = new PurrKatEngine::Standard2DInputController([this](float x, float y)
         {
             auto camPos = m_Camera->GetPosition();
@@ -26,6 +30,7 @@ public:
         cameraTranslateController->SetSpeed(1.f);
         application.PushOverlay(cameraTranslateController);
         
+        // Square Translation Controller
         auto squareTranslateController = new PurrKatEngine::Standard2DInputController([this](float x, float y)
         {
             m_SquareTransform.Move(glm::vec3(x * PurrKatEngine::Time::deltaTime, y * PurrKatEngine::Time::deltaTime, 0));
@@ -33,6 +38,7 @@ public:
         squareTranslateController->SetSpeed(1.f);
         application.PushOverlay(squareTranslateController);
         
+        // Square Scale Controller
         auto squareScaleController = new PurrKatEngine::Standard2DInputController([this](float x, float _)
         {
             glm::vec3 scale = m_SquareTransform.GetScale() + glm::vec3(x * PurrKatEngine::Time::deltaTime);
@@ -95,41 +101,8 @@ public:
         m_SquareVertexArray->AddVertexBuffer(squareVB);
         m_SquareVertexArray->SetIndexBuffer(squareIB);
         
-        // Test shader code.
-        std::string vertexSrc = R"(
-#version 330 core
-
-layout(location = 0) in vec3 a_Position;
-layout(location = 1) in vec4 a_Color;
-uniform mat4 u_ViewProjection;
-uniform mat4 u_Transform;
-out vec3 v_Position;
-out vec4 v_Color;
-void main()
-{
-    v_Color = a_Color;
-
-    v_Position = a_Position;
-    gl_Position = u_ViewProjection * u_Transform * vec4(a_Position*2, 1.0);
-}
-)";
-
-        std::string fragmentSrc = R"(
-#version 330 core
-
-layout(location = 0) out vec4 color;
-
-in vec3 v_Position;
-in vec4 v_Color;
-uniform vec4 u_Color;
-
-void main()
-{
-    color = u_Color;
-}
-)";
-        
-        m_FlatColorShader.reset(PurrKatEngine::Shader::Create(vertexSrc, fragmentSrc));
+        m_FlatColorShader.reset(PurrKatEngine::Shader::MakeFlatColorShader());
+        m_PositionColorShader.reset(PurrKatEngine::Shader::MakeScreenPositionColorShader());
     }
 
     void OnImGuiRender() override
@@ -186,16 +159,16 @@ void main()
         PurrKatEngine::RenderCommand::SetClearColor({0.1f, 0.1f, 0.1f, 1.0f});
         PurrKatEngine::RenderCommand::Clear();
         
-        // m_Camera->SetRotation(PurrKatEngine::Time::time * 1.f);
-        
         PurrKatEngine::Renderer::BeginScene(*m_Camera);
-        PurrKatEngine::Renderer::SubmitGeometry(m_SquareVertexArray, m_FlatColorShader, m_SquareTransform.GetTransformMatrix());
-        PurrKatEngine::Renderer::SubmitGeometry(m_TriangleVertexArray, m_FlatColorShader);
+        PurrKatEngine::Renderer::SubmitGeometry(m_SquareVertexArray, m_PositionColorShader, m_SquareTransform.GetTransformMatrix());
+        PurrKatEngine::Renderer::SubmitGeometry(m_TriangleVertexArray, m_PositionColorShader);
         
         glm::vec4 redColor = {1.f, 0.f, 0.f, 1.f};
         glm::vec4 greenColor = {0.f, 1.f, 0.f, 1.f};
         
         glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.5f));
+        
+        static glm::vec4 color = {1.f, 0.f, 0.f, 1.f};
         
         float triCount = 8;
         float speed = 2;
@@ -203,7 +176,7 @@ void main()
         {
             if (i % 2 == 0)
             {
-                m_FlatColorShader->UploadUniformFloat4("u_Color", redColor / (float)(i+1));
+                m_FlatColorShader->UploadUniformFloat4("u_Color", color / (float)(i+1));
             }
             else
             {
@@ -244,6 +217,7 @@ void main()
 private:
     std::shared_ptr<PurrKatEngine::OrthographicCamera> m_Camera;
     std::shared_ptr<PurrKatEngine::Shader> m_FlatColorShader;
+    std::shared_ptr<PurrKatEngine::Shader> m_PositionColorShader;
     std::shared_ptr<PurrKatEngine::VertexArray> m_TriangleVertexArray;
     std::shared_ptr<PurrKatEngine::VertexArray> m_SquareVertexArray;
 
