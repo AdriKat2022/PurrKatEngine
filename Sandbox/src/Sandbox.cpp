@@ -107,10 +107,15 @@ public:
         m_SquareVertexArray->AddVertexBuffer(squareVB);
         m_SquareVertexArray->SetIndexBuffer(squareIB);
         
+        // Load Textures
+        m_RazowskiTexture = Texture2D::Create("assets/razowski.png");
+        m_LoveTexture = Texture2D::Create("assets/love.png");
+        m_CppTexture = Texture2D::Create("assets/cpp.png");
+        
         m_TextureShader.reset(Shader::MakeTextureShader());
-        m_Texture = Texture2D::Create("assets/razowski.png");
         m_TextureShader->Bind();
         m_TextureShader->UploadUniformInt("u_Texture", 0);
+        
         
         // m_FlatColorShader.reset(Shader::MakeFlatColorShader());
         // m_PositionColorShader.reset(Shader::MakeScreenPositionColorShader());
@@ -179,11 +184,19 @@ public:
         
         Renderer::BeginScene(*m_Camera);
         
-        m_Texture->Bind();
+        m_RazowskiTexture->Bind();
+        Renderer::SubmitGeometry(m_SquareVertexArray, m_TextureShader);
+        
+        m_CppTexture->Bind();
         Renderer::SubmitGeometry(m_SquareVertexArray, m_TextureShader, m_SquareTransform.GetTransformMatrix());
+        
         // Renderer::SubmitGeometry(m_TriangleVertexArray, m_PositionColorShader);
-        Renderer::EndScene();
-        return;
+        
+        if (true)
+        {
+            Renderer::EndScene();
+            return;
+        }
         
         glm::vec4 redColor = {1.f, 0.f, 0.f, 1.f};
         glm::vec4 greenColor = {0.f, 1.f, 0.f, 1.f};
@@ -238,7 +251,9 @@ public:
     }
     
 private:
-    Ref<Texture2D> m_Texture;
+    Ref<Texture2D> m_RazowskiTexture;
+    Ref<Texture2D> m_LoveTexture;
+    Ref<Texture2D> m_CppTexture;
     
     Ref<OrthographicCamera> m_Camera;
     Ref<Shader> m_FlatColorShader;

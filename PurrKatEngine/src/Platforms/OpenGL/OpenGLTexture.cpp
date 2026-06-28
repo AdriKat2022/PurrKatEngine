@@ -10,9 +10,9 @@ namespace PurrKatEngine
     OpenGLTexture2D::OpenGLTexture2D(std::string path)
         : m_Path(std::move(path))
     {
-        int width, height, nrChannels;
+        int width, height, channels;
         stbi_set_flip_vertically_on_load(true);
-        stbi_uc* data = stbi_load(m_Path.c_str(), &width, &height, &nrChannels, 0);
+        stbi_uc* data = stbi_load(m_Path.c_str(), &width, &height, &channels, 0);
         PKE_CORE_ASSERT(data, "Failed to load image '{}'", m_Path);
         
         PKE_CORE_DEBUG("Creating ({}x{}) texture...", width, height);
@@ -20,13 +20,29 @@ namespace PurrKatEngine
         m_Width = width;
         m_Height = height;
         
+        GLenum internalFormat = 0, dataFormat = 0;
+        if (channels == 4)
+        {
+            // Supports transparency
+            internalFormat = GL_RGBA8;
+            dataFormat = GL_RGBA;
+        }
+        else if (channels == 3)
+        {
+            // No transparency channel
+            internalFormat = GL_RGB8;
+            dataFormat = GL_RGB;
+        }
+        
+        PKE_CORE_ASSERT(internalFormat && dataFormat, "Format not supported!");
+        
         glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
-        glTextureStorage2D(m_RendererID, 1, GL_RGB8, width, height);
+        glTextureStorage2D(m_RendererID, 1, internalFormat, width, height);
         
         glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         
-        glTextureSubImage2D(m_RendererID, 0, 0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glTextureSubImage2D(m_RendererID, 0, 0, 0, width, height, dataFormat, GL_UNSIGNED_BYTE, data);
         
         
         PKE_CORE_DEBUG("Freeing...");
