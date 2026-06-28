@@ -6,6 +6,7 @@
 #include "Inputs/Input.h"
 #include "Inputs/Time.h"
 #include "Logs/InternalLog.h"
+#include "Renderer/Renderer.h"
 #include "Window/Window.h"
 
 namespace PurrKatEngine
@@ -21,6 +22,8 @@ namespace PurrKatEngine
         m_Window = Scope<Window>(Window::Create());
         m_Window->SetEventCallback(PKE_BIND_FUNCTION(OnEvent));
 
+        Renderer::Init();
+        
         m_ImGuiLayer = new ImGuiLayer();
         PushOverlay(m_ImGuiLayer);
         m_TimeManagerLayer = new TimeManagerLayer();

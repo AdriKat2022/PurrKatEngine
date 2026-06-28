@@ -6,7 +6,12 @@
 namespace PurrKatEngine
 {
     RendererAPI* RenderCommand::s_RendererAPI = new OpenGLRendererAPI;
-    
+
+    void RenderCommand::Init()
+    {
+        s_RendererAPI->Init();
+    }
+
     void RenderCommand::SetClearColor(glm::vec4 color)
     {
         s_RendererAPI->SetClearColor(color);

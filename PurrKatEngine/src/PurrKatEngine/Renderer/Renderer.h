@@ -8,6 +8,8 @@ namespace PurrKatEngine
     class Renderer
     {
     public:
+        static void Init();
+        
         static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 
         static void BeginScene(OrthographicCamera& camera);

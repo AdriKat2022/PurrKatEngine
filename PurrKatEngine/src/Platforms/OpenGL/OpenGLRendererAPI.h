@@ -8,6 +8,8 @@ namespace PurrKatEngine
     public:
         ~OpenGLRendererAPI();
         
+        void Init() override;
+        
         void SetClearColor(const glm::vec4& color) override;
         void Clear() override;
         
