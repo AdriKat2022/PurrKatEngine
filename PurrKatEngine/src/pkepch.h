@@ -6,10 +6,12 @@
 #include <functional>
 #include <string>
 #include <sstream>
+#include <array>
 #include <vector>
 #include <format>
 
 #include "glm/glm.hpp"
+#include "PurrKatEngine/Core.h"
 #include "PurrKatEngine/Utility/Utility.h"
 #include "PurrKatEngine/Utility/Mathf.h"
 

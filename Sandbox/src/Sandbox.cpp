@@ -1,6 +1,5 @@
 #include <PurrKatEngine.h>
 #include "imgui/imgui.h"
-#include "Platforms/OpenGL/OpenGLShader.h"
 
 using namespace PKE;
 
@@ -108,14 +107,17 @@ public:
         m_SquareVertexArray->SetIndexBuffer(squareIB);
         
         // Load Textures
-        m_RazowskiTexture = Texture2D::Create("assets/razowski.png");
-        m_LoveTexture = Texture2D::Create("assets/love.png");
-        m_CppTexture = Texture2D::Create("assets/cpp.png");
+        m_RazowskiTexture = Texture2D::Create("assets/textures/razowski.png");
+        m_LoveTexture = Texture2D::Create("assets/textures/love.png");
+        m_CppTexture = Texture2D::Create("assets/textures/cpp.png");
+
+        Ref<Shader> textureShader = m_ShaderLibrary.Load("assets/shaders/Texture.glsl");
+        textureShader->Bind();
+        textureShader->UploadUniformInt("u_Texture", 0);
         
-        m_TextureShader.reset(Shader::MakeTextureShader());
-        m_TextureShader->Bind();
-        m_TextureShader->UploadUniformInt("u_Texture", 0);
-        
+        m_ShaderLibrary.Load("assets/shaders/FlatColor.glsl");
+        m_ShaderLibrary.Load("assets/shaders/WorldPositionColor.glsl");
+        m_ShaderLibrary.Load("assets/shaders/ScreenPositionColor.glsl");
         
         // m_FlatColorShader.reset(Shader::MakeFlatColorShader());
         // m_PositionColorShader.reset(Shader::MakeScreenPositionColorShader());
@@ -185,18 +187,15 @@ public:
         Renderer::BeginScene(*m_Camera);
         
         m_RazowskiTexture->Bind();
-        Renderer::SubmitGeometry(m_SquareVertexArray, m_TextureShader);
+        Renderer::SubmitGeometry(m_SquareVertexArray, m_ShaderLibrary.Get("Texture"));
         
         m_CppTexture->Bind();
-        Renderer::SubmitGeometry(m_SquareVertexArray, m_TextureShader, m_SquareTransform.GetTransformMatrix());
+        Renderer::SubmitGeometry(m_SquareVertexArray, m_ShaderLibrary.Get("Texture"), m_SquareTransform.GetTransformMatrix());
         
-        // Renderer::SubmitGeometry(m_TriangleVertexArray, m_PositionColorShader);
+        Renderer::SubmitGeometry(m_TriangleVertexArray, m_ShaderLibrary.Get("WorldPositionColor"));
         
-        if (true)
-        {
-            Renderer::EndScene();
-            return;
-        }
+        // Renderer::EndScene();
+        // return;
         
         glm::vec4 redColor = {1.f, 0.f, 0.f, 1.f};
         glm::vec4 greenColor = {0.f, 1.f, 0.f, 1.f};
@@ -207,16 +206,18 @@ public:
         
         float triCount = 8;
         float speed = 2;
-        if (false)
+
+        Ref<Shader> flatColorShader = m_ShaderLibrary.Get("FlatColor");
+        
         for (int i = 0; i < triCount; i++)
         {
             if (i % 2 == 0)
             {
-                m_FlatColorShader->UploadUniformFloat4("u_Color", MainColor / (float)(i+1));
+                flatColorShader->UploadUniformFloat4("u_Color", MainColor / (i*0.2f+1));
             }
             else
             {
-                m_FlatColorShader->UploadUniformFloat4("u_Color", greenColor / (float)(i+1));
+                flatColorShader->UploadUniformFloat4("u_Color", greenColor / (i*0.2f+1));
             }
             glm::vec3 position = {
                 glm::sin(Time::time*speed + 2*glm::pi<float>() * i/triCount) * (i/triCount),
@@ -226,7 +227,7 @@ public:
             glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
             // * glm::rotate(glm::mat4(1.0f), -(float)PKE::Time::time*speed - 2*glm::pi<float>() * (i/triCount), glm::vec3(0, 0, 1))
             * scale;
-            Renderer::SubmitGeometry(m_TriangleVertexArray, m_FlatColorShader, transform);
+            Renderer::SubmitGeometry(m_TriangleVertexArray, flatColorShader, transform);
         }
         
         Renderer::EndScene();
@@ -255,10 +256,12 @@ private:
     Ref<Texture2D> m_LoveTexture;
     Ref<Texture2D> m_CppTexture;
     
+    ShaderLibrary m_ShaderLibrary;
+    
     Ref<OrthographicCamera> m_Camera;
-    Ref<Shader> m_FlatColorShader;
-    Ref<Shader> m_PositionColorShader;
-    Ref<Shader> m_TextureShader;
+    // Ref<Shader> m_FlatColorShader;
+    // Ref<Shader> m_PositionColorShader;
+    // Ref<Shader> m_TextureShader;
     Ref<VertexArray> m_TriangleVertexArray;
     Ref<VertexArray> m_SquareVertexArray;
 
@@ -272,8 +275,6 @@ public:
     {
         PKE_LOG_TRACE("Sandbox application start. Hey, that's me! A log from the client!");
         PushLayer(new ExampleSandboxLayer());
-        
-        // GetWindow().SetVSync(false);
     }
 };
 
