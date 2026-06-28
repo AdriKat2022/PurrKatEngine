@@ -7,6 +7,8 @@ namespace PurrKatEngine
     class Shader
     {
     public:
+        static std::string s_TextureShaderVertexSrc;
+        static std::string s_TextureShaderFramgmentSrc;
         static std::string s_WorldVertexSrc;
         static std::string s_WorldCustomColorVertexSrc;
         static std::string s_WorldPositionColorVertexSrc;
@@ -31,11 +33,12 @@ namespace PurrKatEngine
         static Shader* Create(const std::string& vertexSource, const std::string& fragmentSrc);
         
         // Test/Classic shaders
+        static Shader* MakeTextureShader();
         static Shader* MakePositionColorShader();
         static Shader* MakeScreenPositionColorShader();
         static Shader* MakeFlatColorShader();
         static Shader* MakeCustomColorShader();
-        
+
     protected:
         uint32_t m_RendererID = 0;
     };

@@ -4,8 +4,8 @@
 
 namespace PurrKatEngine
 {
-    std::shared_ptr<spdlog::logger> InternalLog::m_CoreLogger;
-    std::shared_ptr<spdlog::logger> InternalLog::m_ClientLogger;
+    Ref<spdlog::logger> InternalLog::m_CoreLogger;
+    Ref<spdlog::logger> InternalLog::m_ClientLogger;
     
     void InternalLog::Init()
     {

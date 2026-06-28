@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <memory>
+
 #ifdef PKE_PLATFORM_WINDOWS
     #ifdef PKE_DYNAMIC_LIBRARY
         #ifdef PKE_BUILD_DLL
@@ -11,7 +13,7 @@
         #define PKE_API
     #endif
 #else
-    #error MyGameEngine only supports windows for now!
+    #error PurrKatEngine only supports windows for now!
 #endif
 
 #ifdef PKE_ENABLE_ASSERTS
@@ -26,3 +28,18 @@
 
 #define PKE_BIND_FUNCTION(memberFunction) [this](auto&&... args) -> decltype(auto) \
     { return this->memberFunction(std::forward<decltype(args)>(args)...); }
+
+namespace PurrKatEngine
+{
+    template<typename T>
+    using Ref = std::shared_ptr<T>;
+    
+    template<typename T, typename... Args>
+    Ref<T> MakeRef(Args&&... args)
+    {
+        return std::make_shared<T>(std::forward<Args>(args)...);
+    }
+    
+    template<typename T>
+    using Scope = std::unique_ptr<T>;
+}

@@ -12,6 +12,7 @@ IncludeDirs["GLFW"] = "PurrKatEngine/vendor/GLFW/include"
 IncludeDirs["Glad"] = "PurrKatEngine/vendor/glad/include"
 IncludeDirs["ImGui"] = "PurrKatEngine/vendor/imgui"
 IncludeDirs["Glm"] = "PurrKatEngine/vendor/glm"
+IncludeDirs["stb_image"] = "PurrKatEngine/vendor/stb_image"
 
 group "Dependencies"
     include "PurrKatEngine/vendor"
@@ -36,7 +37,9 @@ project "PurrKatEngine"
     files
     {
         "%{prj.name}/src/**.h",
-        "%{prj.name}/src/**.cpp"
+        "%{prj.name}/src/**.cpp",
+        "%{prj.name}/vendor/stb_image/**.h",
+        "%{prj.name}/vendor/stb_image/**.cpp",
     }
 
     includedirs
@@ -47,6 +50,7 @@ project "PurrKatEngine"
         "%{IncludeDirs.Glad}",
         "%{IncludeDirs.ImGui}",
         "%{IncludeDirs.Glm}",
+        "%{IncludeDirs.stb_image}"
     }
 
     links

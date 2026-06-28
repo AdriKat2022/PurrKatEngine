@@ -38,7 +38,7 @@ namespace PurrKatEngine
         
         bool m_IsRunning = true;
         
-        std::unique_ptr<Window> m_Window;
+        Scope<Window> m_Window;
         LayerStack m_LayerStack;
         ImGuiLayer* m_ImGuiLayer;
         TimeManagerLayer* m_TimeManagerLayer;

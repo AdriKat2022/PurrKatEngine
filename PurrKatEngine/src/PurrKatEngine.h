@@ -8,6 +8,7 @@
 #include "PurrKatEngine/Inputs/KeyCodes.h"
 #include "PurrKatEngine/Inputs/Time.h"
 
+#include "PurrKatEngine/Renderer/Texture.h"
 #include "PurrKatEngine/Renderer/Renderer.h"
 #include "PurrKatEngine/Renderer/RenderCommand.h"
 #include "PurrKatEngine/Renderer/OrthographicCamera.h"
@@ -15,6 +16,8 @@
 
 #include "PurrKatEngine/Components/Transform.h"
 #include "PurrKatEngine/Components/Standard2DInputController.h"
+
+#include <glm/gtc/type_ptr.hpp>
 
 // --- Entry Point ---
 #include "PurrKatEngine/EntryPoint.h"
@@ -24,3 +27,5 @@
 #define CREATE_APPLICATION PurrKatEngine::Application* PurrKatEngine::CreateApplication()
 // For a quick start if there is no need for extra customisation.
 #define CREATE_APPLICATION_FROM_CLASS(class) PurrKatEngine::Application* PurrKatEngine::CreateApplication() { return new class(); }
+
+namespace PKE = PurrKatEngine;
