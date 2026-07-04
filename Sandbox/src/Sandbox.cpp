@@ -9,44 +9,46 @@ class ExampleSandboxLayer : public ImGuiLayer
 public:
     glm::vec4 MainColor = {1.f, 1.f, 1.f, 1.f};
     
+    void OnTestActionInvoked() { PKE_LOG_INFO("TestAction invoked to func!"); }
+    
     ExampleSandboxLayer() :
-        m_Camera(std::make_shared<OrthographicCamera>(-1.6f, 1.6f, -0.9f, 0.9f)) // 16:9 Aspect ratio
+        m_Camera(std::make_shared<OrthographicCamera>(-1.6f, 1.6f, -0.9f, 0.9f)), // 16:9 Aspect ratio
     {
         auto& application = Application::Get();
         
         // Bind Inputs to do some logic
         
         // Camera Rotation Controller
-        auto cameraRotationController = new Standard2DInputController([this](float x, float _)
+        auto cameraRotationController = new Standard2DInputController([this](glm::vec2 input)
         {
-            m_Camera->SetZRotation(m_Camera->GetZRotation() + x * Time::deltaTime);
+            m_Camera->SetZRotation(m_Camera->GetZRotation() + input.x * Time::deltaTime);
         }, KeyCode::Q, KeyCode::E, KeyCode::None, KeyCode::None);
         cameraRotationController->SetSpeed(1.f);
         application.PushOverlay(cameraRotationController);
         
         // Camera Translation Controller
-        auto cameraTranslateController = new Standard2DInputController([this](float x, float y)
+        auto cameraTranslateController = new Standard2DInputController([this](glm::vec2 input)
         {
             auto camPos = m_Camera->GetPosition();
-            camPos.x += x * Time::deltaTime;
-            camPos.y += y * Time::deltaTime;
+            camPos.x += input.x * Time::deltaTime;
+            camPos.y += input.y * Time::deltaTime;
             m_Camera->SetPosition(camPos);
         });
         cameraTranslateController->SetSpeed(1.f);
         application.PushOverlay(cameraTranslateController);
         
         // Square Translation Controller
-        auto squareTranslateController = new Standard2DInputController([this](float x, float y)
+        auto squareTranslateController = new Standard2DInputController([this](glm::vec2 input)
         {
-            m_SquareTransform.Move(glm::vec3(x * Time::deltaTime, y * Time::deltaTime, 0));
+            m_SquareTransform.Move(glm::vec3(input.x * Time::deltaTime, input.y * Time::deltaTime, 0));
         }, KeyCode::LeftArrow, KeyCode::RightArrow, KeyCode::DownArrow, KeyCode::UpArrow);
         squareTranslateController->SetSpeed(1.f);
         application.PushOverlay(squareTranslateController);
         
         // Square Scale Controller
-        auto squareScaleController = new Standard2DInputController([this](float x, float _)
+        auto squareScaleController = new Standard2DInputController([this](glm::vec2 input)
         {
-            glm::vec3 scale = m_SquareTransform.GetScale() + glm::vec3(x * Time::deltaTime);
+            glm::vec3 scale = m_SquareTransform.GetScale() + glm::vec3(input.x * Time::deltaTime);
             m_SquareTransform.SetScale(scale);
         }, KeyCode::Keypad0, KeyCode::Keypad1, KeyCode::None, KeyCode::None);
         squareScaleController->SetSpeed(1.f);
@@ -56,15 +58,15 @@ public:
         
         // Store indices and vertices coordinates for the triangle.
         uint32_t indices[3] = {0, 1, 2};
-        float triangleVertices[3 * 7] = {
-            -0.15f, -0.15f, 0.0f, 1.0f, 1.0f, 0.f, 0.f,
-            0.15f, -0.15f, 0.0f, 1.0f, 0.0f, 0.f, 0.f,
-            0.0f, 0.15f, 0.0f, 1.0f, 0.0f, 1.f, 0.f,
+        float triangleVertices[3 * 3] = {
+            -0.5f, -0.5f, 0.0f,// 1.0f, 1.0f, 0.f, 0.f,
+            0.5f, -0.5f, 0.0f,// 1.0f, 0.0f, 0.f, 0.f,
+            0.0f, 0.5f, 0.0f,// 1.0f, 0.0f, 1.f, 0.f,
         };
 
         BufferLayout triangleLayout = {
             {ShaderDataType::Float3, "a_Position"},
-            {ShaderDataType::Float4, "a_Color"},
+            // {ShaderDataType::Float4, "a_Color"},
         };
 
         Ref<VertexBuffer> triangleVB = PKE::Ref<VertexBuffer>(
@@ -122,6 +124,20 @@ public:
         // m_FlatColorShader.reset(Shader::MakeFlatColorShader());
         // m_PositionColorShader.reset(Shader::MakeScreenPositionColorShader());
         
+        EventAction TEST_ACTION;
+        auto id = TEST_ACTION.AddListener([] { PKE_LOG_INFO("[T] TEST_ACTION invoked!"); });
+        TEST_ACTION.AddListener([] { PKE_LOG_INFO("[Y] TEST_ACTION invoked!"); });
+        auto id2 = TEST_ACTION += PKE_BIND_FUNCTION(ExampleSandboxLayer::OnTestActionInvoked);
+        TEST_ACTION.Invoke();
+        TEST_ACTION.RemoveListener(id);
+        TEST_ACTION -= id2;
+        TEST_ACTION.Invoke();
+        TEST_ACTION.ClearListeners();
+        TEST_ACTION.Invoke();
+        
+        EventAction<float> TEST_ACTION2;
+        TEST_ACTION2.AddListener([](float x) { PKE_LOG_INFO("[T] TEST_ACTION2 invoked with value: {}", x); });
+        TEST_ACTION2.Invoke(1.2f);
     }
 
     void OnImGuiRender() override
@@ -259,9 +275,7 @@ private:
     ShaderLibrary m_ShaderLibrary;
     
     Ref<OrthographicCamera> m_Camera;
-    // Ref<Shader> m_FlatColorShader;
-    // Ref<Shader> m_PositionColorShader;
-    // Ref<Shader> m_TextureShader;
+
     Ref<VertexArray> m_TriangleVertexArray;
     Ref<VertexArray> m_SquareVertexArray;
 

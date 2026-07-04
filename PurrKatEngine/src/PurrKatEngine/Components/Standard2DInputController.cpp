@@ -60,6 +60,6 @@ namespace PurrKatEngine
     {
         Layer::OnUpdate();
         
-        m_OnInputCallback(m_CurrentInput.x * m_Speed, m_CurrentInput.y * m_Speed);
+        m_OnInputCallback.Invoke({m_CurrentInput.x * m_Speed, m_CurrentInput.y * m_Speed});
     }
 }
