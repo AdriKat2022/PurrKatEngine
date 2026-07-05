@@ -5,6 +5,7 @@
 #include "PurrKatEngine/Events/KeyReleasedEvent.h"
 #include "PurrKatEngine/Inputs/Time.h"
 #include "PurrKatEngine/Logs/InternalLog.h"
+#include "PurrKatEngine/Logs/Log.h"
 
 namespace PurrKatEngine
 {
@@ -60,6 +61,8 @@ namespace PurrKatEngine
     {
         Layer::OnUpdate();
         
-        m_OnInputCallback.Invoke({m_CurrentInput.x * m_Speed, m_CurrentInput.y * m_Speed});
+        PKE_LOG_DEBUG("AAAAAAAAAAAAA0 ({}, {})", m_CurrentInput.x, m_CurrentInput.y);
+        
+        m_OnInputCallback.Invoke({m_CurrentInput.x * m_InputAmplitude, m_CurrentInput.y * m_InputAmplitude});
     }
 }

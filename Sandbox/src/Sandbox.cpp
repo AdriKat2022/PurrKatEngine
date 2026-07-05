@@ -12,30 +12,11 @@ public:
     void OnTestActionInvoked() { PKE_LOG_INFO("TestAction invoked to func!"); }
     
     ExampleSandboxLayer() :
-        m_Camera(std::make_shared<OrthographicCamera>(-1.6f, 1.6f, -0.9f, 0.9f)), // 16:9 Aspect ratio
+        m_CameraController(16.0f/9.0f, 1.0f) // 16:9 Aspect ratio
     {
         auto& application = Application::Get();
         
         // Bind Inputs to do some logic
-        
-        // Camera Rotation Controller
-        auto cameraRotationController = new Standard2DInputController([this](glm::vec2 input)
-        {
-            m_Camera->SetZRotation(m_Camera->GetZRotation() + input.x * Time::deltaTime);
-        }, KeyCode::Q, KeyCode::E, KeyCode::None, KeyCode::None);
-        cameraRotationController->SetSpeed(1.f);
-        application.PushOverlay(cameraRotationController);
-        
-        // Camera Translation Controller
-        auto cameraTranslateController = new Standard2DInputController([this](glm::vec2 input)
-        {
-            auto camPos = m_Camera->GetPosition();
-            camPos.x += input.x * Time::deltaTime;
-            camPos.y += input.y * Time::deltaTime;
-            m_Camera->SetPosition(camPos);
-        });
-        cameraTranslateController->SetSpeed(1.f);
-        application.PushOverlay(cameraTranslateController);
         
         // Square Translation Controller
         auto squareTranslateController = new Standard2DInputController([this](glm::vec2 input)
@@ -142,19 +123,19 @@ public:
 
     void OnImGuiRender() override
     {
-        
         ImGui::Begin("Parameters");
         {
             ImGui::ColorEdit3("Main Color", glm::value_ptr(MainColor));
+            ImGui::DragFloat("CameraZoom", m_CameraController.GetCamera().GetZoomPtr(), 0.1f, 0.1f, 10.f);
         }
         ImGui::End();
         
         static bool showOtherStatistics = true;
         ImGui::Begin("Properties", &showOtherStatistics);
         {
-            auto camPos = m_Camera->GetPosition();
+            auto camPos = m_CameraController.GetCamera().GetPosition();
             ImGui::Text("Camera Position: x: %.2f y: %.2f z: %.2f", camPos.x, camPos.y, camPos.z);
-            ImGui::Text("Camera Rotation: z: %.2f", m_Camera->GetZRotation());
+            ImGui::Text("Camera Rotation: z: %.2f", m_CameraController.GetCamera().GetZRotation());
             
             ImGui::Separator();
             
@@ -197,10 +178,12 @@ public:
 
     void OnUpdate() override
     {
+        m_CameraController.OnUpdate();
+        
         RenderCommand::SetClearColor({0.1f, 0.1f, 0.1f, 1.0f});
         RenderCommand::Clear();
         
-        Renderer::BeginScene(*m_Camera);
+        Renderer::BeginScene(m_CameraController.GetCamera());
         
         m_RazowskiTexture->Bind();
         Renderer::SubmitGeometry(m_SquareVertexArray, m_ShaderLibrary.Get("Texture"));
@@ -252,6 +235,8 @@ public:
     void OnEvent(Event& e) override
     {
         // PKE_LOG_DEBUG("ExampleSandboxLayer::OnEvent {}", e.ToString());
+        m_CameraController.OnEvent(e);
+        
         
         EventDispatcher dispatcher(e);
         dispatcher.Dispatch<KeyPressedEvent>([this](KeyPressedEvent& e) {
@@ -274,7 +259,7 @@ private:
     
     ShaderLibrary m_ShaderLibrary;
     
-    Ref<OrthographicCamera> m_Camera;
+    OrthographicCameraController m_CameraController;
 
     Ref<VertexArray> m_TriangleVertexArray;
     Ref<VertexArray> m_SquareVertexArray;

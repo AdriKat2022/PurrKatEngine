@@ -12,6 +12,11 @@ namespace PurrKatEngine
         RecalculateViewMatrix();
     }
 
+    void OrthographicCamera::SetProjection(float x, float x1, float x2, float x3) {
+        m_ProjectionMatrix = glm::ortho(x, x1, x2, x3);
+        RecalculateViewMatrix();
+    }
+
     void OrthographicCamera::RecalculateViewMatrix()
     {
         glm::mat4 identityMatrix(1.0f);
