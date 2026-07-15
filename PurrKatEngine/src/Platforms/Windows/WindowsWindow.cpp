@@ -22,12 +22,12 @@ namespace PurrKatEngine
 
     WindowsWindow::WindowsWindow(const WindowProps& props)
     {
-        Init(props);
+        WindowsWindow::Init(props);
     }
 
     WindowsWindow::~WindowsWindow()
     {
-        Shutdown();
+        WindowsWindow::Shutdown();
     }
 
     void WindowsWindow::SetVSync(const bool enabled)

@@ -22,6 +22,7 @@ namespace PurrKatEngine
         bool EnableMovement = true;
         bool EnableRotation = true;
         bool EnableZoom = true;
+        bool AutoAdjustAspectRatio = true;
         
     private:
         bool OnMouseScroll(MouseScrollEvent& e);

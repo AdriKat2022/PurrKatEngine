@@ -123,15 +123,23 @@ public:
 
     void OnImGuiRender() override
     {
-        ImGui::Begin("Parameters");
+        static bool showParameters = true;
+        if (ImGui::Begin("Parameters", &showParameters))
         {
-            ImGui::ColorEdit3("Main Color", glm::value_ptr(MainColor));
-            ImGui::DragFloat("CameraZoom", m_CameraController.GetCamera().GetZoomPtr(), 0.1f, 0.1f, 10.f);
+            if (ImGui::CollapsingHeader("Camera Controller", ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                ImGui::Checkbox("Camera Auto Adjust Aspect Ratio", &m_CameraController.AutoAdjustAspectRatio);
+                ImGui::DragFloat("CameraZoom", m_CameraController.GetCamera().GetZoomPtr(), 0.1f, 0.1f, 10.f);
+            }
+            if (ImGui::CollapsingHeader("Colors", ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                ImGui::ColorEdit3("Main Color", glm::value_ptr(MainColor));
+            }
         }
         ImGui::End();
         
         static bool showOtherStatistics = true;
-        ImGui::Begin("Properties", &showOtherStatistics);
+        if (ImGui::Begin("Properties", &showOtherStatistics))
         {
             auto camPos = m_CameraController.GetCamera().GetPosition();
             ImGui::Text("Camera Position: x: %.2f y: %.2f z: %.2f", camPos.x, camPos.y, camPos.z);
@@ -147,7 +155,7 @@ public:
         ImGui::End();
         
         static bool showStatisticsWindow = true;
-        ImGui::Begin("Statistics", &showStatisticsWindow);
+        if (ImGui::Begin("Statistics", &showStatisticsWindow))
         {
             ImGui::Text("Framerate: %.2f", 1/Time::deltaTime);
             ImGui::Text("VSync: %d", Application::Get().GetWindow().IsVSync());
@@ -235,10 +243,12 @@ public:
     void OnEvent(Event& e) override
     {
         // PKE_LOG_DEBUG("ExampleSandboxLayer::OnEvent {}", e.ToString());
+        
         m_CameraController.OnEvent(e);
         
-        
         EventDispatcher dispatcher(e);
+        
+        // Switch VSync when tapping the Spacebar.
         dispatcher.Dispatch<KeyPressedEvent>([this](KeyPressedEvent& e) {
             if (!e.IsRepeat() && e.GetKeyCode() == KeyCode::Space)
             {

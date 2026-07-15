@@ -5,9 +5,6 @@
 #include "ImGui/ImGuiLayer.h"
 #include "Inputs/Time.h"
 #include "Layers/LayerStack.h"
-#include "Renderer/Buffer.h"
-#include "Renderer/OrthographicCamera.h"
-#include "Renderer/Shader.h"
 #include "Renderer/VertexArray.h"
 #include "Window/Window.h"
 
@@ -26,24 +23,23 @@ namespace PurrKatEngine
 
         void PushLayer(Layer* layer);
         void PushOverlay(Layer* overlay);
-
-        // OrthographicCamera& GetMainCamera() { return m_Camera; }
+        
         Window& GetWindow() const { return *m_Window; }
         
     protected:
+        virtual bool OnWindowResized(WindowResizeEvent& windowResizeEvent);
         virtual bool OnWindowClosed(WindowCloseEvent& windowCloseEvent);
 
     private:
         static Application* s_Instance;
         
+        bool m_IsMinimized = false;
         bool m_IsRunning = true;
         
         Scope<Window> m_Window;
         LayerStack m_LayerStack;
         ImGuiLayer* m_ImGuiLayer;
         TimeManagerLayer* m_TimeManagerLayer;
-        
-        // OrthographicCamera m_Camera;
     };
 
     // To be defined in a CLIENT.

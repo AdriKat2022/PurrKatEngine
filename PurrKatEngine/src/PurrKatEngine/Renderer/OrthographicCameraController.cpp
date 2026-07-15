@@ -59,8 +59,10 @@ namespace PurrKatEngine
     
     bool OrthographicCameraController::OnWindowResized(WindowResizeEvent& e)
     {
+        if (!AutoAdjustAspectRatio) return false;
+        
         m_AspectRatio = (float)e.GetWidth() / (float)e.GetHeight();
         m_Camera.SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
-        return true;
+        return false;
     }
 }

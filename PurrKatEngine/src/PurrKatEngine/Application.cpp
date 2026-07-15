@@ -3,7 +3,6 @@
 #include "Application.h"
 
 #include "Components/Standard2DInputController.h"
-#include "Inputs/Input.h"
 #include "Inputs/Time.h"
 #include "Logs/InternalLog.h"
 #include "Renderer/Renderer.h"
@@ -24,10 +23,9 @@ namespace PurrKatEngine
 
         Renderer::Init();
         
+        m_TimeManagerLayer = new TimeManagerLayer();
         m_ImGuiLayer = new ImGuiLayer();
         PushOverlay(m_ImGuiLayer);
-        m_TimeManagerLayer = new TimeManagerLayer();
-        PushOverlay(m_TimeManagerLayer);
     }
 
     Application::~Application()
@@ -41,6 +39,7 @@ namespace PurrKatEngine
         EventDispatcher dispatcher(e);
 
         dispatcher.Dispatch<WindowCloseEvent>(PKE_BIND_FUNCTION(OnWindowClosed));
+        dispatcher.Dispatch<WindowResizeEvent>(PKE_BIND_FUNCTION(OnWindowResized));
 
         for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();)
         {
@@ -54,9 +53,15 @@ namespace PurrKatEngine
     {
         while (m_IsRunning)
         {
-            for (Layer* layer : m_LayerStack)
+            m_TimeManagerLayer->OnUpdate();
+            
+            if (!m_IsMinimized)
             {
-                layer->OnUpdate();
+                for (Layer* layer : m_LayerStack)
+                {
+                    layer->OnUpdate();
+                }
+
             }
             
             m_ImGuiLayer->Begin();
@@ -82,9 +87,24 @@ namespace PurrKatEngine
         overlay->OnAttach();
     }
 
+    bool Application::OnWindowResized(WindowResizeEvent& windowResizeEvent)
+    {
+        if (windowResizeEvent.GetWidth() == 0 || windowResizeEvent.GetHeight() == 0)
+        {
+            PKE_CORE_DEBUG("Window is minimised!");
+            m_IsMinimized = true;
+            return false;
+        }
+        
+        m_IsMinimized = false;
+        Renderer::OnWindowResize(windowResizeEvent.GetWidth(), windowResizeEvent.GetHeight());
+        
+        return false;
+    }
+    
     bool Application::OnWindowClosed(WindowCloseEvent& windowCloseEvent)
     {
         m_IsRunning = false;
-        return true;
+        return false;
     }
 }
