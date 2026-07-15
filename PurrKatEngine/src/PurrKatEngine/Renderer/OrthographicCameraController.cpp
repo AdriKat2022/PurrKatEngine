@@ -5,8 +5,9 @@
 
 namespace PurrKatEngine
 {
-    OrthographicCameraController::OrthographicCameraController(float aspectRatio, float zoomLevel)
-        : m_AspectRatio(aspectRatio),
+    OrthographicCameraController::OrthographicCameraController(float aspectRatio, float zoomLevel, bool useScrollToZoom)
+        : EnableZoom(useScrollToZoom),
+          m_AspectRatio(aspectRatio),
           m_ZoomLevel(zoomLevel),
           m_Camera(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel),
           m_CameraMovementInputController([this](glm::vec2 input)
@@ -48,7 +49,10 @@ namespace PurrKatEngine
     
     bool OrthographicCameraController::OnMouseScroll(MouseScrollEvent& e)
     {
+        if (!EnableZoom) return false;
+        
         m_ZoomLevel -= e.GetYOffset() * 0.25f;
+        m_ZoomLevel = std::max(0.01f, m_ZoomLevel);
         m_Camera.SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
         return true;
     }

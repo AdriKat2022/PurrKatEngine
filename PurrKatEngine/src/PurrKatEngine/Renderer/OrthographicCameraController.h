@@ -12,15 +12,16 @@ namespace PurrKatEngine
     class OrthographicCameraController
     {
     public:
-        OrthographicCameraController(float aspectRatio, float zoomLevel);
+        OrthographicCameraController(float aspectRatio, float zoomLevel, bool useScrollToZoom = false);
         
         OrthographicCamera& GetCamera() { return m_Camera; }
-        
+
         void OnUpdate();
         void OnEvent(Event& e);
         
         bool EnableMovement = true;
         bool EnableRotation = true;
+        bool EnableZoom = true;
         
     private:
         bool OnMouseScroll(MouseScrollEvent& e);

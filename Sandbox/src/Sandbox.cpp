@@ -12,7 +12,7 @@ public:
     void OnTestActionInvoked() { PKE_LOG_INFO("TestAction invoked to func!"); }
     
     ExampleSandboxLayer() :
-        m_CameraController(16.0f/9.0f, 1.0f) // 16:9 Aspect ratio
+        m_CameraController(16.0f/9.0f, 1.0f, true) // 16:9 Aspect ratio
     {
         auto& application = Application::Get();
         
