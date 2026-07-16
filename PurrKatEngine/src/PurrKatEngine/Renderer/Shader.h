@@ -27,9 +27,9 @@ namespace PurrKatEngine
         
         virtual void SetUniformInt(const std::string& name, int value) const = 0;
         virtual void SetUniformFloat(const std::string& name, float value) const = 0;
-        virtual void SetUniformFloat2(const std::string& str, glm::vec2 color) const = 0;
-        virtual void SetUniformFloat3(const std::string& str, glm::vec3 color) const = 0;
-        virtual void SetUniformFloat4(const std::string& str, glm::vec4 color) const = 0;
+        virtual void SetUniformFloat2(const std::string& name, glm::vec2 color) const = 0;
+        virtual void SetUniformFloat3(const std::string& name, glm::vec3 color) const = 0;
+        virtual void SetUniformFloat4(const std::string& name, glm::vec4 color) const = 0;
         virtual void SetUniformMat4(const std::string& name, const glm::mat4& matrix) const = 0;
     };
     

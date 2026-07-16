@@ -1,6 +1,7 @@
 ﻿#include "pkepch.h"
 #include "Renderer2D.h"
 
+#include <glm/ext/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.inl>
 #include "Buffer.h"
 #include "RenderCommand.h"
@@ -56,7 +57,6 @@ namespace PurrKatEngine
     {
         s_RendererData->FlatColorShader->Bind();
         s_RendererData->FlatColorShader->SetUniformMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
-        s_RendererData->FlatColorShader->SetUniformMat4("u_Transform", glm::mat4(1.0f));
     }
     
     void Renderer2D::EndScene()
@@ -73,6 +73,10 @@ namespace PurrKatEngine
     {
         // The following bind is safer but costs more performances (if we're, for example, drawing smth in 3D before drawing back in 2D, the wrong shader could be bind).
         s_RendererData->FlatColorShader->Bind();
+        
+        auto transformMatrix = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+        
+        s_RendererData->FlatColorShader->SetUniformMat4("u_Transform", transformMatrix);
         s_RendererData->FlatColorShader->SetUniformFloat4("u_Color", color);
         s_RendererData->QuadVertexArray->Bind();
         RenderCommand::DrawIndexed(s_RendererData->QuadVertexArray.get());
