@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "OrthographicCamera.h"
+#include "Texture.h"
 
 namespace PurrKatEngine
 {
@@ -15,5 +16,8 @@ namespace PurrKatEngine
         // Primitives
         static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color = {1.0f, 1.0f, 1.0f, 1.0f});
         static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color = {1.0f, 1.0f, 1.0f, 1.0f});
+        
+        static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const Texture* texture, const glm::vec4& color = {1.0f, 1.0f, 1.0f, 1.0f});
+        static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const Texture* texture, const glm::vec4& color = {1.0f, 1.0f, 1.0f, 1.0f});
     };
 }

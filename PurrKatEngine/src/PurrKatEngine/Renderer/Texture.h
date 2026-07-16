@@ -18,6 +18,6 @@ namespace PurrKatEngine
     class Texture2D : public Texture
     {
     public:
-        static Ref<Texture2D> Create(const std::string& path);
+        static Texture2D* Create(const std::string& path);
     };
 }

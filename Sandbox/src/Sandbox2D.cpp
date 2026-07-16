@@ -17,12 +17,13 @@ Sandbox2D::Sandbox2D() :
 {
     m_InputMoveSquareController.SetSpeed(0.05f);
     m_InputSizeSquareController.SetSpeed(0.05f);
+    
+    m_RazowskiTexture = ToScope(Texture2D::Create("assets/textures/razowski.png"));
 }
 
 void Sandbox2D::OnAttach()
 {
     Layer::OnAttach();
-    
 }
 
 void Sandbox2D::OnDetach()
@@ -41,7 +42,9 @@ void Sandbox2D::OnUpdate()
     RenderCommand::Clear();
     
     Renderer2D::BeginScene(m_CameraController.GetCamera());
-    Renderer2D::DrawQuad(m_SquareTransform.GetPosition(), m_SquareTransform.GetScale(), m_SquareColor);
+    Renderer2D::DrawQuad({-1.f, 0.5f}, m_SquareTransform.GetScale(), m_SquareColor + 0.2f);
+    Renderer2D::DrawQuad({1.f, 0.5f, -0.2f}, m_SquareTransform.GetScale(), m_SquareColor - 0.2f);
+    Renderer2D::DrawQuad(m_SquareTransform.GetPosition(), m_SquareTransform.GetScale(), m_RazowskiTexture.get(), m_SquareColor);
     Renderer2D::EndScene();
 }
 

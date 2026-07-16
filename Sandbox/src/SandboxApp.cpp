@@ -91,9 +91,9 @@ public:
         m_SquareVertexArray->SetIndexBuffer(squareIB);
         
         // Load Textures
-        m_RazowskiTexture = Texture2D::Create("assets/textures/razowski.png");
-        m_LoveTexture = Texture2D::Create("assets/textures/love.png");
-        m_CppTexture = Texture2D::Create("assets/textures/cpp.png");
+        m_RazowskiTexture = ToRef(Texture2D::Create("assets/textures/razowski.png"));
+        m_LoveTexture = ToRef(Texture2D::Create("assets/textures/love.png"));
+        m_CppTexture = ToRef(Texture2D::Create("assets/textures/cpp.png"));
 
         Ref<Shader> textureShader = m_ShaderLibrary.Load("assets/shaders/Texture.glsl");
         textureShader->Bind();

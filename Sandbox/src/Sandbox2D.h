@@ -21,5 +21,7 @@ private:
     PKE::Standard2DInputController m_InputMoveSquareController;
     PKE::Standard1DInputController m_InputSizeSquareController;
 
+    PKE::Scope<PKE::Texture2D> m_RazowskiTexture;
+
     PKE::ShaderLibrary m_ShaderLibrary;
 };
