@@ -1,5 +1,6 @@
 #include <PurrKatEngine.h>
-#include "imgui/imgui.h"
+#include <PurrKatEngine/EntryPoint.h>
+#include "Sandbox2D.h"
 
 using namespace PKE;
 
@@ -278,14 +279,15 @@ private:
     Transform m_SquareTransform;
 };
 
-class Sandbox : public Application
+class SandboxApp : public Application
 {
 public:
-    Sandbox()
+    SandboxApp()
     {
         PKE_LOG_TRACE("Sandbox application start. Hey, that's me! A log from the client!");
-        PushLayer(new ExampleSandboxLayer());
+        // PushLayer(new ExampleSandboxLayer());
+        PushLayer(new Sandbox2D());
     }
 };
 
-CREATE_APPLICATION_FROM_CLASS(Sandbox);
+RUN_CLASS(SandboxApp);
