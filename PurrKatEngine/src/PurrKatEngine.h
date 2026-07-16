@@ -18,6 +18,7 @@
 #include "PurrKatEngine/Components/Transform.h"
 #include "PurrKatEngine/Components/Standard2DInputController.h"
 
+#include "PurrKatEngine/Utility/ImGuiUtility.h"
 #include "PurrKatEngine/Utility/EventAction.h"
 
 #include <glm/gtc/type_ptr.hpp>

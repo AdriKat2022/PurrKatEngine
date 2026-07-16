@@ -9,6 +9,13 @@
 
 namespace PurrKatEngine
 {
+    enum class AspectRatioAdjustmentMode : byte
+    {
+        None,
+        MatchWidth,
+        MatchHeight,
+    };
+    
     class OrthographicCameraController
     {
     public:
@@ -19,10 +26,13 @@ namespace PurrKatEngine
         void OnUpdate();
         void OnEvent(Event& e);
         
+        float GetZoomLevel() const { return m_ZoomLevel; }
+        void SetZoomLevel(float level) { m_ZoomLevel = level; }
+        
         bool EnableMovement = true;
         bool EnableRotation = true;
         bool EnableZoom = true;
-        bool AutoAdjustAspectRatio = true;
+        AspectRatioAdjustmentMode AspectRatioAdjustment = AspectRatioAdjustmentMode::MatchHeight;
         
     private:
         bool OnMouseScroll(MouseScrollEvent& e);

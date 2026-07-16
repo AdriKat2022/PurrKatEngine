@@ -128,7 +128,8 @@ public:
         {
             if (ImGui::CollapsingHeader("Camera Controller", ImGuiTreeNodeFlags_DefaultOpen))
             {
-                ImGui::Checkbox("Camera Auto Adjust Aspect Ratio", &m_CameraController.AutoAdjustAspectRatio);
+                static constexpr std::array<const char*, 3> aspectRatioOptions = {"None", "Match Width", "Match Height"};
+                ImGuiUtility::EnumCombo("Camera Auto Adjust Aspect Ratio", m_CameraController.AspectRatioAdjustment, aspectRatioOptions);
                 ImGui::DragFloat("CameraZoom", m_CameraController.GetCamera().GetZoomPtr(), 0.1f, 0.1f, 10.f);
             }
             if (ImGui::CollapsingHeader("Colors", ImGuiTreeNodeFlags_DefaultOpen))
