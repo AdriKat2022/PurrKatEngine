@@ -14,6 +14,7 @@ public:
     
 private:
     glm::vec4 m_BackgroundColor = { 0.1f, 0.1f, 0.1f, 1.0f };
+    glm::vec4 m_SquareColor = { 0.1f, 0.1f, 0.1f, 1.0f };
 
     PKE::ShaderLibrary m_ShaderLibrary;
     PKE::OrthographicCameraController m_CameraController;

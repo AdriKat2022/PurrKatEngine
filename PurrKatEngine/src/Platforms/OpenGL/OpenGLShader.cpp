@@ -3,7 +3,6 @@
 
 #include "PurrKatEngine/Logs/InternalLog.h"
 #include <fstream>
-#include <backends/imgui_impl_opengl3_loader.h>
 #include <glm/gtc/type_ptr.hpp>
 
 namespace PurrKatEngine

@@ -2,6 +2,7 @@
 #include "Renderer.h"
 
 #include "RenderCommand.h"
+#include "Renderer2D.h"
 
 namespace PurrKatEngine
 {
@@ -10,6 +11,7 @@ namespace PurrKatEngine
     void Renderer::Init()
     {
         RenderCommand::Init();
+        Renderer2D::Init();
     }
 
     void Renderer::OnWindowResize(uint32_t width, uint32_t height)
@@ -28,7 +30,7 @@ namespace PurrKatEngine
         shader->UploadUniformMat4("u_ViewProjection", s_SceneData->ViewProjectionMatrix); // If using a single shader + static camera, this can be done once at the start, and never again.
         shader->UploadUniformMat4("u_Transform", transform);
         vertexArray->Bind();
-        RenderCommand::DrawIndexed(vertexArray);
+        RenderCommand::DrawIndexed(vertexArray.get());
     }
 
     void Renderer::EndScene()

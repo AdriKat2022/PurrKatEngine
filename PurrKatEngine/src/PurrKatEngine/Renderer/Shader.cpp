@@ -6,20 +6,20 @@
 
 namespace PurrKatEngine
 {
-    Ref<Shader> Shader::Create(const std::string& filePath)
+    Shader* Shader::Create(const std::string& filePath)
     {
         switch (RendererAPI::GetAPI()) {
             case RendererAPI::API::None:
                 PKE_CORE_ASSERT(false, "RendererAPI::None is currently not supported.")
                 return nullptr;
             case RendererAPI::API::OpenGL:
-                return MakeRef<OpenGLShader>(filePath);
+                return new OpenGLShader(filePath);
         }
         
         return nullptr;
     }
 
-    Ref<Shader> Shader::Create(const std::string& name, const std::string& vertexSource, const std::string& fragmentSrc)
+    Shader* Shader::Create(const std::string& name, const std::string& vertexSource, const std::string& fragmentSrc)
     {
         switch (RendererAPI::GetAPI())
         {
@@ -27,13 +27,13 @@ namespace PurrKatEngine
                 PKE_CORE_ASSERT(false, "RendererAPI::None is currently not supported.")
                 return nullptr;
             case RendererAPI::API::OpenGL:
-                return MakeRef<OpenGLShader>(name, vertexSource, fragmentSrc);
+                return new OpenGLShader(name, vertexSource, fragmentSrc);
         }
         
         return nullptr;
     }
-    
-    Ref<Shader> Shader::MakeTextureShader()
+
+    Shader* Shader::MakeTextureShader()
     {
         return Create("assets/shaders/Texture.glsl");
     }
@@ -55,14 +55,14 @@ namespace PurrKatEngine
 
     Ref<Shader> ShaderLibrary::Load(const std::string& filePath)
     {
-        auto shader = Shader::Create(filePath);
+        auto shader = ToRef(Shader::Create(filePath));
         Add(shader);
         return shader;
     }
     
     Ref<Shader> ShaderLibrary::Load(const std::string& filePath, const std::string& name)
     {
-        auto shader = Shader::Create(filePath);
+        auto shader = ToRef(Shader::Create(filePath));
         Add(shader, name);
         return shader;
     }

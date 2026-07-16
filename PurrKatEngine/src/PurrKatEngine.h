@@ -17,6 +17,7 @@
 #include "PurrKatEngine/Renderer/OrthographicCameraController.h"
 #include "PurrKatEngine/Renderer/RenderCommand.h"
 #include "PurrKatEngine/Renderer/Renderer.h"
+#include "PurrKatEngine/Renderer/Renderer2D.h"
 #include "PurrKatEngine/Renderer/Texture.h"
 #include "PurrKatEngine/Renderer/VertexArray.h"
 

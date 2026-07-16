@@ -5,7 +5,7 @@
 
 namespace PurrKatEngine
 {
-    RendererAPI* RenderCommand::s_RendererAPI = new OpenGLRendererAPI;
+    RendererAPI* RenderCommand::s_RendererAPI = new OpenGLRendererAPI();
 
     void RenderCommand::Init()
     {
@@ -27,7 +27,7 @@ namespace PurrKatEngine
         s_RendererAPI->Clear();
     }
 
-    void RenderCommand::DrawIndexed(const Ref<VertexArray>& vertexArray)
+    void RenderCommand::DrawIndexed(const VertexArray* vertexArray)
     {
         s_RendererAPI->DrawIndexed(vertexArray);
     }

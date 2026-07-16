@@ -22,6 +22,10 @@ void Sandbox2D::OnUpdate()
     
     RenderCommand::SetClearColor(m_BackgroundColor);
     RenderCommand::Clear();
+    
+    Renderer2D::BeginScene(m_CameraController.GetCamera());
+    Renderer2D::DrawQuad({0.0f, 0.0f}, {1.0f, 1.0f}, m_SquareColor);
+    Renderer2D::EndScene();
 }
 
 void Sandbox2D::OnImGuiRender()
@@ -31,7 +35,8 @@ void Sandbox2D::OnImGuiRender()
     static bool showSettings = true;
     if (ImGui::Begin("Settings", &showSettings, ImGuiWindowFlags_AlwaysAutoResize))
     {
-        ImGui::ColorEdit4("Background Color", (float*)&m_BackgroundColor);
+        ImGui::ColorEdit4("Background Color", glm::value_ptr(m_BackgroundColor));
+        ImGui::ColorEdit4("Square Color", glm::value_ptr(m_SquareColor));
     }
     ImGui::End();
 }

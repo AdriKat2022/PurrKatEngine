@@ -40,6 +40,12 @@ namespace PurrKatEngine
         return std::make_shared<T>(std::forward<Args>(args)...);
     }
     
+    template<typename T, typename... Args>
+    Ref<T> ToRef(T* obj) { return Ref<T>(obj); }
+    
     template<typename T>
     using Scope = std::unique_ptr<T>;
+    
+    template<typename T, typename... Args>
+    Scope<T> ToScope(T* obj) { return Scope<T>(obj); }
 }
