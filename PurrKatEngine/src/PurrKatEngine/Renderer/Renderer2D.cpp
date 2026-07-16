@@ -55,8 +55,8 @@ namespace PurrKatEngine
     void Renderer2D::BeginScene(const OrthographicCamera& camera)
     {
         s_RendererData->FlatColorShader->Bind();
-        s_RendererData->FlatColorShader->UploadUniformMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
-        s_RendererData->FlatColorShader->UploadUniformMat4("u_Transform", glm::mat4(1.0f));
+        s_RendererData->FlatColorShader->SetUniformMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
+        s_RendererData->FlatColorShader->SetUniformMat4("u_Transform", glm::mat4(1.0f));
     }
     
     void Renderer2D::EndScene()
@@ -73,7 +73,7 @@ namespace PurrKatEngine
     {
         // The following bind is safer but costs more performances (if we're, for example, drawing smth in 3D before drawing back in 2D, the wrong shader could be bind).
         s_RendererData->FlatColorShader->Bind();
-        s_RendererData->FlatColorShader->UploadUniformFloat4("u_Color", color);
+        s_RendererData->FlatColorShader->SetUniformFloat4("u_Color", color);
         s_RendererData->QuadVertexArray->Bind();
         RenderCommand::DrawIndexed(s_RendererData->QuadVertexArray.get());
     }

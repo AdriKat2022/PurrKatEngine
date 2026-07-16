@@ -97,7 +97,7 @@ public:
 
         Ref<Shader> textureShader = m_ShaderLibrary.Load("assets/shaders/Texture.glsl");
         textureShader->Bind();
-        textureShader->UploadUniformInt("u_Texture", 0);
+        textureShader->SetUniformInt("u_Texture", 0);
         
         m_ShaderLibrary.Load("assets/shaders/FlatColor.glsl");
         m_ShaderLibrary.Load("assets/shaders/WorldPositionColor.glsl");
@@ -222,11 +222,11 @@ public:
         {
             if (i % 2 == 0)
             {
-                flatColorShader->UploadUniformFloat4("u_Color", MainColor / (i*0.2f+1));
+                flatColorShader->SetUniformFloat4("u_Color", MainColor / (i*0.2f+1));
             }
             else
             {
-                flatColorShader->UploadUniformFloat4("u_Color", greenColor / (i*0.2f+1));
+                flatColorShader->SetUniformFloat4("u_Color", greenColor / (i*0.2f+1));
             }
             glm::vec3 position = {
                 glm::sin(Time::time*speed + 2*glm::pi<float>() * i/triCount) * (i/triCount),
