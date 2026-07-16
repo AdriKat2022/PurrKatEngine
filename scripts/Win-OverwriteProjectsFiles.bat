@@ -1,7 +1,19 @@
 @echo off
 setlocal
 
-echo This will delete the solution file and ALL *.vcxproj *.vcxproj.filters *.vcxproj.user files within this entire folder.
+pushd ..\
+
+echo ! WARNING !
+echo This will delete within the whole solution:
+echo - The solution file
+echo - ALL *.vcxproj files
+echo - ALL *.vcxproj.user files
+echo - ALL *.vcxproj.filters files
+echo.
+echo Only then to run premake to re-generate project files.
+echo.
+echo Press any key to proceed.
+echo Close this window to cancel.
 
 pause
 
@@ -24,10 +36,13 @@ echo.
 echo Regenerating project files with Premake...
 
 REM Run premake (adjust if needed)
-call premake5 vs2022
+call premake5 vs2026
 
 echo.
 echo Done!
+
+popd
+
 pause
 
 endlocal
