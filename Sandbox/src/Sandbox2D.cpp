@@ -5,11 +5,19 @@ using namespace PKE;
 
 Sandbox2D::Sandbox2D() :
     Layer("Sandbox2D"),
-    m_CameraController(16/9.f, 1.f, true)
+    m_CameraController(16/9.f, 0.5f, true),
+    m_InputMoveSquareController([this](glm::vec2 input)
+    {
+        m_SquareTransform.Move({input.x, input.y, 0});
+    }, KeyCode::LeftArrow, KeyCode::RightArrow, KeyCode::DownArrow, KeyCode::UpArrow)
+    
 {
+    m_InputMoveSquareController.SetSpeed(0.05f);
+    
     m_RazowskiTexture = ToScope(Texture2D::Create("assets/textures/razowski.png"));
     m_LoveTexture = ToScope(Texture2D::Create("assets/textures/love.png"));
     m_CppTexture = ToScope(Texture2D::Create("assets/textures/cpp.png"));
+    m_FreddyTexture = ToScope(Texture2D::Create("assets/textures/freddy.png"));
 }
 
 void Sandbox2D::OnAttach()
@@ -26,7 +34,7 @@ void Sandbox2D::OnUpdate()
 {
     Layer::OnUpdate();
     m_CameraController.OnUpdate();
-    
+    m_InputMoveSquareController.OnUpdate();
     m_ElapsedTime += Time::deltaTime;
     
     RenderCommand::SetClearColor(m_BackgroundColor);
@@ -49,21 +57,21 @@ void Sandbox2D::OnUpdate()
     
     // ========== BACKGROUND LAYER ==========
     // Animated background grid pattern
-    float gridSize = 0.25f;
-    float gridSpacing = 0.3f;
-    int gridCount = 14;
-    for (int y = -gridCount/2; y < gridCount/2; y++)
-    {
-        for (int x = -gridCount/2; x < gridCount/2; x++)
-        {
-            float distFromCenter = glm::length(glm::vec2(x, y));
-            float pulse = glm::sin(m_ElapsedTime * 1.5f + distFromCenter * 0.5f) * 0.5f + 0.5f;
-            float brightness = 0.15f + pulse * 0.1f;
-            glm::vec3 pos = glm::vec3(x * gridSpacing, y * gridSpacing, -1.0f);
-            glm::vec4 color = glm::vec4(0.3f, 0.4f, 0.6f, 1.0f) * brightness;
-            Renderer2D::DrawLitQuad(pos, glm::vec2(gridSize), color, m_LightAmbiance * 1.5f);
-        }
-    }
+    // float gridSize = 0.4f;
+    // float gridSpacing = 0.3f;
+    // int gridCount = 15;
+    // for (int y = -gridCount/2; y < gridCount/2; y++)
+    // {
+    //     for (int x = -gridCount/2; x < gridCount/2; x++)
+    //     {
+    //         float distFromCenter = glm::length(glm::vec2(x, y));
+    //         float pulse = glm::sin(m_ElapsedTime * 1.5f + distFromCenter * 0.5f) * 0.5f + 0.5f;
+    //         float brightness = 0.15f + pulse * 0.3f;
+    //         glm::vec3 pos = glm::vec3(x * gridSpacing, y * gridSpacing, 0.0f);
+    //         glm::vec4 color = glm::vec4(0.3f, 0.4f, 0.6f, 1.0f) * brightness;
+    //         Renderer2D::DrawLitQuad(pos, glm::vec2(gridSize), color, m_LightAmbiance * 1.5f);
+    //     }
+    // }
     
     // ========== BACK LAYER OBJECTS ==========
     // Left back pillar
@@ -77,31 +85,32 @@ void Sandbox2D::OnUpdate()
     // ========== CENTER SHOWCASE ==========
     // Main centerpiece - rotating
     float rotation = glm::sin(m_ElapsedTime * 0.5f) * 0.1f;
-    Renderer2D::DrawLitQuad({0.0f, 0.2f, 0.0f}, glm::vec2(1.2f), m_RazowskiTexture.get(), glm::vec4(1.0f), 0.8f);
+    glm::vec2 size(1.0f, 1.0f*m_FreddyTexture->GetHeight() / m_FreddyTexture->GetWidth());
+    Renderer2D::DrawLitQuad(m_SquareTransform.GetPosition(), size, m_FreddyTexture.get(), glm::vec4(1.0f), 0.0f);
     
     // Top left accent - bobbing and rotating
     float topLeftBobbing = glm::sin(m_ElapsedTime * 1.2f) * 0.2f;
     float topLeftRotation = m_ElapsedTime * 1.5f;
-    Renderer2D::DrawLitQuad({-1.2f, 1.0f + topLeftBobbing, 0.2f}, glm::vec2(0.5f), m_LoveTexture.get(), glm::vec4(1.0f, 0.8f, 0.3f, 1.0f), 0.7f);
-    
+    Renderer2D::DrawLitQuad({-1.2f, 1.0f + topLeftBobbing, 0.2f}, glm::vec2(0.5f), m_LoveTexture.get(), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 0.7f);
+
     // Top right accent - bobbing opposite phase
     float topRightBobbing = glm::sin(m_ElapsedTime * 1.2f + 3.14f) * 0.2f;
-    Renderer2D::DrawLitQuad({1.2f, 1.0f + topRightBobbing, 0.2f}, glm::vec2(0.5f), m_CppTexture.get(), glm::vec4(0.3f, 1.0f, 0.8f, 1.0f), 0.7f);
+    Renderer2D::DrawLitQuad({1.2f, 1.0f + topRightBobbing, 0.2f}, glm::vec2(0.5f), m_CppTexture.get(), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 0.7f);
     
     // Bottom left detail
     float bottomLeftBobbing = glm::sin(m_ElapsedTime * 0.9f + 1.57f) * 0.1f;
-    Renderer2D::DrawLitQuad({-1.5f, -1.0f + bottomLeftBobbing, -0.3f}, glm::vec2(0.35f), glm::vec4(1.0f, 0.5f, 0.5f, 1.0f), m_LightAmbiance);
+    Renderer2D::DrawLitQuad({-1.5f, -1.0f + bottomLeftBobbing, -0.3f}, glm::vec2(0.8f), glm::vec4(1.0f, 0.5f, 0.5f, 1.0f), m_LightAmbiance);
     
     // Bottom right detail
     float bottomRightBobbing = glm::sin(m_ElapsedTime * 0.9f) * 0.1f;
-    Renderer2D::DrawLitQuad({1.5f, -1.0f + bottomRightBobbing, -0.3f}, glm::vec2(0.35f), glm::vec4(0.5f, 1.0f, 0.5f, 1.0f), m_LightAmbiance);
+    Renderer2D::DrawLitQuad({1.5f, -1.0f + bottomRightBobbing, -0.3f}, glm::vec2(0.8f), glm::vec4(0.5f, 1.0f, 0.5f, 1.0f), m_LightAmbiance);
     
     // ========== FRONT LAYER GLOW ==========
     // Subtle foreground glow elements
     glm::vec4 glowColor = glm::vec4(0.7f, 0.8f, 1.0f, 0.5f);
-    Renderer2D::DrawLitQuad({-3.5f, 0.5f, 0.8f}, glm::vec2(0.3f, 0.6f), glowColor, m_LightAmbiance * 0.5f);
-    Renderer2D::DrawLitQuad({3.5f, 0.5f, 0.8f}, glm::vec2(0.3f, 0.6f), glowColor, m_LightAmbiance * 0.5f);
-    Renderer2D::DrawLitQuad({0.0f, -2.0f, 0.5f}, glm::vec2(1.0f, 0.2f), glm::vec4(1.0f, 0.9f, 0.7f, 0.3f), m_LightAmbiance * 0.3f);
+    Renderer2D::DrawLitQuad({-3.5f, 0.5f, 0.5f}, glm::vec2(0.3f, 0.6f), glowColor, m_LightAmbiance * 0.5f);
+    Renderer2D::DrawLitQuad({3.5f, 0.5f, 0.5f}, glm::vec2(0.3f, 0.6f), glowColor, m_LightAmbiance * 0.5f);
+    Renderer2D::DrawLitQuad({0.0f, -2.0f, 0.5f}, glm::vec2(1.0f, 0.2f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), m_LightAmbiance * 0.3f);
     
     Renderer2D::ClearLightSources();
     
@@ -127,7 +136,7 @@ void Sandbox2D::OnImGuiRender()
         ImGui::Separator();
         ImGui::Text("This scene showcases:");
         ImGui::BulletText("Dynamic mouse-following light");
-        ImGui::BulletText("Animated objects with bobbing and rotation");
+        ImGui::BulletText("Animated objects with bobbing");
         ImGui::BulletText("Layered depth composition");
         ImGui::BulletText("Real-time lighting calculations");
     }
@@ -138,4 +147,5 @@ void Sandbox2D::OnEvent(Event& event)
 {
     Layer::OnEvent(event);
     m_CameraController.OnEvent(event);
+    m_InputMoveSquareController.OnEvent(event);
 }

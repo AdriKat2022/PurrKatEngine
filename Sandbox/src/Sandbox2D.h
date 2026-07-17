@@ -15,6 +15,9 @@ public:
 private:
     PKE::OrthographicCameraController m_CameraController;
     
+    PKE::Standard2DInputController m_InputMoveSquareController;
+    PKE::Transform m_SquareTransform;
+    
     // Lighting Settings
     float m_LightAmbiance = 0.3f;
     float m_LightIntensity = 1.2f;
@@ -28,6 +31,7 @@ private:
     PKE::Scope<PKE::Texture2D> m_RazowskiTexture;
     PKE::Scope<PKE::Texture2D> m_LoveTexture;
     PKE::Scope<PKE::Texture2D> m_CppTexture;
+    PKE::Scope<PKE::Texture2D> m_FreddyTexture;
 
     PKE::ShaderLibrary m_ShaderLibrary;
 };
