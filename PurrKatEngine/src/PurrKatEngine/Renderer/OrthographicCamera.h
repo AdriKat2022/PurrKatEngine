@@ -18,6 +18,8 @@ namespace PurrKatEngine
         const glm::vec3& GetPosition() const { return m_Position; }
         const glm::vec3& GetRotation() const { return m_Rotation; }
         float GetZRotation() const { return m_Rotation.z; }
+
+        glm::vec3 ScreenToWorldPosition(const glm::vec2& screenPosition) const;
         
         const glm::mat4& GetProjectionMatrix() const { return m_ProjectionMatrix; }
         const glm::mat4& GetViewMatrix() const { return m_ViewMatrix; }
