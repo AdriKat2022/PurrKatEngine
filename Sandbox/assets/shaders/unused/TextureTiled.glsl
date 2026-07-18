@@ -6,13 +6,13 @@ layout(location = 1) in vec2 a_TexCoord;
 
 uniform mat4 u_ViewProjection;
 uniform mat4 u_Transform;
-uniform vec2 u_TilingCount;
+uniform vec2 u_TexScale;
 
 out vec2 v_TexCoord;
 
 void main()
 {
-    v_TexCoord = a_TexCoord * u_TilingCount;
+    v_TexCoord = a_TexCoord * u_TexScale;
     gl_Position = u_ViewProjection * u_Transform * vec4(a_Position*2, 1.0);
 }
 

@@ -16,11 +16,10 @@ namespace PurrKatEngine
     {
         Scope<VertexArray> QuadVertexArray;
         
-        Scope<Shader> FlatColorShader;
-        Scope<Shader> FlatColorShaderLit;
-        Scope<Shader> TextureColoredShader;
-        Scope<Shader> TextureColoredShaderLit;
-        Scope<Shader> TextureColoredTiledShader;
+        Scope<Shader> SpriteColorShader;
+        Scope<Shader> SpriteColorShaderLit;
+        
+        Scope<Texture2D> BlankTexture;
         
         std::vector<LightSource2D> LightSources;
     };
@@ -52,21 +51,17 @@ namespace PurrKatEngine
         Ref<IndexBuffer> squareIB = ToRef(IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t)));
         s_RendererData->QuadVertexArray->SetIndexBuffer(squareIB);
         
-        s_RendererData->FlatColorShader = ToScope(Shader::Create("assets/shaders/FlatColor.glsl"));
+        uint32_t whitePixel = 0xffffffff;
+        s_RendererData->BlankTexture = ToScope(Texture2D::Create(1, 1));
+        s_RendererData->BlankTexture->SetData(&whitePixel, sizeof(whitePixel));
         
-        s_RendererData->FlatColorShaderLit = ToScope(Shader::Create("assets/shaders/FlatColorLit.glsl"));
-        
-        s_RendererData->TextureColoredShader = ToScope(Shader::Create("assets/shaders/Texture.glsl"));
-        s_RendererData->TextureColoredShader->Bind();
-        s_RendererData->TextureColoredShader->SetUniformInt("u_Texture", 0);
+        s_RendererData->SpriteColorShader = ToScope(Shader::Create("assets/shaders/Texture.glsl"));
+        s_RendererData->SpriteColorShader->Bind();
+        s_RendererData->SpriteColorShader->SetUniformInt("u_Texture", 0);
 
-        s_RendererData->TextureColoredShaderLit = ToScope(Shader::Create("assets/shaders/TextureLit.glsl"));
-        s_RendererData->TextureColoredShaderLit->Bind();
-        s_RendererData->TextureColoredShaderLit->SetUniformInt("u_Texture", 0);
-        
-        s_RendererData->TextureColoredTiledShader = ToScope(Shader::Create("assets/shaders/TextureTiled.glsl"));
-        s_RendererData->TextureColoredTiledShader->Bind();
-        s_RendererData->TextureColoredTiledShader->SetUniformInt("u_Texture", 0);
+        s_RendererData->SpriteColorShaderLit = ToScope(Shader::Create("assets/shaders/TextureLit.glsl"));
+        s_RendererData->SpriteColorShaderLit->Bind();
+        s_RendererData->SpriteColorShaderLit->SetUniformInt("u_Texture", 0);
     }
     
     void Renderer2D::Shutdown()
@@ -78,20 +73,11 @@ namespace PurrKatEngine
     {
         // The following is NOT OPTIMIZED since we may not need all the shaders during this scene.
         
-        s_RendererData->FlatColorShader->Bind();
-        s_RendererData->FlatColorShader->SetUniformMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
+        s_RendererData->SpriteColorShader->Bind();
+        s_RendererData->SpriteColorShader->SetUniformMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
         
-        s_RendererData->FlatColorShaderLit->Bind();
-        s_RendererData->FlatColorShaderLit->SetUniformMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
-        
-        s_RendererData->TextureColoredShader->Bind();
-        s_RendererData->TextureColoredShader->SetUniformMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
-        
-        s_RendererData->TextureColoredTiledShader->Bind();
-        s_RendererData->TextureColoredTiledShader->SetUniformMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
-
-        s_RendererData->TextureColoredShaderLit->Bind();
-        s_RendererData->TextureColoredShaderLit->SetUniformMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
+        s_RendererData->SpriteColorShaderLit->Bind();
+        s_RendererData->SpriteColorShaderLit->SetUniformMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
     }
     
     void Renderer2D::EndScene()
@@ -108,34 +94,16 @@ namespace PurrKatEngine
     void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
     {
         // The following bind is safer but costs more performances (if we're, for example, drawing smth in 3D before drawing back in 2D, the wrong shader could be bind).
-        s_RendererData->FlatColorShader->Bind();
+        s_RendererData->SpriteColorShader->Bind();
         
         auto transformMatrix = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
         
-        s_RendererData->FlatColorShader->SetUniformMat4("u_Transform", transformMatrix);
-        s_RendererData->FlatColorShader->SetUniformFloat4("u_Color", color);
+        s_RendererData->SpriteColorShader->SetUniformMat4("u_Transform", transformMatrix);
+        s_RendererData->SpriteColorShader->SetUniformFloat4("u_Color", color);
         s_RendererData->QuadVertexArray->Bind();
-        RenderCommand::DrawIndexed(s_RendererData->QuadVertexArray.get());
-    }
-
-    void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Texture* texture, const glm::vec4& color)
-    {
-        DrawQuad({ position.x, position.y, 0.0f }, size, texture, color);
-    }
-    
-    void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Texture* texture, const glm::vec4& color)
-    {
-        // The following bind is safer but costs more performances (if we're, for example, drawing smth in 3D before drawing back in 2D, the wrong shader could be bind).
-        s_RendererData->TextureColoredShader->Bind();
         
-        auto transformMatrix = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+        s_RendererData->BlankTexture->Bind();
         
-        s_RendererData->TextureColoredShader->SetUniformMat4("u_Transform", transformMatrix);
-        s_RendererData->TextureColoredShader->SetUniformFloat4("u_Color", color);
-        
-        texture->Bind();
-        
-        s_RendererData->QuadVertexArray->Bind();
         RenderCommand::DrawIndexed(s_RendererData->QuadVertexArray.get());
     }
 
@@ -147,13 +115,13 @@ namespace PurrKatEngine
     void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Texture* texture, const glm::vec2& tilingCount, const glm::vec4& color)
     {
         // The following bind is safer but costs more performances (if we're, for example, drawing smth in 3D before drawing back in 2D, the wrong shader could be bind).
-        s_RendererData->TextureColoredTiledShader->Bind();
+        s_RendererData->SpriteColorShader->Bind();
         
         auto transformMatrix = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
         
-        s_RendererData->TextureColoredTiledShader->SetUniformMat4("u_Transform", transformMatrix);
-        s_RendererData->TextureColoredTiledShader->SetUniformFloat4("u_Color", color);
-        s_RendererData->TextureColoredTiledShader->SetUniformFloat2("u_TilingCount", tilingCount);
+        s_RendererData->SpriteColorShader->SetUniformMat4("u_Transform", transformMatrix);
+        s_RendererData->SpriteColorShader->SetUniformFloat4("u_Color", color);
+        s_RendererData->SpriteColorShader->SetUniformFloat2("u_TexScale", tilingCount);
         
         texture->Bind();
         
@@ -170,7 +138,7 @@ namespace PurrKatEngine
 
     void Renderer2D::DrawLitQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, float ambientStrength)
     {
-        Shader& shader = *s_RendererData->FlatColorShaderLit.get();
+        Shader& shader = *s_RendererData->SpriteColorShaderLit.get();
         
         shader.Bind();
 
@@ -206,7 +174,9 @@ namespace PurrKatEngine
 
         shader.SetUniformInt("u_LightCount", lightCount);
 
+        s_RendererData->BlankTexture->Bind();
         s_RendererData->QuadVertexArray->Bind();
+        
         RenderCommand::DrawIndexed(s_RendererData->QuadVertexArray.get());
     }
     
@@ -217,7 +187,7 @@ namespace PurrKatEngine
 
     void Renderer2D::DrawLitQuad(const glm::vec3& position, const glm::vec2& size, const Texture* texture, const glm::vec4& color, float ambientStrength, const glm::vec2& tilingCount)
     {
-        Shader& shader = *s_RendererData->TextureColoredShaderLit.get();
+        Shader& shader = *s_RendererData->SpriteColorShaderLit.get();
         
         shader.Bind();
 
@@ -226,7 +196,7 @@ namespace PurrKatEngine
 
         shader.SetUniformMat4("u_Transform", transformMatrix);
         shader.SetUniformFloat4("u_Color", color);
-        shader.SetUniformFloat2("u_TilingCount", tilingCount);
+        shader.SetUniformFloat2("u_TexScale", tilingCount);
         shader.SetUniformFloat("u_AmbientStrength", ambientStrength);
 
         int lightCount = 0;
@@ -256,6 +226,7 @@ namespace PurrKatEngine
 
         texture->Bind();
         s_RendererData->QuadVertexArray->Bind();
+        
         RenderCommand::DrawIndexed(s_RendererData->QuadVertexArray.get());
     }
     

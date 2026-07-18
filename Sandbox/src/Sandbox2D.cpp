@@ -55,32 +55,23 @@ void Sandbox2D::OnUpdate()
     
     Renderer2D::AddLightSource(lightSource);
     
-    // ========== BACKGROUND LAYER ==========
-    // Animated background grid pattern
-    // float gridSize = 0.4f;
-    // float gridSpacing = 0.3f;
-    // int gridCount = 15;
-    // for (int y = -gridCount/2; y < gridCount/2; y++)
-    // {
-    //     for (int x = -gridCount/2; x < gridCount/2; x++)
-    //     {
-    //         float distFromCenter = glm::length(glm::vec2(x, y));
-    //         float pulse = glm::sin(m_ElapsedTime * 1.5f + distFromCenter * 0.5f) * 0.5f + 0.5f;
-    //         float brightness = 0.15f + pulse * 0.3f;
-    //         glm::vec3 pos = glm::vec3(x * gridSpacing, y * gridSpacing, 0.0f);
-    //         glm::vec4 color = glm::vec4(0.3f, 0.4f, 0.6f, 1.0f) * brightness;
-    //         Renderer2D::DrawLitQuad(pos, glm::vec2(gridSize), color, m_LightAmbiance * 1.5f);
-    //     }
-    // }
-    
     // ========== BACK LAYER OBJECTS ==========
     // Left back pillar
     float leftBobbing = glm::sin(m_ElapsedTime * 0.7f) * 0.15f;
-    Renderer2D::DrawLitQuad({-2.2f, -0.5f + leftBobbing, -0.5f}, glm::vec2(0.4f, 1.2f), glm::vec4(0.4f, 0.3f, 0.8f, 1.0f), m_LightAmbiance);
+    Renderer2D::DrawLitQuad({-2.2f, -0.5f + leftBobbing, -0.4f}, glm::vec2(0.4f, 1.2f), glm::vec4(0.4f, 0.3f, 0.8f, 1.0f), m_LightAmbiance);
     
     // Right back pillar
     float rightBobbing = glm::sin(m_ElapsedTime * 0.7f + 1.57f) * 0.15f;
-    Renderer2D::DrawLitQuad({2.2f, -0.5f + rightBobbing, -0.5f}, glm::vec2(0.4f, 1.2f), glm::vec4(0.8f, 0.3f, 0.4f, 1.0f), m_LightAmbiance);
+    Renderer2D::DrawLitQuad({2.2f, -0.5f + rightBobbing, -0.4f}, glm::vec2(0.4f, 1.2f), glm::vec4(0.8f, 0.3f, 0.4f, 1.0f), m_LightAmbiance);
+    
+    // Bottom left detail
+    float bottomLeftBobbing = glm::sin(m_ElapsedTime * 0.9f + 1.57f) * 0.1f;
+    Renderer2D::DrawLitQuad({-1.5f, -1.0f + bottomLeftBobbing, -0.1f}, glm::vec2(0.8f), glm::vec4(1.0f, 0.5f, 0.5f, 1.0f), m_LightAmbiance);
+    
+    // Bottom right detail
+    float bottomRightBobbing = glm::sin(m_ElapsedTime * 0.9f) * 0.1f;
+    Renderer2D::DrawLitQuad({1.5f, -1.0f + bottomRightBobbing, -0.1f}, glm::vec2(0.8f), glm::vec4(0.5f, 1.0f, 0.5f, 1.0f), m_LightAmbiance);
+    
     
     // ========== CENTER SHOWCASE ==========
     // Main centerpiece - rotating
@@ -96,15 +87,7 @@ void Sandbox2D::OnUpdate()
     // Top right accent - bobbing opposite phase
     float topRightBobbing = glm::sin(m_ElapsedTime * 1.2f + 3.14f) * 0.2f;
     Renderer2D::DrawLitQuad({1.2f, 1.0f + topRightBobbing, 0.2f}, glm::vec2(0.5f), m_CppTexture.get(), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 0.7f);
-    
-    // Bottom left detail
-    float bottomLeftBobbing = glm::sin(m_ElapsedTime * 0.9f + 1.57f) * 0.1f;
-    Renderer2D::DrawLitQuad({-1.5f, -1.0f + bottomLeftBobbing, -0.3f}, glm::vec2(0.8f), glm::vec4(1.0f, 0.5f, 0.5f, 1.0f), m_LightAmbiance);
-    
-    // Bottom right detail
-    float bottomRightBobbing = glm::sin(m_ElapsedTime * 0.9f) * 0.1f;
-    Renderer2D::DrawLitQuad({1.5f, -1.0f + bottomRightBobbing, -0.3f}, glm::vec2(0.8f), glm::vec4(0.5f, 1.0f, 0.5f, 1.0f), m_LightAmbiance);
-    
+
     // ========== FRONT LAYER GLOW ==========
     // Subtle foreground glow elements
     glm::vec4 glowColor = glm::vec4(0.7f, 0.8f, 1.0f, 0.5f);
