@@ -3,19 +3,8 @@
 #include <chrono>
 #include "PurrKatEngine/Logs/Log.h"
 
-#define EMPLACE_AT(at) [&](ProfileResults profile) { at = profile; }
-
-#define PROFILE_TIME_SECTION(name, outFloat) Timer timer1987(name, EMPLACE_AT(outFloat))
-
-
 namespace PurrKatEngine
 {
-    struct ProfileResults
-    {
-        const char* Name;
-        float Duration;
-    };
-    
     template<typename Fn = std::nullptr_t>
     class Timer
     {

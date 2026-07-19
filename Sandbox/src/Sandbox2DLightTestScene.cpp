@@ -41,11 +41,14 @@ void Sandbox2DLightTestScene::OnUpdate()
 {
     Layer::OnUpdate();
     
-    PROFILE_TIME_SECTION("UPDATE", m_ProfileResults[0]);
+    PROFILE_SCOPE("UPDATE");
     
-    m_CameraController.OnUpdate();
-    m_InputMoveSquareController.OnUpdate();
-    m_ElapsedTime += Time::deltaTime;
+    {
+        PROFILE_SCOPE("Controller");
+        
+        m_CameraController.OnUpdate();
+        m_InputMoveSquareController.OnUpdate();
+    }
     
     static bool active = true;
     if (Input::IsKeyPressed(KeyCode::Space))
@@ -58,19 +61,26 @@ void Sandbox2DLightTestScene::OnUpdate()
         active = true;
     }
     
-    RenderCommand::SetClearColor(m_BackgroundColor);
-    RenderCommand::Clear();
+    LightSource2D lightSource;
     
-    glm::vec2 mousePosition = Input::GetMousePosition();
+    {
+        PROFILE_SCOPE("Pre-Rendering");
+        
+        RenderCommand::SetClearColor(m_BackgroundColor);
+        RenderCommand::Clear();
     
-    // Dynamic light following mouse
-    LightSource2D lightSource =
-        {
+        glm::vec2 mousePosition = Input::GetMousePosition();
+    
+        // Dynamic light following mouse
+        lightSource = {
             .Position = glm::vec2(m_CameraController.GetCamera().ScreenToWorldPosition(mousePosition)),
             .Color = m_LightColor,
             .Radius = m_LightRadius,
             .Intensity = m_LightIntensity,
         };
+    }
+    
+    PROFILE_SCOPE("Rendering");
     
     Renderer2D::BeginScene(m_CameraController.GetCamera());
     
@@ -145,6 +155,8 @@ void Sandbox2DLightTestScene::OnImGuiRender()
 {
     Layer::OnImGuiRender();
     
+    PROFILE_SCOPE("ImGui Render");
+    
     ImGuiUtility::ApplicationInfoWindow(Application::Get());
     
     static bool infos = true;
@@ -169,8 +181,6 @@ void Sandbox2DLightTestScene::OnImGuiRender()
         ImGui::Separator();
         ImGui::Text("This scene showcases:");
         ImGui::BulletText("Dynamic mouse-following light");
-        // ImGui::BulletText("Animated objects with bobbing");
-        // ImGui::BulletText("Layered depth composition");
         ImGui::BulletText("Real-time lighting calculations");
     }
     ImGui::End();
@@ -178,24 +188,7 @@ void Sandbox2DLightTestScene::OnImGuiRender()
     static bool profiling = true;
     if (ImGui::Begin("Profiling", &profiling, ImGuiWindowFlags_AlwaysAutoResize))
     {
-        auto count = m_ProfileResults.size();
-        
-        if (count > 0)
-        {
-            ImGui::BeginTable("Profiling", 2);
-            ImGui::TableSetupColumn("");
-            ImGui::TableSetupColumn("Duration (ms)");
-            ImGui::TableHeadersRow();
-            for (const auto& [name, duration] : m_ProfileResults)
-            {
-                ImGui::TableNextRow();
-                ImGui::TableSetColumnIndex(0);
-                ImGui::Text(name);
-                ImGui::TableSetColumnIndex(1);
-                ImGui::Text("%.3f", duration);
-            }
-            ImGui::EndTable();
-        }
+        PROFILE_DISPLAY();
     }
     ImGui::End();
 }
