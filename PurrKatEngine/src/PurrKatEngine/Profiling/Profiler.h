@@ -29,10 +29,13 @@ namespace PurrKatEngine
     class Profiler
     {
     public:
+        inline static bool s_EnableProfiling = false;
         inline static std::vector<ProfileResults> s_ProfileResults = std::vector<ProfileResults>();
         
         static void AddProfileResult(const ProfileResults& profileResults, int index = -1)
         {
+            if (!s_EnableProfiling) return;
+            
             // Insert the profile results where items after it have a >= index, and items before have a <= index.
             auto it = s_ProfileResults.begin();
             
@@ -53,6 +56,8 @@ namespace PurrKatEngine
         
         static void DisplayProfiledResults()
         {
+            ImGui::Checkbox("Enable Profiling", &s_EnableProfiling);
+            
             ImGui::DragInt("Value Smoothing", &PROFILE_SMOOTHING, 1, 1, 250);
             
             ImGui::BeginTable("Profiling", 2);
