@@ -33,6 +33,7 @@ namespace PurrKatEngine
             long long start = std::chrono::time_point_cast<std::chrono::microseconds>(m_StartTime).time_since_epoch().count();
             long long end = std::chrono::time_point_cast<std::chrono::microseconds>(endTime).time_since_epoch().count();
 
+            // Put in milliseconds.
             float duration = (end - start) * 0.001f;
 
             if (m_OutResult)
@@ -45,8 +46,10 @@ namespace PurrKatEngine
             }
             if constexpr (!std::is_same_v<Fn, std::nullptr_t>)
             {
+                int threadId = std::hash<std::thread::id>{}(std::this_thread::get_id()); // Trick to transform the thread id to an integer.
+                
                 // Only calling if the type is NOT nullptr.
-                m_CallbackFunc({m_Name, duration});
+                m_CallbackFunc({m_Name, start, duration, threadId});
             }
         }
         

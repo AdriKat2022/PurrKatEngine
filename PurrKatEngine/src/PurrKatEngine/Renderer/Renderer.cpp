@@ -6,7 +6,7 @@
 
 namespace PurrKatEngine
 {
-    Renderer::SceneData* Renderer::s_SceneData = new SceneData;
+    Renderer::SceneData* Renderer::s_SceneData = new SceneData();
 
     void Renderer::Init()
     {

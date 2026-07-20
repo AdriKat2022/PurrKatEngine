@@ -2,6 +2,7 @@
 #include "OpenGLShader.h"
 
 #include "PurrKatEngine/Logs/InternalLog.h"
+#include "PurrKatEngine/Profiling/Profiler.h"
 #include <fstream>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -46,6 +47,7 @@ namespace PurrKatEngine
 
     void OpenGLShader::Bind() const
     {
+		PROFILE_FUNCTION();
     	glUseProgram(m_RendererID);
     }
 
@@ -56,36 +58,42 @@ namespace PurrKatEngine
 
     void OpenGLShader::SetUniformInt(const std::string& name, int value) const
     {
+    	PROFILE_FUNCTION();
     	GLint location = glGetUniformLocation(m_RendererID, name.c_str());
     	glUniform1i(location, value);
     }
 
     void OpenGLShader::SetUniformFloat(const std::string& name, float value) const
     {
+    	PROFILE_FUNCTION();
     	GLint location = glGetUniformLocation(m_RendererID, name.c_str());
     	glUniform1f(location, value);
     }
 
     void OpenGLShader::SetUniformFloat2(const std::string& name, glm::vec2 vec) const
     {
+    	PROFILE_FUNCTION();
     	GLint location = glGetUniformLocation(m_RendererID, name.c_str());
     	glUniform2f(location, vec.r, vec.g);
     }
 	
     void OpenGLShader::SetUniformFloat3(const std::string& name, glm::vec3 vec) const
     {
+    	PROFILE_FUNCTION();
     	GLint location = glGetUniformLocation(m_RendererID, name.c_str());
     	glUniform3f(location, vec.r, vec.g, vec.b);
     }
 
     void OpenGLShader::SetUniformFloat4(const std::string& name, glm::vec4 vec) const
     {
+    	PROFILE_FUNCTION();
     	GLint location = glGetUniformLocation(m_RendererID, name.c_str());
     	glUniform4f(location, vec.r, vec.g, vec.b, vec.a);
     }
 
     void OpenGLShader::SetUniformMat4(const std::string& name, const glm::mat4& matrix) const
     {
+    	PROFILE_FUNCTION();
     	GLint location = glGetUniformLocation(m_RendererID, name.c_str());
     	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
     }

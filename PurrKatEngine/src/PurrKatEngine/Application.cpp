@@ -5,16 +5,18 @@
 #include "Components/Standard2DInputController.h"
 #include "Inputs/Time.h"
 #include "Logs/InternalLog.h"
+#include "Profiling/Profiler.h"
 #include "Renderer/Renderer.h"
 #include "Window/Window.h"
 
 namespace PurrKatEngine
 {
-    
     Application* Application::s_Instance = nullptr;
 
     Application::Application()
     {
+        PROFILE_FUNCTION();
+        
         PKE_CORE_ASSERT(s_Instance == nullptr, "An application already exists.")
         s_Instance = this;
         
@@ -53,24 +55,30 @@ namespace PurrKatEngine
     {
         while (m_IsRunning)
         {
+            PROFILE_SCOPE("Application LOOP");
             m_TimeManagerLayer->OnUpdate();
             
             if (!m_IsMinimized)
             {
+                PROFILE_SCOPE("Layer Update");
                 for (Layer* layer : m_LayerStack)
                 {
                     layer->OnUpdate();
                 }
-
             }
             
-            m_ImGuiLayer->Begin();
-            for (Layer* layer : m_LayerStack)
             {
-                layer->OnImGuiRender();
+                PROFILE_SCOPE("ImGui Update");
+            
+                m_ImGuiLayer->Begin();
+                for (Layer* layer : m_LayerStack)
+                {
+                    layer->OnImGuiRender();
+                }
+                m_ImGuiLayer->End();
             }
-            m_ImGuiLayer->End();
 
+            PROFILE_SCOPE("Window Update");
             m_Window->OnUpdate();
         }
     }
@@ -89,6 +97,7 @@ namespace PurrKatEngine
 
     bool Application::OnWindowResized(WindowResizeEvent& windowResizeEvent)
     {
+        PROFILE_FUNCTION();
         if (windowResizeEvent.GetWidth() == 0 || windowResizeEvent.GetHeight() == 0)
         {
             PKE_CORE_DEBUG("Window is minimised!");

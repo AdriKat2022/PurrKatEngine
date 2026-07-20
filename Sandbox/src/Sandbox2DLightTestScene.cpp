@@ -41,8 +41,6 @@ void Sandbox2DLightTestScene::OnUpdate()
 {
     Layer::OnUpdate();
     
-    PROFILE_SCOPE("UPDATE");
-    
     {
         PROFILE_SCOPE("Controller");
         
@@ -155,7 +153,7 @@ void Sandbox2DLightTestScene::OnImGuiRender()
 {
     Layer::OnImGuiRender();
     
-    PROFILE_SCOPE("ImGui Render");
+    PROFILE_FUNCTION();
     
     ImGuiUtility::ApplicationInfoWindow(Application::Get());
     

@@ -3,6 +3,7 @@
 
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.inl>
+#include "PurrKatEngine/Profiling/Profiler.h"
 #include "PurrKatEngine/Renderer/Buffer.h"
 #include "PurrKatEngine/Renderer/RenderCommand.h"
 #include "PurrKatEngine/Renderer/Shader.h"
@@ -187,6 +188,8 @@ namespace PurrKatEngine
 
     void Renderer2D::DrawLitQuad(const glm::vec3& position, const glm::vec2& size, const Texture* texture, const glm::vec4& color, float ambientStrength, const glm::vec2& tilingCount)
     {
+        PROFILE_FUNCTION();
+        
         Shader& shader = *s_RendererData->SpriteColorShaderLit.get();
         
         shader.Bind();
