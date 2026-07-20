@@ -31,24 +31,27 @@ namespace PurrKatEngine
     struct ProfileResults
     {
         const char* Name;
-        long long StartTime = 0;
-        float Duration = 0;
-        int ThreadId = 0;
+        long long StartTime = 0; // In ns
+        long long Duration = 0; // In ns
+        size_t ThreadId = 0;
         
         int CurrentSmooth = 0; // Should be private
         
-        void AddValue(float value)
+        void AddValue(long long value)
         {
             if (CurrentSmooth < PROFILE_SMOOTHING) { CurrentSmooth++; }
             else CurrentSmooth = PROFILE_SMOOTHING;
             
-            Duration = (Duration * (float)(CurrentSmooth - 1) + value) / (float)CurrentSmooth;
+            Duration = (Duration * (CurrentSmooth - 1) + value) / CurrentSmooth;
         }
     };
     
     class Profiler
     {
     public:
+        constexpr static long OUTPUT_PRECISION_DIVIDE = 1000; // 1 for ns, 1000 for µs, 1000000 for ms. Typically, chrome tracing wants it in µs.
+        constexpr static int OUTPUT_PRECISION = 3; // Precision after the comma.
+        
         inline static bool s_EnableLiveProfiling = false;
         inline static bool s_EnableFileProfiling = true;
         
@@ -59,6 +62,7 @@ namespace PurrKatEngine
             PKE_CORE_ASSERT(!m_SessionInitialized, "Tried to begin session '{}' while session '{}' was still active.", name, m_Name);
             m_Name = name;
             m_OutputFile.open(filepath);
+            m_OutputFile << std::fixed << std::setprecision(OUTPUT_PRECISION);
             m_SessionInitialized = true;
             WriteHeader();
         }
@@ -73,19 +77,23 @@ namespace PurrKatEngine
         
         void WriteProfile(const ProfileResults& profileResults)
         {
-            if (m_ProfileCount++ > 0) m_OutputFile << ",";
+            if (m_ProfileCount++ > 0) m_OutputFile << ",\n";
             
             std::string name = profileResults.Name;
             std::ranges::replace(name, '"', '\'');
             
+            PKE_CORE_DEBUG("Start: {}, {}, {}", (double)profileResults.StartTime, (double)profileResults.StartTime/1000, (double)profileResults.StartTime/1000000);
+            double duration = (double)profileResults.Duration/OUTPUT_PRECISION_DIVIDE;
+            double startTime = (double)profileResults.StartTime/OUTPUT_PRECISION_DIVIDE;
+            
             m_OutputFile << "{";
             m_OutputFile << R"("cat":"function",)";
-            m_OutputFile << "\"dur\":" << profileResults.Duration * 1000 << ",";
+            m_OutputFile << "\"dur\":" << duration << ",";
             m_OutputFile << R"("name":")" << name << "\",";
             m_OutputFile << R"("ph":"X",)";
             m_OutputFile << "\"pid\":0,";
             m_OutputFile << "\"tid\":" << profileResults.ThreadId << ",";
-            m_OutputFile << "\"ts\":" << profileResults.StartTime;
+            m_OutputFile << "\"ts\":" << startTime;
             m_OutputFile << "}";
             m_OutputFile.flush();
         }
@@ -95,7 +103,7 @@ namespace PurrKatEngine
             if (s_CurrentSession == nullptr) s_CurrentSession = new Profiler();
             
             return s_CurrentSession;
-        };
+        }
         
         static void AddProfileResult(const ProfileResults& profileResults, int index = -1)
         {
@@ -147,7 +155,7 @@ namespace PurrKatEngine
                 ImGui::TableSetColumnIndex(0);
                 ImGui::Text(result.Name);
                 ImGui::TableSetColumnIndex(1);
-                ImGui::Text("%.3f", result.Duration);
+                ImGui::Text("%.3f", (float)result.Duration/1000000.0f);
             }
             ImGui::EndTable();
         }

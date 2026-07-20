@@ -55,7 +55,7 @@ namespace PurrKatEngine
     {
         while (m_IsRunning)
         {
-            PROFILE_SCOPE("Application LOOP");
+            PROFILE_SCOPE("Application Loop");
             m_TimeManagerLayer->OnUpdate();
             
             if (!m_IsMinimized)

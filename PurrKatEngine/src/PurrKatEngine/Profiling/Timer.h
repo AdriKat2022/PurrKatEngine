@@ -30,11 +30,10 @@ namespace PurrKatEngine
 
             m_Stopped = true;
 
-            long long start = std::chrono::time_point_cast<std::chrono::microseconds>(m_StartTime).time_since_epoch().count();
-            long long end = std::chrono::time_point_cast<std::chrono::microseconds>(endTime).time_since_epoch().count();
-
-            // Put in milliseconds.
-            float duration = (end - start) * 0.001f;
+            long long start = std::chrono::time_point_cast<std::chrono::nanoseconds>(m_StartTime).time_since_epoch().count();
+            long long end = std::chrono::time_point_cast<std::chrono::nanoseconds>(endTime).time_since_epoch().count();
+            
+            long long duration = end - start;
 
             if (m_OutResult)
             {
@@ -42,11 +41,11 @@ namespace PurrKatEngine
             }
             if (m_PrintResult)
             {
-                PKE_LOG_INFO("Timer: {} took {} µs", m_Name, duration);
+                PKE_LOG_INFO("Timer: {} took {} ms", m_Name, duration);
             }
             if constexpr (!std::is_same_v<Fn, std::nullptr_t>)
             {
-                int threadId = std::hash<std::thread::id>{}(std::this_thread::get_id()); // Trick to transform the thread id to an integer.
+                size_t threadId = std::hash<std::thread::id>{}(std::this_thread::get_id()); // Trick to transform the thread id to an integer.
                 
                 // Only calling if the type is NOT nullptr.
                 m_CallbackFunc({m_Name, start, duration, threadId});
@@ -59,7 +58,7 @@ namespace PurrKatEngine
         
         const char* m_Name;
         bool m_PrintResult = false;
-        float* m_OutResult = nullptr;
+        long long* m_OutResult = nullptr;
         Fn m_CallbackFunc = nullptr;
     };
 }

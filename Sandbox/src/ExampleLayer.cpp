@@ -19,7 +19,7 @@ ExampleSandboxLayer::ExampleSandboxLayer() : m_CameraController(16.0f/9.0f, 1.0f
     // Square Scale Controller
     auto squareScaleController = new Standard2DInputController([this](glm::vec2 input)
     {
-        glm::vec3 scale = m_SquareTransform.GetScale() + glm::vec3(input.x * Time::deltaTime);
+        glm::vec3 scale = m_SquareTransform.GetScale() + glm::vec3(input.x * (float)Time::deltaTime);
         m_SquareTransform.SetScale(scale);
     }, KeyCode::Keypad0, KeyCode::Keypad1, KeyCode::None, KeyCode::None);
     squareScaleController->SetSpeed(1.f);
