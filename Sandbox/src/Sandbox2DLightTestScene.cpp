@@ -8,7 +8,7 @@ Sandbox2DLightTestScene::Sandbox2DLightTestScene() :
     m_CameraController(16/9.f, 0.5f, true),
     m_InputMoveSquareController([this](glm::vec2 input)
     {
-        m_SquareTransform.Move({input.x, input.y, 0});
+        m_SquareTransform.Move({input.x, input.y, 0.0f});
     }, KeyCode::LeftArrow, KeyCode::RightArrow, KeyCode::DownArrow, KeyCode::UpArrow)
     
 {
@@ -21,10 +21,6 @@ Sandbox2DLightTestScene::Sandbox2DLightTestScene() :
     m_BackgroundTexture = ToScope(Texture2D::Create("assets/textures/hollowKnightBg.png"));
     m_MobTexture = ToScope(Texture2D::Create("assets/textures/mob.png"));
     m_CreeperTexture = ToScope(Texture2D::Create("assets/textures/creeper.png"));
-    
-    // Profiling
-    
-    m_ProfileResults.emplace_back("Update");
 }
 
 void Sandbox2DLightTestScene::OnAttach()
@@ -48,18 +44,18 @@ void Sandbox2DLightTestScene::OnUpdate()
         m_InputMoveSquareController.OnUpdate();
     }
     
-    static bool active = true;
-    if (Input::IsKeyPressed(KeyCode::Space))
-    {
-        if (active) m_LightOn = !m_LightOn;
-        active = false;
-    }
-    else
-    {
-        active = true;
-    }
+    // static bool active = true;
+    // if (Input::IsKeyPressed(KeyCode::Space))
+    // {
+    //     if (active) m_LightOn = !m_LightOn;
+    //     active = false;
+    // }
+    // else
+    // {
+    //     active = true;
+    // }
     
-    LightSource2D lightSource;
+    // LightSource2D lightSource;
     
     {
         PROFILE_SCOPE("Pre-Rendering");
@@ -67,82 +63,39 @@ void Sandbox2DLightTestScene::OnUpdate()
         RenderCommand::SetClearColor(m_BackgroundColor);
         RenderCommand::Clear();
     
-        glm::vec2 mousePosition = Input::GetMousePosition();
-    
-        // Dynamic light following mouse
-        lightSource = {
-            .Position = glm::vec2(m_CameraController.GetCamera().ScreenToWorldPosition(mousePosition)),
-            .Color = m_LightColor,
-            .Radius = m_LightRadius,
-            .Intensity = m_LightIntensity,
-        };
+        // glm::vec2 mousePosition = Input::GetMousePosition();
+        //
+        // // Dynamic light following mouse
+        // lightSource = {
+        //     .Position = glm::vec2(m_CameraController.GetCamera().ScreenToWorldPosition(mousePosition)),
+        //     .Color = m_LightColor,
+        //     .Radius = m_LightRadius,
+        //     .Intensity = m_LightIntensity,
+        // };
     }
     
     PROFILE_SCOPE("Rendering");
     
     Renderer2D::BeginScene(m_CameraController.GetCamera());
     
-    if (m_LightOn) Renderer2D::AddLightSource(lightSource);
+    Renderer2D::DrawQuad({0, 0, 0}, {1, 1}, {1,1,1,1});
+    Renderer2D::DrawQuad(m_SquareTransform.GetPosition(), {1, 1}, {0.5f, 0.5f, 0.5f, 1.0f});
+    
+    // if (m_LightOn) Renderer2D::AddLightSource(lightSource);
     
     // float leftBobbing = glm::sin(m_ElapsedTime * 0.7f) * 0.15f;
-    glm::vec2 backgroundSize = glm::vec2(20.0f, 20.0f/m_BackgroundTexture->GetAspectRatio());
-    Renderer2D::DrawLitQuad({0.0f, 0.0f, -0.6f}, backgroundSize, m_BackgroundTexture.get(), m_BackgroundColor, 0.4f + m_LightAmbiance / 1.6f);
-    
-    Renderer2D::DrawLitQuad({3.8f, -2.2f}, m_SquareTransform.GetScale(), m_MobTexture.get(), glm::vec4(1), 0);
-    
-    Renderer2D::DrawLitQuad({-14.0f, 0}, {1.5f, 1.5f/m_FreddyTexture->GetAspectRatio()}, m_FreddyTexture.get(), glm::vec4(1), 0);
-    
-    Renderer2D::DrawLitQuad({3.0f, 1.9f}, {0.8f, 0.8f/m_CreeperTexture->GetAspectRatio()}, m_CreeperTexture.get(), glm::vec4(1), 0);
-    
-    Renderer2D::DrawLitQuad({-7.3f, 1.0f}, {1.0f, 1.0f/m_CppTexture->GetAspectRatio()}, m_CppTexture.get(), glm::vec4(1), 0.5f + m_LightAmbiance/2.0f);
-
-    Renderer2D::DrawLitQuad(m_SquareTransform.GetPosition(), {0.5f, 0.5f/m_LoveTexture->GetAspectRatio()}, m_LoveTexture.get(), glm::vec4(1), m_LightAmbiance - 0.5f);
-    
-    // ========== BACK LAYER OBJECTS ==========
-    
-    // Scope<Texture2D> checkerboardTexture = ToScope(Texture2D::Create(2, 2));
-    // uint32_t checkerboardPixels[] = { 0xffffffff, 0x000000ff, 0x000000ff, 0xffffffff };
-    // checkerboardTexture->SetData(checkerboardPixels, sizeof(checkerboardPixels));
-    // Renderer2D::DrawLitQuad({0, 0, -0.5f}, glm::vec2(20.0f), checkerboardTexture.get(), m_BackgroundColor, m_LightAmbiance + 0.2f, {30, 30});
-    
-    // Left back pillar
-    // float leftBobbing = glm::sin(m_ElapsedTime * 0.7f) * 0.15f;
-    // Renderer2D::DrawLitQuad({-2.2f, -0.5f + leftBobbing, -0.4f}, glm::vec2(0.4f, 1.2f), glm::vec4(0.4f, 0.3f, 0.8f, 1.0f), m_LightAmbiance);
-    
-    // Right back pillar
-    // float rightBobbing = glm::sin(m_ElapsedTime * 0.7f + 1.57f) * 0.15f;
-    // Renderer2D::DrawLitQuad({2.2f, -0.5f + rightBobbing, -0.4f}, glm::vec2(0.4f, 1.2f), glm::vec4(0.8f, 0.3f, 0.4f, 1.0f), m_LightAmbiance);
-    
-    // Bottom left detail
-    // float bottomLeftBobbing = glm::sin(m_ElapsedTime * 0.9f + 1.57f) * 0.1f;
-    // Renderer2D::DrawLitQuad({-1.5f, -1.0f + bottomLeftBobbing, -0.1f}, glm::vec2(0.8f), glm::vec4(1.0f, 0.5f, 0.5f, 1.0f), m_LightAmbiance);
-    
-    // Bottom right detail
-    // float bottomRightBobbing = glm::sin(m_ElapsedTime * 0.9f) * 0.1f;
-    // Renderer2D::DrawLitQuad({1.5f, -1.0f + bottomRightBobbing, -0.1f}, glm::vec2(0.8f), glm::vec4(0.5f, 1.0f, 0.5f, 1.0f), m_LightAmbiance);
-    
-    
-    // ========== CENTER SHOWCASE ==========
-    // Main centerpiece - rotating
-    // float rotation = glm::sin(m_ElapsedTime * 0.5f) * 0.1f;
-    // glm::vec2 size(1.0f, 1.0f*m_FreddyTexture->GetHeight() / m_FreddyTexture->GetWidth());
-    // Renderer2D::DrawLitQuad(m_SquareTransform.GetPosition(), size, m_FreddyTexture.get(), glm::vec4(1.0f), 0.0f);
-    
-    // Top left accent - bobbing and rotating
-    // float topLeftBobbing = glm::sin(m_ElapsedTime * 1.2f) * 0.2f;
-    // float topLeftRotation = m_ElapsedTime * 1.5f;
-    // Renderer2D::DrawLitQuad({-1.2f, 1.0f + topLeftBobbing, 0.2f}, glm::vec2(0.5f), m_LoveTexture.get(), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 0.7f);
-
-    // Top right accent - bobbing opposite phase
-    // float topRightBobbing = glm::sin(m_ElapsedTime * 1.2f + 3.14f) * 0.2f;
-    // Renderer2D::DrawLitQuad({1.2f, 1.0f + topRightBobbing, 0.2f}, glm::vec2(0.5f), m_CppTexture.get(), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 0.7f);
-
-    // ========== FRONT LAYER GLOW ==========
-    // Subtle foreground glow elements
-    // glm::vec4 glowColor = glm::vec4(0.7f, 0.8f, 1.0f, 0.5f);
-    // Renderer2D::DrawLitQuad({-3.5f, 0.5f, 0.5f}, glm::vec2(0.3f, 0.6f), glowColor, m_LightAmbiance * 0.5f);
-    // Renderer2D::DrawLitQuad({3.5f, 0.5f, 0.5f}, glm::vec2(0.3f, 0.6f), glowColor, m_LightAmbiance * 0.5f);
-    // Renderer2D::DrawLitQuad({0.0f, -2.0f, 0.5f}, glm::vec2(1.0f, 0.2f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), m_LightAmbiance * 0.3f);
+    // glm::vec2 backgroundSize = glm::vec2(20.0f, 20.0f/m_BackgroundTexture->GetAspectRatio());
+    // Renderer2D::DrawLitQuad({0.0f, 0.0f, -0.6f}, backgroundSize, m_BackgroundTexture.get(), m_BackgroundColor, 0.4f + m_LightAmbiance / 1.6f);
+    //
+    // Renderer2D::DrawLitQuad({3.8f, -2.2f}, m_SquareTransform.GetScale(), m_MobTexture.get(), glm::vec4(1), 0);
+    //
+    // Renderer2D::DrawLitQuad({-14.0f, 0}, {1.5f, 1.5f/m_FreddyTexture->GetAspectRatio()}, m_FreddyTexture.get(), glm::vec4(1), 0);
+    //
+    // Renderer2D::DrawLitQuad({3.0f, 1.9f}, {0.8f, 0.8f/m_CreeperTexture->GetAspectRatio()}, m_CreeperTexture.get(), glm::vec4(1), 0);
+    //
+    // Renderer2D::DrawLitQuad({-7.3f, 1.0f}, {1.0f, 1.0f/m_CppTexture->GetAspectRatio()}, m_CppTexture.get(), glm::vec4(1), 0.5f + m_LightAmbiance/2.0f);
+    //
+    // Renderer2D::DrawLitQuad(m_SquareTransform.GetPosition(), {0.5f, 0.5f/m_LoveTexture->GetAspectRatio()}, m_LoveTexture.get(), glm::vec4(1), m_LightAmbiance - 0.5f);
     
     Renderer2D::ClearLightSources();
     

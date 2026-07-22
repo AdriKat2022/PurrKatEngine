@@ -20,6 +20,7 @@ namespace PurrKatEngine
         
         static void BeginScene(const OrthographicCamera& camera);
         static void EndScene();
+        static void FlushScene();
         
         // Primitives
         

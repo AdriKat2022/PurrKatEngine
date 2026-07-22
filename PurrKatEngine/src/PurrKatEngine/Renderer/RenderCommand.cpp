@@ -27,8 +27,8 @@ namespace PurrKatEngine
         s_RendererAPI->Clear();
     }
 
-    void RenderCommand::DrawIndexed(const VertexArray* vertexArray)
+    void RenderCommand::DrawIndexed(const VertexArray* vertexArray, uint32_t indexCount)
     {
-        s_RendererAPI->DrawIndexed(vertexArray);
+        s_RendererAPI->DrawIndexed(vertexArray, indexCount);
     }
 }

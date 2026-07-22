@@ -26,7 +26,7 @@ private:
     float m_LightRadius = 2.0f;
     float m_ElapsedTime = 0.0f;
     
-    glm::vec4 m_BackgroundColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+    glm::vec4 m_BackgroundColor = { 0.0f, 0.0f, 0.0f, 1.0f };
     glm::vec4 m_CheckerColor = { 0.05f, 0.05f, 0.12f, 1.0f };
     glm::vec3 m_LightColor = { 1.0f, 0.95f, 0.8f };
     
@@ -40,7 +40,4 @@ private:
     PKE::Scope<PKE::Texture2D> m_CreeperTexture;
 
     PKE::ShaderLibrary m_ShaderLibrary;
-    
-    // Profiling
-    std::vector<PKE::ProfileResults> m_ProfileResults;
 };

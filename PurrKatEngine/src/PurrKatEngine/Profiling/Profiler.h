@@ -82,7 +82,6 @@ namespace PurrKatEngine
             std::string name = profileResults.Name;
             std::ranges::replace(name, '"', '\'');
             
-            PKE_CORE_DEBUG("Start: {}, {}, {}", (double)profileResults.StartTime, (double)profileResults.StartTime/1000, (double)profileResults.StartTime/1000000);
             double duration = (double)profileResults.Duration/OUTPUT_PRECISION_DIVIDE;
             double startTime = (double)profileResults.StartTime/OUTPUT_PRECISION_DIVIDE;
             
