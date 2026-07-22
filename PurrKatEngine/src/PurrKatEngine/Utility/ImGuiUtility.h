@@ -2,6 +2,8 @@
 #include "imgui/imgui.h"
 #include "PurrKatEngine/Components/Transform.h"
 
+#define DEBUG_CONTROL
+
 namespace PurrKatEngine
 {
     /* Utility class to help with the usage of ImGui. */
@@ -91,6 +93,97 @@ namespace PurrKatEngine
             return changed;
         }
 
+        //////////// DEBUG CONTROLS //////////////
+        
+        template<typename T>
+        static void AddDebugControl(const char* name, T* ptr)
+        {
+            DebugControl::Type type;
+
+            if constexpr (std::is_same_v<T, int>)
+            {
+                type = DebugControl::Type::Int;
+            }
+            else if constexpr (std::is_same_v<T, float>)
+            {
+                type = DebugControl::Type::Float;
+            }
+            else if constexpr (std::is_same_v<T, double>)
+            {
+                type = DebugControl::Type::Double;
+            }
+            else if constexpr (std::is_same_v<T, bool>)
+            {
+                type = DebugControl::Type::Bool;
+            }
+            else if constexpr (std::is_same_v<T, std::string>)
+            {
+                type = DebugControl::Type::String;
+            }
+            else
+            {
+                static_assert([] { return false; }(), "Unsupported debug control type");
+            }
+
+            s_DebugControls.push_back({
+                name,
+                static_cast<void*>(ptr),
+                type
+            });
+        }
+        
+        static void ShowDebugControls()
+        {
+            if (s_DebugControls.empty())
+                return;
+
+            if (ImGui::Begin("Debug Controls"))
+            {
+                for (auto& control : s_DebugControls)
+                {
+                    switch (control.ControlType)
+                    {
+                        case DebugControl::Type::Int:
+                        {
+                            int* value = static_cast<int*>(control.ControlPtr);
+                            ImGui::DragInt(control.ControlName.c_str(), value);
+                            break;
+                        }
+                        case DebugControl::Type::Float:
+                        case DebugControl::Type::Double:
+                        {
+                            float* value = static_cast<float*>(control.ControlPtr);
+                            ImGui::DragFloat(control.ControlName.c_str(), value, 0.01f);
+                            break;
+                        }
+                        case DebugControl::Type::Bool:
+                        {
+                            bool* value = static_cast<bool*>(control.ControlPtr);
+                            ImGui::Checkbox(control.ControlName.c_str(), value);
+                            break;
+                        }
+
+                        case DebugControl::Type::String:
+                        {
+                            std::string* value = static_cast<std::string*>(control.ControlPtr);
+
+                            char buffer[256];
+                            std::snprintf(buffer, sizeof(buffer), "%s", value->c_str());
+
+                            if (ImGui::InputText(control.ControlName.c_str(), buffer, sizeof(buffer)))
+                                *value = buffer;
+
+                            break;
+                        }
+                    }
+                }
+            }
+
+            ImGui::End();
+
+            s_DebugControls.clear();
+        }
+        
     private:
         static void DisplayVector3Row(const char* label, const glm::vec3& value)
         {
@@ -104,5 +197,25 @@ namespace PurrKatEngine
             ImGui::TableSetColumnIndex(3);
             ImGui::Text("%.3f", value.z);
         }
+        
+    private:
+        
+        struct DebugControl
+        {
+            enum class Type
+            {
+                Int,
+                Float,
+                Double,
+                Bool,
+                String
+            };
+
+            std::string ControlName;
+            void* ControlPtr;
+            Type ControlType;
+        };
+        
+        static std::vector<DebugControl> s_DebugControls;
     };
 }

@@ -18,6 +18,8 @@ namespace PurrKatEngine
         glm::vec3 Position;
         glm::vec4 Color;
         glm::vec2 TexCoord;
+        glm::vec2 UVTiling;
+        float TexIndex;
     };
     
     struct Renderer2DData
@@ -27,6 +29,7 @@ namespace PurrKatEngine
         const uint32_t MAX_QUADS = 10000;
         const uint32_t MAX_VERTICES = MAX_QUADS * 4;
         const uint32_t MAX_INDICES = MAX_QUADS * 6;
+        static constexpr uint32_t MAX_TEXTURE_SLOTS = 32;
         
         Ref<VertexArray> QuadVertexArray;
         Ref<VertexBuffer> QuadVertexBuffer;
@@ -37,8 +40,11 @@ namespace PurrKatEngine
         
         Scope<Shader> SpriteColorShader;
         Scope<Shader> SpriteColorShaderLit;
-        Scope<Texture2D> BlankTexture;
+        
         std::vector<LightSource2D> LightSources;
+        
+        std::array<Ref<const Texture2D>, MAX_TEXTURE_SLOTS> TextureSlots;
+        uint32_t TextureSlotIndex = 1; // 0 = White texture
     };
     
     static Renderer2DData s_RendererData;
@@ -52,7 +58,9 @@ namespace PurrKatEngine
         s_RendererData.QuadVertexBuffer->SetLayout({
             { ShaderDataType::Float3, "a_Position" },
             { ShaderDataType::Float4, "a_Color" },
-            { ShaderDataType::Float2, "a_TexCoord" }
+            { ShaderDataType::Float2, "a_TexCoord" },
+            { ShaderDataType::Float2, "a_UVTiling" },
+            { ShaderDataType::Float, "a_TexIndex" }
         });
         s_RendererData.QuadVertexArray->AddVertexBuffer(s_RendererData.QuadVertexBuffer);
         
@@ -80,16 +88,24 @@ namespace PurrKatEngine
         delete[] quadIndices;
         
         uint32_t whitePixel = 0xffffffff;
-        s_RendererData.BlankTexture = ToScope(Texture2D::Create(1, 1));
-        s_RendererData.BlankTexture->SetData(&whitePixel, sizeof(whitePixel));
+        Ref<Texture2D> blankTexture = ToRef(Texture2D::Create(1, 1));
+        blankTexture->SetData(&whitePixel, sizeof(whitePixel));
+        
+        int samplers[Renderer2DData::MAX_TEXTURE_SLOTS];
+        for (uint32_t i = 0; i < Renderer2DData::MAX_TEXTURE_SLOTS; i++)
+        {
+            samplers[i] = (int)i;
+        }
         
         s_RendererData.SpriteColorShader = ToScope(Shader::Create("assets/shaders/Texture.glsl"));
         s_RendererData.SpriteColorShader->Bind();
-        s_RendererData.SpriteColorShader->SetUniformInt("u_Texture", 0);
+        s_RendererData.SpriteColorShader->SetUniformIntArray("u_Textures", samplers, Renderer2DData::MAX_TEXTURE_SLOTS);
 
-        s_RendererData.SpriteColorShaderLit = ToScope(Shader::Create("assets/shaders/TextureLit.glsl"));
-        s_RendererData.SpriteColorShaderLit->Bind();
-        s_RendererData.SpriteColorShaderLit->SetUniformInt("u_Texture", 0);
+        // s_RendererData.SpriteColorShaderLit = ToScope(Shader::Create("assets/shaders/TextureLit.glsl"));
+        // s_RendererData.SpriteColorShaderLit->Bind();
+        // s_RendererData.SpriteColorShaderLit->SetUniformInt("u_Texture", 0);
+        
+        s_RendererData.TextureSlots[0] = blankTexture;
     }
     
     void Renderer2D::Shutdown()
@@ -108,6 +124,8 @@ namespace PurrKatEngine
         
         s_RendererData.QuadVertexBufferPtr = s_RendererData.QuadVertexBufferBase;
         s_RendererData.QuadIndexCount = 0;
+        
+        s_RendererData.TextureSlotIndex = 1;
     }
     
     void Renderer2D::EndScene()
@@ -120,6 +138,10 @@ namespace PurrKatEngine
 
     void Renderer2D::FlushScene()
     {
+        for (uint32_t i = 0; i < s_RendererData.TextureSlotIndex; i++)
+        {
+            s_RendererData.TextureSlots[i]->Bind(i);
+        }
         RenderCommand::DrawIndexed(s_RendererData.QuadVertexArray.get(), s_RendererData.QuadIndexCount);
     }
 
@@ -132,49 +154,99 @@ namespace PurrKatEngine
     
     void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
     {
-        s_RendererData.QuadVertexBufferPtr->Position = position;
+        constexpr float textureIndex = 0;
+        constexpr glm::vec2 uvTiling = {1, 1};
+        
+        s_RendererData.QuadVertexBufferPtr->Position = {position.x - size.x/2, position.y - size.y/2, position.z};
         s_RendererData.QuadVertexBufferPtr->Color = color;
         s_RendererData.QuadVertexBufferPtr->TexCoord = {0, 0};
+        s_RendererData.QuadVertexBufferPtr->UVTiling = uvTiling;
+        s_RendererData.QuadVertexBufferPtr->TexIndex = textureIndex;
         s_RendererData.QuadVertexBufferPtr++;
         
-        s_RendererData.QuadVertexBufferPtr->Position = {position.x + size.x, position.y, 0.0f};
+        s_RendererData.QuadVertexBufferPtr->Position = {position.x + size.x/2, position.y - size.y/2, position.z};
         s_RendererData.QuadVertexBufferPtr->Color = color;
         s_RendererData.QuadVertexBufferPtr->TexCoord = {1, 0};
+        s_RendererData.QuadVertexBufferPtr->UVTiling = uvTiling;
+        s_RendererData.QuadVertexBufferPtr->TexIndex = textureIndex;
         s_RendererData.QuadVertexBufferPtr++;
         
-        s_RendererData.QuadVertexBufferPtr->Position = {position.x + size.x, position.y + size.y, 0.0f};
+        s_RendererData.QuadVertexBufferPtr->Position = {position.x + size.x/2, position.y + size.y/2, position.z};
         s_RendererData.QuadVertexBufferPtr->Color = color;
         s_RendererData.QuadVertexBufferPtr->TexCoord = {1, 1};
+        s_RendererData.QuadVertexBufferPtr->UVTiling = uvTiling;
+        s_RendererData.QuadVertexBufferPtr->TexIndex = textureIndex;
         s_RendererData.QuadVertexBufferPtr++;
         
-        s_RendererData.QuadVertexBufferPtr->Position = {position.x, position.y + size.y, 0.0f};
+        s_RendererData.QuadVertexBufferPtr->Position = {position.x - size.x/2, position.y + size.y/2, position.z};
         s_RendererData.QuadVertexBufferPtr->Color = color;
         s_RendererData.QuadVertexBufferPtr->TexCoord = {0, 1};
+        s_RendererData.QuadVertexBufferPtr->UVTiling = uvTiling;
+        s_RendererData.QuadVertexBufferPtr->TexIndex = textureIndex;
         s_RendererData.QuadVertexBufferPtr++;
         
         s_RendererData.QuadIndexCount += 6;
     }
 
-    void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Texture* texture, const glm::vec2& tilingCount, const glm::vec4& color)
+    void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<const Texture2D>& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor)
     {
-        DrawQuad({ position.x, position.y, 0.0f }, size, texture, tilingCount, color);
+        DrawQuad({ position.x, position.y, 0.0f }, size, texture, uvTiling, tintColor);
     }
     
-    void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Texture* texture, const glm::vec2& tilingCount, const glm::vec4& color)
+    void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<const Texture2D>& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor)
     {
-        // The following bind is safer but costs more performances (if we're, for example, drawing smth in 3D before drawing back in 2D, the wrong shader could be bind).
-        s_RendererData.SpriteColorShader->Bind();
+        PKE_CORE_ASSERT(texture, "Texture is null!")
         
-        auto transformMatrix = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+        glm::vec4 color = tintColor;
+        float textureIndex = 0;
         
-        s_RendererData.SpriteColorShader->SetUniformMat4("u_Transform", transformMatrix);
-        s_RendererData.SpriteColorShader->SetUniformFloat4("u_Color", color);
-        s_RendererData.SpriteColorShader->SetUniformFloat2("u_TexScale", tilingCount);
+        // Fetch the texture index if it already exists.
+        for (uint32_t i = 0; i < s_RendererData.TextureSlotIndex; i++)
+        {
+            if (*s_RendererData.TextureSlots[i] == *texture)
+            {
+                textureIndex = (float)i;
+                break;
+            }
+        }
         
-        texture->Bind();
+        // If not, store it for the current batch.
+        if (textureIndex == 0)
+        {
+            textureIndex = (float)s_RendererData.TextureSlotIndex;
+            s_RendererData.TextureSlots[s_RendererData.TextureSlotIndex] = texture;
+            s_RendererData.TextureSlotIndex++;
+        }
         
-        s_RendererData.QuadVertexArray->Bind();
-        RenderCommand::DrawIndexed(s_RendererData.QuadVertexArray.get());
+        s_RendererData.QuadVertexBufferPtr->Position = {position.x - size.x/2, position.y - size.y/2, position.z};
+        s_RendererData.QuadVertexBufferPtr->Color = color;
+        s_RendererData.QuadVertexBufferPtr->TexCoord = {0, 0};
+        s_RendererData.QuadVertexBufferPtr->UVTiling = uvTiling;
+        s_RendererData.QuadVertexBufferPtr->TexIndex = textureIndex;
+        s_RendererData.QuadVertexBufferPtr++;
+        
+        s_RendererData.QuadVertexBufferPtr->Position = {position.x + size.x/2, position.y - size.y/2, position.z};
+        s_RendererData.QuadVertexBufferPtr->Color = color;
+        s_RendererData.QuadVertexBufferPtr->TexCoord = {1, 0};
+        s_RendererData.QuadVertexBufferPtr->UVTiling = uvTiling;
+        s_RendererData.QuadVertexBufferPtr->TexIndex = textureIndex;
+        s_RendererData.QuadVertexBufferPtr++;
+        
+        s_RendererData.QuadVertexBufferPtr->Position = {position.x + size.x/2, position.y + size.y/2, position.z};
+        s_RendererData.QuadVertexBufferPtr->Color = color;
+        s_RendererData.QuadVertexBufferPtr->TexCoord = {1, 1};
+        s_RendererData.QuadVertexBufferPtr->UVTiling = uvTiling;
+        s_RendererData.QuadVertexBufferPtr->TexIndex = textureIndex;
+        s_RendererData.QuadVertexBufferPtr++;
+        
+        s_RendererData.QuadVertexBufferPtr->Position = {position.x - size.x/2, position.y + size.y/2, position.z};
+        s_RendererData.QuadVertexBufferPtr->Color = color;
+        s_RendererData.QuadVertexBufferPtr->TexCoord = {0, 1};
+        s_RendererData.QuadVertexBufferPtr->UVTiling = uvTiling;
+        s_RendererData.QuadVertexBufferPtr->TexIndex = textureIndex;
+        s_RendererData.QuadVertexBufferPtr++;
+        
+        s_RendererData.QuadIndexCount += 6;
     }
     
     // ################## LIT FUNCTIONS ##################
@@ -222,18 +294,18 @@ namespace PurrKatEngine
 
         shader.SetUniformInt("u_LightCount", lightCount);
 
-        s_RendererData.BlankTexture->Bind();
+        // s_RendererData.BlankTexture->Bind();
         s_RendererData.QuadVertexArray->Bind();
         
         RenderCommand::DrawIndexed(s_RendererData.QuadVertexArray.get());
     }
     
-    void Renderer2D::DrawLitQuad(const glm::vec2& position, const glm::vec2& size, const Texture* texture, const glm::vec4& color, float ambientStrength, const glm::vec2& tilingCount)
+    void Renderer2D::DrawLitQuad(const glm::vec2& position, const glm::vec2& size, const Texture2D* texture, const glm::vec4& tintColor, float ambientStrength, const glm::vec2& uvTiling)
     {
-        DrawLitQuad({position.x, position.y, 0.0f}, size, texture, color, ambientStrength, tilingCount);
+        DrawLitQuad({position.x, position.y, 0.0f}, size, texture, tintColor, ambientStrength, uvTiling);
     }
 
-    void Renderer2D::DrawLitQuad(const glm::vec3& position, const glm::vec2& size, const Texture* texture, const glm::vec4& color, float ambientStrength, const glm::vec2& tilingCount)
+    void Renderer2D::DrawLitQuad(const glm::vec3& position, const glm::vec2& size, const Texture2D* texture, const glm::vec4& tintColor, float ambientStrength, const glm::vec2& uvTiling)
     {
         PROFILE_FUNCTION();
         
@@ -245,8 +317,8 @@ namespace PurrKatEngine
             * glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0f});
 
         shader.SetUniformMat4("u_Transform", transformMatrix);
-        shader.SetUniformFloat4("u_Color", color);
-        shader.SetUniformFloat2("u_TexScale", tilingCount);
+        shader.SetUniformFloat4("u_Color", tintColor);
+        shader.SetUniformFloat2("u_TexScale", uvTiling);
         shader.SetUniformFloat("u_AmbientStrength", ambientStrength);
 
         int lightCount = 0;

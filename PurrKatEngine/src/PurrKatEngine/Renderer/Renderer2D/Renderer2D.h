@@ -29,16 +29,16 @@ namespace PurrKatEngine
         static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color = {1.0f, 1.0f, 1.0f, 1.0f});
         static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color = {1.0f, 1.0f, 1.0f, 1.0f});
         
-        static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const Texture* texture, const glm::vec2& tilingCount, const glm::vec4& color = {1.0f, 1.0f, 1.0f, 1.0f});
-        static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const Texture* texture, const glm::vec2& tilingCount, const glm::vec4& color = {1.0f, 1.0f, 1.0f, 1.0f});
+        static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<const Texture2D>& texture, const glm::vec2& uvTiling = {1, 1}, const glm::vec4& tintColor = {1.0f, 1.0f, 1.0f, 1.0f});
+        static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<const Texture2D>& texture, const glm::vec2& uvTiling = {1, 1}, const glm::vec4& tintColor = {1.0f, 1.0f, 1.0f, 1.0f});
         
         // ########### LIT ############
         
         static void DrawLitQuad( const glm::vec2& position, const glm::vec2& size, const glm::vec4& color = {1.0f, 1.0f, 1.0f, 1.0f}, float ambientStrength = 0.15f);
         static void DrawLitQuad( const glm::vec3& position, const glm::vec2& size, const glm::vec4& color = {1.0f, 1.0f, 1.0f, 1.0f}, float ambientStrength = 0.15f);
         
-        static void DrawLitQuad( const glm::vec2& position, const glm::vec2& size, const Texture* texture, const glm::vec4& color = {1.0f, 1.0f, 1.0f, 1.0f}, float ambientStrength = 0.15f, const glm::vec2& tilingCount = {1.0f, 1.0f});
-        static void DrawLitQuad( const glm::vec3& position, const glm::vec2& size, const Texture* texture, const glm::vec4& color = {1.0f, 1.0f, 1.0f, 1.0f}, float ambientStrength = 0.15f, const glm::vec2& tilingCount = {1.0f, 1.0f});
+        static void DrawLitQuad(const glm::vec2& position, const glm::vec2& size, const Texture2D* texture, const glm::vec4& tintColor = {1.0f, 1.0f, 1.0f, 1.0f}, float ambientStrength = 0.15f, const glm::vec2& uvTiling = {1.0f, 1.0f});
+        static void DrawLitQuad(const glm::vec3& position, const glm::vec2& size, const Texture2D* texture, const glm::vec4& tintColor = {1.0f, 1.0f, 1.0f, 1.0f}, float ambientStrength = 0.15f, const glm::vec2& uvTiling = {1.0f, 1.0f});
         
         // ########## LIGHTING ###########
         

@@ -53,7 +53,7 @@ namespace PurrKatEngine
         constexpr static int OUTPUT_PRECISION = 3; // Precision after the comma.
         
         inline static bool s_EnableLiveProfiling = false;
-        inline static bool s_EnableFileProfiling = true;
+        inline static bool s_EnableFileProfiling = false;
         
         inline static std::vector<ProfileResults> s_ProfileResults = std::vector<ProfileResults>();
         

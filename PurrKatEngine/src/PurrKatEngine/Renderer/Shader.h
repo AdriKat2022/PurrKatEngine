@@ -26,6 +26,7 @@ namespace PurrKatEngine
         // static Shader* MakeCustomColorShader();
         
         virtual void SetUniformInt(const std::string& name, int value) const = 0;
+        virtual void SetUniformIntArray(const std::string& name, int* values, uint32_t count) const = 0;
         virtual void SetUniformFloat(const std::string& name, float value) const = 0;
         virtual void SetUniformFloat2(const std::string& name, glm::vec2 color) const = 0;
         virtual void SetUniformFloat3(const std::string& name, glm::vec3 color) const = 0;

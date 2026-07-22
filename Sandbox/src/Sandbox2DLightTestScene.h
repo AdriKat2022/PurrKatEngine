@@ -31,13 +31,13 @@ private:
     glm::vec3 m_LightColor = { 1.0f, 0.95f, 0.8f };
     
     // Textures
-    PKE::Scope<PKE::Texture2D> m_RazowskiTexture;
-    PKE::Scope<PKE::Texture2D> m_LoveTexture;
-    PKE::Scope<PKE::Texture2D> m_CppTexture;
-    PKE::Scope<PKE::Texture2D> m_FreddyTexture;
-    PKE::Scope<PKE::Texture2D> m_BackgroundTexture;
-    PKE::Scope<PKE::Texture2D> m_MobTexture;
-    PKE::Scope<PKE::Texture2D> m_CreeperTexture;
+    PKE::Ref<PKE::Texture2D> m_RazowskiTexture;
+    PKE::Ref<PKE::Texture2D> m_LoveTexture;
+    PKE::Ref<PKE::Texture2D> m_CppTexture;
+    PKE::Ref<PKE::Texture2D> m_FreddyTexture;
+    PKE::Ref<PKE::Texture2D> m_BackgroundTexture;
+    PKE::Ref<PKE::Texture2D> m_MobTexture;
+    PKE::Ref<PKE::Texture2D> m_CreeperTexture;
 
     PKE::ShaderLibrary m_ShaderLibrary;
 };

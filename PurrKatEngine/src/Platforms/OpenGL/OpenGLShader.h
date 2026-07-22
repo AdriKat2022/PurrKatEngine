@@ -22,6 +22,7 @@ namespace PurrKatEngine
         void Unbind() const override;
         
         void SetUniformInt(const std::string& name, int value) const override;
+        void SetUniformIntArray(const std::string& name, int* values, uint32_t count) const override;
         void SetUniformFloat(const std::string& name, float value) const override;
         void SetUniformFloat2(const std::string& name, glm::vec2 vec) const override;
         void SetUniformFloat3(const std::string& name, glm::vec3 vec) const override;

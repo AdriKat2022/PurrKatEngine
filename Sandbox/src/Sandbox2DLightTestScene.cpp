@@ -14,13 +14,13 @@ Sandbox2DLightTestScene::Sandbox2DLightTestScene() :
 {
     m_InputMoveSquareController.SetSpeed(0.05f);
     
-    m_RazowskiTexture = ToScope(Texture2D::Create("assets/textures/razowski.png"));
-    m_LoveTexture = ToScope(Texture2D::Create("assets/textures/love.png"));
-    m_CppTexture = ToScope(Texture2D::Create("assets/textures/cpp.png"));
-    m_FreddyTexture = ToScope(Texture2D::Create("assets/textures/freddy.png"));
-    m_BackgroundTexture = ToScope(Texture2D::Create("assets/textures/hollowKnightBg.png"));
-    m_MobTexture = ToScope(Texture2D::Create("assets/textures/mob.png"));
-    m_CreeperTexture = ToScope(Texture2D::Create("assets/textures/creeper.png"));
+    m_RazowskiTexture = ToRef(Texture2D::Create("assets/textures/razowski.png"));
+    m_LoveTexture = ToRef(Texture2D::Create("assets/textures/love.png"));
+    m_CppTexture = ToRef(Texture2D::Create("assets/textures/cpp.png"));
+    m_FreddyTexture = ToRef(Texture2D::Create("assets/textures/freddy.png"));
+    m_BackgroundTexture = ToRef(Texture2D::Create("assets/textures/hollowKnightBg.png"));
+    m_MobTexture = ToRef(Texture2D::Create("assets/textures/mob.png"));
+    m_CreeperTexture = ToRef(Texture2D::Create("assets/textures/creeper.png"));
 }
 
 void Sandbox2DLightTestScene::OnAttach()
@@ -78,8 +78,22 @@ void Sandbox2DLightTestScene::OnUpdate()
     
     Renderer2D::BeginScene(m_CameraController.GetCamera());
     
-    Renderer2D::DrawQuad({0, 0, 0}, {1, 1}, {1,1,1,1});
+    Renderer2D::DrawQuad({0, 0, -0.4f}, SET_WIDTH(m_BackgroundTexture, 50), m_BackgroundTexture, {1, 1});
+    Renderer2D::DrawQuad({0, 3, 0}, {1, 1}, {1,1,1,1});
     Renderer2D::DrawQuad(m_SquareTransform.GetPosition(), {1, 1}, {0.5f, 0.5f, 0.5f, 1.0f});
+    
+    for (int i = 0; i < 20; i++)
+    {
+        for (int j = 0; j < 20; j++)
+        {
+            static float elapsedTime = 0.0f;
+            elapsedTime += Time::deltaTime/20;
+            glm::vec3 position = {i, j, 0};
+            glm::vec3 displacement = glm::vec3(glm::sin(elapsedTime * 0.5f + (i + j) * 0.5f) * 0.1f, glm::cos(elapsedTime * 0.5f + (i + j) * 0.5f) * 0.1f, 0);
+            glm::vec4 color = ((i + j) % 2 == 0) ? glm::vec4(1, 0.5f, 1, 1) : glm::vec4(0, 0, 1, 1.0f);
+            Renderer2D::DrawQuad(position + displacement, {1, 1}, color);
+        }
+    }
     
     // if (m_LightOn) Renderer2D::AddLightSource(lightSource);
     

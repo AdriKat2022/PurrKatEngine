@@ -13,14 +13,14 @@ namespace PurrKatEngine
           m_CameraMovementInputController([this](glm::vec2 input)
           {
               auto camPos = m_Camera.GetPosition();
-              camPos.x += input.x * Time::deltaTime;
-              camPos.y += input.y * Time::deltaTime;
+              camPos.x += input.x * (float)Time::deltaTime;
+              camPos.y += input.y * (float)Time::deltaTime;
               m_Camera.SetPosition(camPos);
           }, KeyCode::A, KeyCode::D, KeyCode::S, KeyCode::W),
           m_CameraRotationInputController([this](float input)
           {
               auto camRot = m_Camera.GetZRotation();
-              camRot += input * Time::deltaTime;
+              camRot += input * (float)Time::deltaTime;
               m_Camera.SetZRotation(camRot);
           }, KeyCode::Q, KeyCode::E)
     {}
