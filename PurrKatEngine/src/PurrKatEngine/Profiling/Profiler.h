@@ -138,7 +138,7 @@ namespace PurrKatEngine
             
             if (s_EnableFileProfiling)
             {
-                if (s_CurrentSession)   ImGui::TextColored(ImVec4(1, 0, 0, 1), "RECORDING (session '%s')", s_CurrentSession->m_Name);
+                if (s_CurrentSession)   ImGui::TextColored(ImVec4(1, 0, 0, 1), "RECORDING (session %s)", s_CurrentSession->m_Name.c_str());
                 else                    ImGui::TextColored(ImVec4(0.4f, 0.4f, 0.4f, 1), "There is no session to record to.");
             }
             

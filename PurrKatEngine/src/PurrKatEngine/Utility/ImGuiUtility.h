@@ -2,7 +2,8 @@
 #include "imgui/imgui.h"
 #include "PurrKatEngine/Components/Transform.h"
 
-#define DEBUG_CONTROL
+#define ADD_DEBUG_CONTROL(control) PurrKatEngine::ImGuiUtility::AddDebugControl(#control, &control)
+#define MAKE_DEBUG_CONTROL(type, control, defaultValue) static type control = defaultValue; ADD_DEBUG_CONTROL(control)
 
 namespace PurrKatEngine
 {
@@ -132,55 +133,66 @@ namespace PurrKatEngine
             });
         }
         
-        static void ShowDebugControls()
+        static void ShowDebugControls(bool useNewWindow = false)
         {
-            if (s_DebugControls.empty())
-                return;
-
-            if (ImGui::Begin("Debug Controls"))
+            if (s_DebugControls.empty()) return;
+            
+            bool opened = false;
+            if (useNewWindow)
             {
-                for (auto& control : s_DebugControls)
+                opened = ImGui::Begin("Debug Controls");
+            }
+            else
+            {
+                opened = ImGui::CollapsingHeader("Debug Controls");
+            }
+            
+            if (!opened)
+            {
+                if (useNewWindow) ImGui::End();
+                s_DebugControls.clear();
+                return;
+            }
+            
+            for (auto& control : s_DebugControls)
+            {
+                switch (control.ControlType)
                 {
-                    switch (control.ControlType)
+                    case DebugControl::Type::Int:
                     {
-                        case DebugControl::Type::Int:
-                        {
-                            int* value = static_cast<int*>(control.ControlPtr);
-                            ImGui::DragInt(control.ControlName.c_str(), value);
-                            break;
-                        }
-                        case DebugControl::Type::Float:
-                        case DebugControl::Type::Double:
-                        {
-                            float* value = static_cast<float*>(control.ControlPtr);
-                            ImGui::DragFloat(control.ControlName.c_str(), value, 0.01f);
-                            break;
-                        }
-                        case DebugControl::Type::Bool:
-                        {
-                            bool* value = static_cast<bool*>(control.ControlPtr);
-                            ImGui::Checkbox(control.ControlName.c_str(), value);
-                            break;
-                        }
+                        int* value = static_cast<int*>(control.ControlPtr);
+                        ImGui::DragInt(control.ControlName.c_str(), value);
+                        break;
+                    }
+                    case DebugControl::Type::Float:
+                    case DebugControl::Type::Double:
+                    {
+                        float* value = static_cast<float*>(control.ControlPtr);
+                        ImGui::DragFloat(control.ControlName.c_str(), value, 0.01f);
+                        break;
+                    }
+                    case DebugControl::Type::Bool:
+                    {
+                        bool* value = static_cast<bool*>(control.ControlPtr);
+                        ImGui::Checkbox(control.ControlName.c_str(), value);
+                        break;
+                    }
 
-                        case DebugControl::Type::String:
-                        {
-                            std::string* value = static_cast<std::string*>(control.ControlPtr);
+                    case DebugControl::Type::String:
+                    {
+                        std::string* value = static_cast<std::string*>(control.ControlPtr);
 
-                            char buffer[256];
-                            std::snprintf(buffer, sizeof(buffer), "%s", value->c_str());
+                        char buffer[256];
+                        std::snprintf(buffer, sizeof(buffer), "%s", value->c_str());
 
-                            if (ImGui::InputText(control.ControlName.c_str(), buffer, sizeof(buffer)))
-                                *value = buffer;
+                        if (ImGui::InputText(control.ControlName.c_str(), buffer, sizeof(buffer)))
+                            *value = buffer;
 
-                            break;
-                        }
+                        break;
                     }
                 }
             }
-
-            ImGui::End();
-
+            
             s_DebugControls.clear();
         }
         
@@ -216,6 +228,6 @@ namespace PurrKatEngine
             Type ControlType;
         };
         
-        static std::vector<DebugControl> s_DebugControls;
+        inline static std::vector<DebugControl> s_DebugControls = {};
     };
 }

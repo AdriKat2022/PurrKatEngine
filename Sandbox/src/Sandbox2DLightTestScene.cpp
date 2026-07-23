@@ -12,7 +12,7 @@ Sandbox2DLightTestScene::Sandbox2DLightTestScene() :
     }, KeyCode::LeftArrow, KeyCode::RightArrow, KeyCode::DownArrow, KeyCode::UpArrow)
     
 {
-    m_InputMoveSquareController.SetSpeed(0.05f);
+    m_InputMoveSquareController.SetSpeed(0.1f);
     
     m_RazowskiTexture = ToRef(Texture2D::Create("assets/textures/razowski.png"));
     m_LoveTexture = ToRef(Texture2D::Create("assets/textures/love.png"));
@@ -44,18 +44,18 @@ void Sandbox2DLightTestScene::OnUpdate()
         m_InputMoveSquareController.OnUpdate();
     }
     
-    // static bool active = true;
-    // if (Input::IsKeyPressed(KeyCode::Space))
-    // {
-    //     if (active) m_LightOn = !m_LightOn;
-    //     active = false;
-    // }
-    // else
-    // {
-    //     active = true;
-    // }
+    static bool active = true;
+    if (Input::IsKeyPressed(KeyCode::Space))
+    {
+        if (active) m_LightOn = !m_LightOn;
+        active = false;
+    }
+    else
+    {
+        active = true;
+    }
     
-    // LightSource2D lightSource;
+    LightSource2D lightSource;
     
     {
         PROFILE_SCOPE("Pre-Rendering");
@@ -63,56 +63,67 @@ void Sandbox2DLightTestScene::OnUpdate()
         RenderCommand::SetClearColor(m_BackgroundColor);
         RenderCommand::Clear();
     
-        // glm::vec2 mousePosition = Input::GetMousePosition();
-        //
-        // // Dynamic light following mouse
-        // lightSource = {
-        //     .Position = glm::vec2(m_CameraController.GetCamera().ScreenToWorldPosition(mousePosition)),
-        //     .Color = m_LightColor,
-        //     .Radius = m_LightRadius,
-        //     .Intensity = m_LightIntensity,
-        // };
+        glm::vec2 mousePosition = Input::GetMousePosition();
+        
+        // Dynamic light following mouse
+        lightSource = {
+            .Position = glm::vec2(m_CameraController.GetCamera().ScreenToWorldPosition(mousePosition)),
+            .Color = m_LightColor,
+            .Radius = m_LightRadius,
+            .Intensity = m_LightIntensity,
+        };
     }
     
     PROFILE_SCOPE("Rendering");
     
-    Renderer2D::BeginScene(m_CameraController.GetCamera());
+    Renderer2D::BeginScene(m_CameraController.GetCamera(), true);
     
-    Renderer2D::DrawQuad({0, 0, -0.4f}, SET_WIDTH(m_BackgroundTexture, 50), m_BackgroundTexture, {1, 1});
-    Renderer2D::DrawQuad({0, 3, 0}, {1, 1}, {1,1,1,1});
-    Renderer2D::DrawQuad(m_SquareTransform.GetPosition(), {1, 1}, {0.5f, 0.5f, 0.5f, 1.0f});
     
-    for (int i = 0; i < 20; i++)
+    // Renderer2D::AddLightSource({
+    //     .Position = m_SquareTransform.GetPosition(),
+    //     .Color = m_LightColor,
+    //     .Radius = m_LightRadius,
+    //     .Intensity = m_LightIntensity,
+    // });
+    
+    MAKE_DEBUG_CONTROL(float, rotation, 45);
+    MAKE_DEBUG_CONTROL(float, width, 50);
+    MAKE_DEBUG_CONTROL(float, speed, 1);
+    MAKE_DEBUG_CONTROL(int, count, 20);
+    
+    Renderer2D::DrawLitQuad({-0.5f, -0.5f, 0.0f}, {1, 1});
+    Renderer2D::DrawLitQuad(m_SquareTransform.GetPosition(), {1, 1});
+    
+    Renderer2D::EndScene();
+    Renderer2D::BeginScene(m_CameraController.GetCamera(), false);
+    
+    if (m_LightOn) Renderer2D::AddLightSource(lightSource);
+    
+    // Renderer2D::DrawRotatedQuad({0, 0, -0.4f}, SET_WIDTH(m_BackgroundTexture, width), rotation, m_BackgroundTexture, {1, 1}, {1, 1, 1, 1});
+    // Renderer2D::DrawQuad({0, 0, -0.4f}, SET_WIDTH(m_BackgroundTexture, 50), m_BackgroundTexture, {1, 1});
+    // Renderer2D::DrawQuad({0, 3, 0}, {1, 1}, {1,1,1,1});
+    // Renderer2D::DrawQuad(m_SquareTransform.GetPosition(), {1, 1}, {0.5f, 0.5f, 0.5f, 1.0f});
+    
+    for (int i = 0; i < count; i++)
     {
-        for (int j = 0; j < 20; j++)
+        for (int j = 0; j < count; j++)
         {
             static float elapsedTime = 0.0f;
-            elapsedTime += Time::deltaTime/20;
+            elapsedTime += (float)Time::deltaTime/100 * speed;
             glm::vec3 position = {i, j, 0};
-            glm::vec3 displacement = glm::vec3(glm::sin(elapsedTime * 0.5f + (i + j) * 0.5f) * 0.1f, glm::cos(elapsedTime * 0.5f + (i + j) * 0.5f) * 0.1f, 0);
+            glm::vec3 displacement = glm::vec3(glm::sin(elapsedTime * 0.5f + (float)(i + j) * 0.5f) * 0.1f, glm::cos(elapsedTime * 0.5f + (float)(i + j) * 0.5f) * 0.1f, 0);
             glm::vec4 color = ((i + j) % 2 == 0) ? glm::vec4(1, 0.5f, 1, 1) : glm::vec4(0, 0, 1, 1.0f);
             Renderer2D::DrawQuad(position + displacement, {1, 1}, color);
         }
     }
     
-    // if (m_LightOn) Renderer2D::AddLightSource(lightSource);
-    
-    // float leftBobbing = glm::sin(m_ElapsedTime * 0.7f) * 0.15f;
-    // glm::vec2 backgroundSize = glm::vec2(20.0f, 20.0f/m_BackgroundTexture->GetAspectRatio());
-    // Renderer2D::DrawLitQuad({0.0f, 0.0f, -0.6f}, backgroundSize, m_BackgroundTexture.get(), m_BackgroundColor, 0.4f + m_LightAmbiance / 1.6f);
-    //
-    // Renderer2D::DrawLitQuad({3.8f, -2.2f}, m_SquareTransform.GetScale(), m_MobTexture.get(), glm::vec4(1), 0);
-    //
-    // Renderer2D::DrawLitQuad({-14.0f, 0}, {1.5f, 1.5f/m_FreddyTexture->GetAspectRatio()}, m_FreddyTexture.get(), glm::vec4(1), 0);
-    //
-    // Renderer2D::DrawLitQuad({3.0f, 1.9f}, {0.8f, 0.8f/m_CreeperTexture->GetAspectRatio()}, m_CreeperTexture.get(), glm::vec4(1), 0);
-    //
-    // Renderer2D::DrawLitQuad({-7.3f, 1.0f}, {1.0f, 1.0f/m_CppTexture->GetAspectRatio()}, m_CppTexture.get(), glm::vec4(1), 0.5f + m_LightAmbiance/2.0f);
-    //
-    // Renderer2D::DrawLitQuad(m_SquareTransform.GetPosition(), {0.5f, 0.5f/m_LoveTexture->GetAspectRatio()}, m_LoveTexture.get(), glm::vec4(1), m_LightAmbiance - 0.5f);
-    
-    Renderer2D::ClearLightSources();
-    
+    Renderer2D::DrawLitQuad({0.0f, 0.0f, -0.5f}, SET_WIDTH(m_BackgroundTexture, 20), m_BackgroundTexture);
+    Renderer2D::DrawLitQuad({3.8f, -2.2f}, m_SquareTransform.GetScale(), m_MobTexture);
+    Renderer2D::DrawLitQuad({-14.0f, 0}, SET_WIDTH(m_FreddyTexture, 1.5f), m_FreddyTexture);
+    Renderer2D::DrawLitQuad({3.0f, 1.9f}, SET_WIDTH(m_CreeperTexture, 0.8f), m_CreeperTexture);
+    Renderer2D::DrawLitQuad({-7.3f, 1.0f}, SET_WIDTH(m_CppTexture, 1.0f), m_CppTexture);
+    Renderer2D::DrawLitQuad(m_SquareTransform.GetPosition(), SET_WIDTH(m_LoveTexture, width), m_LoveTexture);
+
     Renderer2D::EndScene();
 }
 
@@ -128,8 +139,16 @@ void Sandbox2DLightTestScene::OnImGuiRender()
     if (ImGui::Begin("Infos", &infos, ImGuiWindowFlags_AlwaysAutoResize))
     {
         ImGuiUtility::DisplayMouseAndWorldPosition(&m_CameraController.GetCamera());
+        ImGui::Separator();
+        auto stats = Renderer2D::GetStatistics();
+        ImGui::Text("Draw Calls: %u", stats.DrawCalls);
+        ImGui::Text("Quad Count: %u", stats.QuadCount);
+        ImGui::Text("Indices: %u", stats.GetIndexCount());
+        ImGui::Text("Vertices: %u", stats.GetVertexCount());
+        Renderer2D::EndFrameStatistics();
     }
     ImGui::End();
+    
     
     static bool showSettings = true;
     if (ImGui::Begin("Lighting Showcase Settings", &showSettings, ImGuiWindowFlags_AlwaysAutoResize))
@@ -147,6 +166,10 @@ void Sandbox2DLightTestScene::OnImGuiRender()
         ImGui::Text("This scene showcases:");
         ImGui::BulletText("Dynamic mouse-following light");
         ImGui::BulletText("Real-time lighting calculations");
+        
+        ImGui::Separator();
+        
+        ImGuiUtility::ShowDebugControls();
     }
     ImGui::End();
     
