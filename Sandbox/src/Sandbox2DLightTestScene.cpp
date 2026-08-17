@@ -55,7 +55,7 @@ void Sandbox2DLightTestScene::OnUpdate()
         active = true;
     }
     
-    LightSource2D lightSource;
+    LightSource2D mouseLightSource;
     
     {
         PROFILE_SCOPE("Pre-Rendering");
@@ -66,7 +66,7 @@ void Sandbox2DLightTestScene::OnUpdate()
         glm::vec2 mousePosition = Input::GetMousePosition();
         
         // Dynamic light following mouse
-        lightSource = {
+        mouseLightSource = {
             .Position = glm::vec2(m_CameraController.GetCamera().ScreenToWorldPosition(mousePosition)),
             .Color = m_LightColor,
             .Radius = m_LightRadius,
@@ -81,23 +81,32 @@ void Sandbox2DLightTestScene::OnUpdate()
     MAKE_DEBUG_CONTROL(float, speed, 1);
     MAKE_DEBUG_CONTROL(int, count, 20);
     
-    // Renderer2D::BeginScene(m_CameraController.GetCamera(), true);
+    Renderer2D::BeginScene(m_CameraController.GetCamera(), true);
     
-    // Renderer2D::AddLightSource({
-    //     .Position = m_SquareTransform.GetPosition(),
-    //     .Color = m_LightColor,
-    //     .Radius = m_LightRadius,
-    //     .Intensity = m_LightIntensity,
-    // });
+    Renderer2D::AddLightSource({
+        .Position = m_SquareTransform.GetPosition(),
+        .Color = m_LightColor,
+        .Radius = m_LightRadius,
+        .Intensity = m_LightIntensity,
+    });
     
-    // Renderer2D::DrawLitQuad({-0.5f, -0.5f, 0.0f}, {1, 1});
-    // Renderer2D::DrawLitQuad(m_SquareTransform.GetPosition(), {1, 1});
+    Renderer2D::AddLightSource(mouseLightSource);
     
-    // Renderer2D::EndScene();
+    Renderer2D::DrawLitQuad({-0.5f, -0.5f, 0.0f}, {1, 1});
+    Renderer2D::DrawLitQuad(m_SquareTransform.GetPosition(), {1, 1});
+    
+    Renderer2D::DrawLitQuad({0.0f, 0.0f, -0.5f}, SET_WIDTH(m_BackgroundTexture, 20), m_BackgroundTexture);
+    Renderer2D::DrawLitQuad({3.8f, -2.2f}, m_SquareTransform.GetScale(), m_MobTexture);
+    Renderer2D::DrawLitQuad({-14.0f, 0}, SET_WIDTH(m_FreddyTexture, 1.5f), m_FreddyTexture);
+    Renderer2D::DrawLitQuad({3.0f, 1.9f}, SET_WIDTH(m_CreeperTexture, 0.8f), m_CreeperTexture);
+    Renderer2D::DrawLitQuad({-7.3f, 1.0f}, SET_WIDTH(m_CppTexture, 1.0f), m_CppTexture);
+    Renderer2D::DrawLitQuad(m_SquareTransform.GetPosition(), SET_WIDTH(m_LoveTexture, width), m_LoveTexture);
+    
+    Renderer2D::EndScene();
     
     Renderer2D::BeginScene(m_CameraController.GetCamera(), false);
     
-    if (m_LightOn) Renderer2D::AddLightSource(lightSource);
+    if (m_LightOn) Renderer2D::AddLightSource(mouseLightSource);
     
     // Renderer2D::DrawRotatedQuad({0, 0, -0.4f}, SET_WIDTH(m_BackgroundTexture, width), rotation, m_BackgroundTexture, {1, 1}, {1, 1, 1, 1});
     // Renderer2D::DrawQuad({0, 0, -0.4f}, SET_WIDTH(m_BackgroundTexture, 50), m_BackgroundTexture, {1, 1});
@@ -117,13 +126,6 @@ void Sandbox2DLightTestScene::OnUpdate()
             Renderer2D::DrawQuad(position + displacement, {1, 1}, color);
         }
     }
-    
-    // Renderer2D::DrawLitQuad({0.0f, 0.0f, -0.5f}, SET_WIDTH(m_BackgroundTexture, 20), m_BackgroundTexture);
-    // Renderer2D::DrawLitQuad({3.8f, -2.2f}, m_SquareTransform.GetScale(), m_MobTexture);
-    // Renderer2D::DrawLitQuad({-14.0f, 0}, SET_WIDTH(m_FreddyTexture, 1.5f), m_FreddyTexture);
-    // Renderer2D::DrawLitQuad({3.0f, 1.9f}, SET_WIDTH(m_CreeperTexture, 0.8f), m_CreeperTexture);
-    // Renderer2D::DrawLitQuad({-7.3f, 1.0f}, SET_WIDTH(m_CppTexture, 1.0f), m_CppTexture);
-    // Renderer2D::DrawLitQuad(m_SquareTransform.GetPosition(), SET_WIDTH(m_LoveTexture, width), m_LoveTexture);
 
     Renderer2D::EndScene();
 }
