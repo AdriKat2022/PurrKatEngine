@@ -8,7 +8,19 @@
 
 namespace PurrKatEngine
 {
-    VertexBuffer* VertexBuffer::Create(float* vertices, uint32_t size)
+    VertexBuffer* VertexBuffer::Create(uint32_t size)
+    {
+        switch (Renderer::GetAPI())
+        {
+            case RendererAPI::API::None:     PKE_CORE_ASSERT(false, "Having No RendererAPI is currently not supported.") return nullptr;
+            case RendererAPI::API::OpenGL:   return new OpenGLVertexBuffer(size);
+        }
+
+        PKE_CORE_ASSERT(false, "Invalid RendererAPI.")
+        return nullptr;
+    }
+
+    VertexBuffer* VertexBuffer::Create(const float* vertices, uint32_t size)
     {
         switch (Renderer::GetAPI())
         {

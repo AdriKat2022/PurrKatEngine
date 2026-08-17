@@ -2,23 +2,27 @@
 #version 330 core
 
 layout(location = 0) in vec3 a_Position;
-layout(location = 1) in vec2 a_TexCoord;
+layout(location = 1) in vec4 a_Color;
+layout(location = 2) in vec2 a_TexCoord;
+layout(location = 3) in vec2 a_UVTiling;
+layout(location = 4) in float a_TexIndex;
 
 uniform mat4 u_ViewProjection;
-uniform mat4 u_Transform;
-uniform vec2 u_TexScale;
 
-out vec2 v_TexCoord;
 out vec2 v_WorldPosition;
+out vec4 v_Color;
+out vec2 v_TexCoord;
+out float v_TexIndex;
 
 void main()
 {
-    vec4 worldPosition = u_Transform * vec4(a_Position * 2.0, 1.0);
+    vec4 worldPos = vec4(a_Position, 1.0);    
 
-    v_WorldPosition = worldPosition.xy;
-
-    v_TexCoord = a_TexCoord * u_TexScale;
-    gl_Position = u_ViewProjection * worldPosition;
+    v_WorldPosition = vec2(worldPos.x, worldPos.y);
+    v_Color = a_Color;
+    v_TexCoord = a_TexCoord * a_UVTiling;
+    v_TexIndex = a_TexIndex;
+    gl_Position = u_ViewProjection * worldPos;
 }
 
 
@@ -27,11 +31,12 @@ void main()
 
 layout(location = 0) out vec4 color;
 
-in vec2 v_TexCoord;
 in vec2 v_WorldPosition;
+in vec4 v_Color;
+in vec2 v_TexCoord;
+in float v_TexIndex;
 
-uniform sampler2D u_Texture;
-uniform vec4 u_Color;
+uniform sampler2D u_Textures[32];
 
 const int MAX_LIGHTS = 16;
 
@@ -47,10 +52,11 @@ uniform int u_LightCount;
 uniform LightSource u_Lights[MAX_LIGHTS];
 uniform float u_AmbientStrength;
 
+
 void main()
 {
-    vec4 textureColor = texture(u_Texture, v_TexCoord) * u_Color;
-
+    vec4 textureColor = texture(u_Textures[int(v_TexIndex)], v_TexCoord) * v_Color;
+    
     vec3 lighting = textureColor.rgb * max(u_AmbientStrength, 0.0);
 
     for (int i = 0; i < u_LightCount; ++i)

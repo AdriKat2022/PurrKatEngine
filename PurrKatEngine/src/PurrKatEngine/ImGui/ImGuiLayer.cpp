@@ -73,7 +73,6 @@ namespace PurrKatEngine
     void ImGuiLayer::OnImGuiRender()
     {
         Layer::OnImGuiRender();
-        ImGui::ShowDemoWindow(&show);
     }
 
     void ImGuiLayer::Begin()

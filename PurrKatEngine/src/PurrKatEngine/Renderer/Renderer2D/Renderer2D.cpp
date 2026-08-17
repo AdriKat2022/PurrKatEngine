@@ -8,240 +8,408 @@
 #include "PurrKatEngine/Renderer/RenderCommand.h"
 #include "PurrKatEngine/Renderer/Shader.h"
 #include "PurrKatEngine/Renderer/VertexArray.h"
+#include "PurrKatEngine/Utility/ImGuiUtility.h"
 
 namespace PurrKatEngine
 {
-    constexpr int MAX_LIGHT_COUNT = 16;
+    constexpr glm::vec2 QUAD_TEX_COORDS[4] = {{0, 0}, {1 ,0}, {1, 1}, {0, 1}};
+    
+    struct QuadVertex
+    {
+        glm::vec3 Position;
+        glm::vec4 Color;
+        glm::vec2 TexCoord;
+        glm::vec2 UVTiling;
+        float TexIndex;
+    };
+    
+    struct DrawCallData
+    {
+        uint32_t PersistenceTTL; // If reaches zero, the memory gets freed.
+        uint32_t QuadIndexCount = 0;
+        QuadVertex* QuadVertexBufferBase = nullptr;
+        QuadVertex* QuadVertexBufferPtr = nullptr;
+
+        void ResetCountAndPtr()
+        {
+            QuadVertexBufferPtr = QuadVertexBufferBase;
+            QuadIndexCount = 0;
+        }
+    };
     
     struct Renderer2DData
     {
-        Scope<VertexArray> QuadVertexArray;
+        static constexpr uint32_t BUFFER_CAPACITY_PERSISTENCE = 9999; // Frames until a draw call's allocated memory gets freed if unused.
+        static constexpr uint32_t MAX_DRAW_CALLS = 1000;
+        static constexpr uint32_t MAX_QUADS = 50;
+        static constexpr uint32_t MAX_VERTICES = MAX_QUADS * 4;
+        static constexpr uint32_t MAX_INDICES = MAX_QUADS * 6;
+        static constexpr uint32_t MAX_TEXTURE_SLOTS = 32;
+        static constexpr uint32_t MAX_LIGHT_COUNT = 16;
+        
+        Ref<VertexArray> QuadVertexArray;
+        Ref<VertexBuffer> QuadVertexBuffer;
+        
+        uint32_t DrawCallsCount;
+        uint32_t DrawCallsCapacity;
+        DrawCallData* DrawCalls = nullptr; // All different draw calls that will occur.
         
         Scope<Shader> SpriteColorShader;
         Scope<Shader> SpriteColorShaderLit;
         
-        Scope<Texture2D> BlankTexture;
-        
         std::vector<LightSource2D> LightSources;
+        
+        std::array<Ref<const Texture2D>, MAX_TEXTURE_SLOTS> TextureSlots;
+        uint32_t TextureSlotIndex = 1; // 0 = White texture
+        
+        glm::vec4 QuadVertexPositions[4];
+        
+        Renderer2D::Statistics Stats;
     };
     
-    static Renderer2DData* s_RendererData;
+    static Renderer2DData s_RendererData;
     
     void Renderer2D::Init()
     {
-        PKE_CORE_ASSERT(!s_RendererData, "Renderer2D already initialized!")
+        s_RendererData.DrawCallsCount = 0;
+        s_RendererData.DrawCallsCapacity = 0;
+        s_RendererData.DrawCalls = new DrawCallData[Renderer2DData::MAX_DRAW_CALLS];
         
-        s_RendererData = new Renderer2DData();
-        s_RendererData->QuadVertexArray = ToScope(VertexArray::Create());
-        
-        float squareVertices[5 * 4] = {
-            -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-             0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-             0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
-            -0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
-        };
-
-        Ref<VertexBuffer> squareVB = ToRef(VertexBuffer::Create(squareVertices, sizeof(squareVertices)));
-        squareVB->SetLayout({
+        s_RendererData.QuadVertexBuffer = ToRef(VertexBuffer::Create(PurrKatEngine::Renderer2DData::MAX_VERTICES * sizeof(QuadVertex)));
+        s_RendererData.QuadVertexBuffer->SetLayout({
             { ShaderDataType::Float3, "a_Position" },
-            { ShaderDataType::Float2, "a_TexCoord" }
+            { ShaderDataType::Float4, "a_Color" },
+            { ShaderDataType::Float2, "a_TexCoord" },
+            { ShaderDataType::Float2, "a_UVTiling" },
+            { ShaderDataType::Float, "a_TexIndex" }
         });
-        s_RendererData->QuadVertexArray->AddVertexBuffer(squareVB);
+        s_RendererData.QuadVertexArray = ToRef(VertexArray::Create());
+        s_RendererData.QuadVertexArray->AddVertexBuffer(s_RendererData.QuadVertexBuffer);
         
-        uint32_t squareIndices[6] = { 0, 1, 2, 2, 3, 0 };
-        Ref<IndexBuffer> squareIB = ToRef(IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t)));
-        s_RendererData->QuadVertexArray->SetIndexBuffer(squareIB);
+        uint32_t* quadIndices = new uint32_t[Renderer2DData::MAX_INDICES];
+        
+        uint32_t offset = 0;
+        for (uint32_t i = 0; i < Renderer2DData::MAX_INDICES; i += 6)
+        {
+            quadIndices[i + 0] = offset + 0;
+            quadIndices[i + 1] = offset + 1;
+            quadIndices[i + 2] = offset + 2;
+            
+            quadIndices[i + 3] = offset + 2;
+            quadIndices[i + 4] = offset + 3;
+            quadIndices[i + 5] = offset + 0;
+            
+            offset += 4;
+        }
+        
+        Ref<IndexBuffer> quadIB = ToRef(IndexBuffer::Create(quadIndices, Renderer2DData::MAX_INDICES));
+        s_RendererData.QuadVertexArray->SetIndexBuffer(quadIB);
+        
+        delete[] quadIndices;
         
         uint32_t whitePixel = 0xffffffff;
-        s_RendererData->BlankTexture = ToScope(Texture2D::Create(1, 1));
-        s_RendererData->BlankTexture->SetData(&whitePixel, sizeof(whitePixel));
+        Ref<Texture2D> blankTexture = ToRef(Texture2D::Create(1, 1));
+        blankTexture->SetData(&whitePixel, sizeof(whitePixel));
         
-        s_RendererData->SpriteColorShader = ToScope(Shader::Create("assets/shaders/Texture.glsl"));
-        s_RendererData->SpriteColorShader->Bind();
-        s_RendererData->SpriteColorShader->SetUniformInt("u_Texture", 0);
+        int samplers[Renderer2DData::MAX_TEXTURE_SLOTS];
+        for (uint32_t i = 0; i < Renderer2DData::MAX_TEXTURE_SLOTS; i++)
+        {
+            samplers[i] = (int)i;
+        }
+        
+        s_RendererData.SpriteColorShader = ToScope(Shader::Create("assets/shaders/Texture.glsl"));
+        s_RendererData.SpriteColorShader->Bind();
+        s_RendererData.SpriteColorShader->SetUniformIntArray("u_Textures", samplers, Renderer2DData::MAX_TEXTURE_SLOTS);
 
-        s_RendererData->SpriteColorShaderLit = ToScope(Shader::Create("assets/shaders/TextureLit.glsl"));
-        s_RendererData->SpriteColorShaderLit->Bind();
-        s_RendererData->SpriteColorShaderLit->SetUniformInt("u_Texture", 0);
+        s_RendererData.SpriteColorShaderLit = ToScope(Shader::Create("assets/shaders/TextureLit.glsl"));
+        s_RendererData.SpriteColorShaderLit->Bind();
+        s_RendererData.SpriteColorShaderLit->SetUniformIntArray("u_Textures", samplers, Renderer2DData::MAX_TEXTURE_SLOTS);
+        
+        s_RendererData.QuadVertexPositions[0] = {-0.5f, -0.5f, 0.0f, 1.0f};
+        s_RendererData.QuadVertexPositions[1] = {0.5f, -0.5f, 0.0f, 1.0f};
+        s_RendererData.QuadVertexPositions[2] = {0.5f, 0.5f, 0.0f, 1.0f};
+        s_RendererData.QuadVertexPositions[3] = {-0.5f, 0.5f, 0.0f, 1.0f};
+        
+        s_RendererData.TextureSlots[0] = blankTexture;
+        s_RendererData.TextureSlotIndex = 1;
     }
     
     void Renderer2D::Shutdown()
     {
-        delete s_RendererData;
     }
     
-    void Renderer2D::BeginScene(const OrthographicCamera& camera)
+    void Renderer2D::BeginScene(const OrthographicCamera& camera, bool litScene)
     {
-        // The following is NOT OPTIMIZED since we may not need all the shaders during this scene.
-        
-        s_RendererData->SpriteColorShader->Bind();
-        s_RendererData->SpriteColorShader->SetUniformMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
-        
-        s_RendererData->SpriteColorShaderLit->Bind();
-        s_RendererData->SpriteColorShaderLit->SetUniformMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
+        if (litScene)
+        {
+            s_RendererData.SpriteColorShaderLit->Bind();
+            s_RendererData.SpriteColorShaderLit->SetUniformMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
+        }
+        else
+        {
+            s_RendererData.SpriteColorShader->Bind();
+            s_RendererData.SpriteColorShader->SetUniformMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
+        }
     }
     
     void Renderer2D::EndScene()
     {
+        FlushScene();
+    }
+
+    void Renderer2D::FlushScene()
+    {
+        if (s_RendererData.DrawCallsCount != 0)
+        {
+            UploadLights();
+            PassDrawCalls();
+        }
+        
+        FreeUnusedBuffers();
+        ClearLightSources();
+        
+        s_RendererData.DrawCallsCount = 0;
+        
+        s_RendererData.TextureSlotIndex = 1;
+    }
+    
+    void Renderer2D::UploadLights()
+    {
+        int lightCount = 0;
+        Shader& shader = *s_RendererData.SpriteColorShaderLit;
+        for (const LightSource2D& light : s_RendererData.LightSources)
+        {
+            if (light.Radius <= 0.0f || light.Intensity <= 0.0f) continue;
+
+            // const glm::vec2 closestPoint = glm::clamp(light.Position, quadMin, quadMax);
+            // const glm::vec2 offset = light.Position - closestPoint;
+            // if (glm::dot(offset, offset) > light.Radius * light.Radius) continue;
+
+            const std::string uniform = "u_Lights[" + std::to_string(lightCount) + "]";
+            shader.SetUniformFloat2(uniform + ".Position", light.Position);
+            shader.SetUniformFloat3(uniform + ".Color", light.Color);
+            shader.SetUniformFloat(uniform + ".Radius", light.Radius);
+            shader.SetUniformFloat(uniform + ".Intensity", light.Intensity);
+            lightCount++;
+        }
+
+        shader.SetUniformInt("u_LightCount", lightCount);
+    }
+
+    const Renderer2D::Statistics& Renderer2D::GetStatistics()
+    {
+        return s_RendererData.Stats;
+    }
+
+    void Renderer2D::EndFrameStatistics()
+    {
+        s_RendererData.Stats.DrawCalls = 0;
+        s_RendererData.Stats.QuadCount = 0;
     }
     
     // ################## UNLIT FUNCTIONS ##################
-    
+
     void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
     {
-        DrawQuad({ position.x, position.y, 0.0f }, size, color);
-    }
-    
-    void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
-    {
-        // The following bind is safer but costs more performances (if we're, for example, drawing smth in 3D before drawing back in 2D, the wrong shader could be bind).
-        s_RendererData->SpriteColorShader->Bind();
-        
-        auto transformMatrix = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
-        
-        s_RendererData->SpriteColorShader->SetUniformMat4("u_Transform", transformMatrix);
-        s_RendererData->SpriteColorShader->SetUniformFloat4("u_Color", color);
-        s_RendererData->QuadVertexArray->Bind();
-        
-        s_RendererData->BlankTexture->Bind();
-        
-        RenderCommand::DrawIndexed(s_RendererData->QuadVertexArray.get());
+        DrawQuad({ position.x, position.y, 0}, size, color);
     }
 
-    void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Texture* texture, const glm::vec2& tilingCount, const glm::vec4& color)
+    void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
     {
-        DrawQuad({ position.x, position.y, 0.0f }, size, texture, tilingCount, color);
+        glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0f});
+        
+        constexpr float textureIndex = 0;
+        constexpr glm::vec2 uvTiling = {1, 1};
+
+        WriteToVertexBuffer(color, transform, textureIndex, uvTiling);
+    }
+
+    void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<const Texture2D>& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor)
+    {
+        DrawQuad({ position.x, position.y, 0}, size, texture, uvTiling, tintColor);
+    }
+
+    void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<const Texture2D>& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor)
+    {
+        glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0f});
+        glm::vec4 color = tintColor;
+        
+        float textureIndex = GetOrCreateTextureIndex(texture);
+
+        WriteToVertexBuffer(color, transform, textureIndex, uvTiling);
+    }
+
+    void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<const Texture2D>& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor)
+    {
+        DrawRotatedQuad({ position.x, position.y, 0}, size, rotation, texture, uvTiling, tintColor);
     }
     
-    void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Texture* texture, const glm::vec2& tilingCount, const glm::vec4& color)
+    void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<const Texture2D>& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor)
     {
-        // The following bind is safer but costs more performances (if we're, for example, drawing smth in 3D before drawing back in 2D, the wrong shader could be bind).
-        s_RendererData->SpriteColorShader->Bind();
+        PKE_CORE_ASSERT(texture, "Texture is null!")
         
-        auto transformMatrix = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+        glm::vec4 color = tintColor;
         
-        s_RendererData->SpriteColorShader->SetUniformMat4("u_Transform", transformMatrix);
-        s_RendererData->SpriteColorShader->SetUniformFloat4("u_Color", color);
-        s_RendererData->SpriteColorShader->SetUniformFloat2("u_TexScale", tilingCount);
+        float textureIndex = GetOrCreateTextureIndex(texture);
         
-        texture->Bind();
-        
-        s_RendererData->QuadVertexArray->Bind();
-        RenderCommand::DrawIndexed(s_RendererData->QuadVertexArray.get());
+        glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+            * glm::rotate(glm::mat4(1.0f), glm::radians(rotation), {0.0f, 0.0f, 1.0f})
+            * glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0f});
+
+        WriteToVertexBuffer(color, transform, textureIndex, uvTiling);
     }
     
     // ################## LIT FUNCTIONS ##################
     
     void Renderer2D::DrawLitQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color, float ambientStrength)
     {
-        DrawLitQuad({position.x, position.y, 0.0f}, size, color, ambientStrength);
+        DrawLitQuad({position.x, position.y, 0}, size, color, ambientStrength);
     }
 
     void Renderer2D::DrawLitQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, float ambientStrength)
     {
-        Shader& shader = *s_RendererData->SpriteColorShaderLit.get();
+        const glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1), {size.x, size.y, 1.0f});
+        constexpr glm::vec2 uvTiling = glm::vec2(1.0f, 1.0f);
+        constexpr float textureIndex = 0;
         
-        shader.Bind();
-
-        const auto transformMatrix = glm::translate(glm::mat4(1.0f), position)
-            * glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0f});
-
-        shader.SetUniformFloat4("u_Color", color);
-        shader.SetUniformMat4("u_Transform", transformMatrix);
-        shader.SetUniformFloat("u_AmbientStrength", ambientStrength);
-
-        int lightCount = 0;
-        const glm::vec2 quadMin = glm::vec2(position) - glm::abs(size);
-        const glm::vec2 quadMax = glm::vec2(position) + glm::abs(size);
-
-        for (const LightSource2D& light : s_RendererData->LightSources)
-        {
-            if (lightCount == MAX_LIGHT_COUNT) break;
-
-            if (light.Radius <= 0.0f || light.Intensity <= 0.0f) continue;
-
-            const glm::vec2 closestPoint = glm::clamp(light.Position, quadMin, quadMax);
-            const glm::vec2 offset = light.Position - closestPoint;
-            
-            if (glm::dot(offset, offset) > light.Radius * light.Radius) continue;
-
-            const std::string uniform = "u_Lights[" + std::to_string(lightCount) + "]";
-            shader.SetUniformFloat2(uniform + ".Position", light.Position);
-            shader.SetUniformFloat3(uniform + ".Color", light.Color);
-            shader.SetUniformFloat(uniform + ".Radius", light.Radius);
-            shader.SetUniformFloat(uniform + ".Intensity", light.Intensity);
-            ++lightCount;
-        }
-
-        shader.SetUniformInt("u_LightCount", lightCount);
-
-        s_RendererData->BlankTexture->Bind();
-        s_RendererData->QuadVertexArray->Bind();
-        
-        RenderCommand::DrawIndexed(s_RendererData->QuadVertexArray.get());
+        WriteToVertexBuffer(color, transform, textureIndex, uvTiling);
     }
     
-    void Renderer2D::DrawLitQuad(const glm::vec2& position, const glm::vec2& size, const Texture* texture, const glm::vec4& color, float ambientStrength, const glm::vec2& tilingCount)
+    void Renderer2D::DrawLitQuad(const glm::vec2& position, const glm::vec2& size, const Ref<const Texture2D>& texture, const glm::vec4& tintColor, float ambientStrength, const glm::vec2& uvTiling)
     {
-        DrawLitQuad({position.x, position.y, 0.0f}, size, texture, color, ambientStrength, tilingCount);
+        DrawLitQuad({position.x, position.y, 0}, size, texture, tintColor, ambientStrength, uvTiling);
     }
 
-    void Renderer2D::DrawLitQuad(const glm::vec3& position, const glm::vec2& size, const Texture* texture, const glm::vec4& color, float ambientStrength, const glm::vec2& tilingCount)
+    void Renderer2D::DrawLitQuad(const glm::vec3& position, const glm::vec2& size, const Ref<const Texture2D>& texture, const glm::vec4& tintColor, float ambientStrength, const glm::vec2& uvTiling)
     {
         PROFILE_FUNCTION();
+
+        glm::vec4 color = tintColor;
+        const glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1), {size.x, size.y, 1.0f});
         
-        Shader& shader = *s_RendererData->SpriteColorShaderLit.get();
-        
-        shader.Bind();
+        float textureIndex = GetOrCreateTextureIndex(texture);
 
-        const auto transformMatrix = glm::translate(glm::mat4(1.0f), position)
-            * glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0f});
-
-        shader.SetUniformMat4("u_Transform", transformMatrix);
-        shader.SetUniformFloat4("u_Color", color);
-        shader.SetUniformFloat2("u_TexScale", tilingCount);
-        shader.SetUniformFloat("u_AmbientStrength", ambientStrength);
-
-        int lightCount = 0;
-        const glm::vec2 quadMin = glm::vec2(position) - glm::abs(size);
-        const glm::vec2 quadMax = glm::vec2(position) + glm::abs(size);
-
-        for (const LightSource2D& light : s_RendererData->LightSources)
-        {
-            if (lightCount == MAX_LIGHT_COUNT) break;
-
-            if (light.Radius <= 0.0f || light.Intensity <= 0.0f) continue;
-
-            const glm::vec2 closestPoint = glm::clamp(light.Position, quadMin, quadMax);
-            const glm::vec2 offset = light.Position - closestPoint;
-            
-            if (glm::dot(offset, offset) > light.Radius * light.Radius) continue;
-
-            const std::string uniform = "u_Lights[" + std::to_string(lightCount) + "]";
-            shader.SetUniformFloat2(uniform + ".Position", light.Position);
-            shader.SetUniformFloat3(uniform + ".Color", light.Color);
-            shader.SetUniformFloat(uniform + ".Radius", light.Radius);
-            shader.SetUniformFloat(uniform + ".Intensity", light.Intensity);
-            ++lightCount;
-        }
-
-        shader.SetUniformInt("u_LightCount", lightCount);
-
-        texture->Bind();
-        s_RendererData->QuadVertexArray->Bind();
-        
-        RenderCommand::DrawIndexed(s_RendererData->QuadVertexArray.get());
+        WriteToVertexBuffer(color, transform, textureIndex, uvTiling);
     }
     
     // ################## LIGHTNING FUNCTIONS ##################
     
-    void Renderer2D::ClearLightSources()
-    {
-        s_RendererData->LightSources.clear();
-    }
-    
     void Renderer2D::AddLightSource(const LightSource2D& lightSource)
     {
-        s_RendererData->LightSources.push_back(lightSource);
+        s_RendererData.LightSources.push_back(lightSource);
+    }
+    
+    void Renderer2D::ClearLightSources()
+    {
+        s_RendererData.LightSources.clear();
+    }
+    
+    // ################## UTILITY FUNCTIONS ####################
+    
+    void Renderer2D::PassDrawCalls()
+    {
+        // Prepare textures.
+        for (uint32_t i = 0; i < s_RendererData.TextureSlotIndex; i++)
+        {
+            s_RendererData.TextureSlots[i]->Bind(i);
+        }
+        
+        RenderCommand::DisableDepthTest();
+        
+        for (uint32_t drawCallIndex = 0; drawCallIndex < s_RendererData.DrawCallsCount; drawCallIndex++)
+        {
+            const DrawCallData& drawCallData = s_RendererData.DrawCalls[drawCallIndex];
+            
+            uint32_t dataSize = (uint32_t)((uint8_t*)drawCallData.QuadVertexBufferPtr - (uint8_t*)drawCallData.QuadVertexBufferBase);
+            s_RendererData.QuadVertexBuffer->SetData(drawCallData.QuadVertexBufferBase, dataSize);
+            RenderCommand::DrawIndexed(s_RendererData.QuadVertexArray.get(), drawCallData.QuadIndexCount);
+        }
+        
+        s_RendererData.Stats.DrawCalls += s_RendererData.DrawCallsCount;
+    }
+    
+    void Renderer2D::FreeUnusedBuffers()
+    {
+        for (uint32_t i = s_RendererData.DrawCallsCapacity-1; i >= s_RendererData.DrawCallsCount; i--)
+        {
+            s_RendererData.DrawCalls[i].PersistenceTTL--;
+            if (s_RendererData.DrawCalls[i].PersistenceTTL == 0)
+            {
+                delete s_RendererData.DrawCalls[i].QuadVertexBufferBase;
+                s_RendererData.DrawCallsCapacity--;
+            }
+            
+            if (i == 0) break;
+        }
+    }
+
+    void Renderer2D::IncreaseDrawCallMemoryIfNeeded(int countToFit)
+    {
+        if (s_RendererData.DrawCallsCount == 0 ||
+            s_RendererData.DrawCalls[s_RendererData.DrawCallsCount-1].QuadIndexCount + countToFit > Renderer2DData::MAX_INDICES)
+        {
+            // Create a new draw call.
+            if (s_RendererData.DrawCallsCount == s_RendererData.DrawCallsCapacity)
+            {
+                // Allocate for the new draw call.
+                
+                if (s_RendererData.DrawCallsCapacity == Renderer2DData::MAX_DRAW_CALLS)
+                {
+                    PKE_CORE_ERROR("Renderer2D: Maximum draw calls reached! Cannot allocate more memory for new draw calls.");
+                    throw std::runtime_error("Renderer2D: Maximum draw calls reached!");
+                }
+                
+                auto quadVertexAllocation = new QuadVertex[Renderer2DData::MAX_VERTICES];
+                s_RendererData.DrawCalls[s_RendererData.DrawCallsCount].QuadVertexBufferBase = quadVertexAllocation;
+                s_RendererData.DrawCallsCapacity++;
+            }
+            s_RendererData.DrawCalls[s_RendererData.DrawCallsCount].ResetCountAndPtr();
+            s_RendererData.DrawCalls[s_RendererData.DrawCallsCount].PersistenceTTL = Renderer2DData::BUFFER_CAPACITY_PERSISTENCE;
+            s_RendererData.DrawCallsCount++;
+        }
+    }
+
+    void Renderer2D::WriteToVertexBuffer(const glm::vec4& color, const glm::mat4& transform, float textureIndex, const glm::vec2& uvTiling)
+    {
+        IncreaseDrawCallMemoryIfNeeded(6);
+     
+        auto& drawCallData = s_RendererData.DrawCalls[s_RendererData.DrawCallsCount-1];
+        
+        for (int i = 0; i < 4; ++i)
+        {
+            drawCallData.QuadVertexBufferPtr->Position = transform * s_RendererData.QuadVertexPositions[i];
+            drawCallData.QuadVertexBufferPtr->Color = color;
+            drawCallData.QuadVertexBufferPtr->TexCoord = QUAD_TEX_COORDS[i];
+            drawCallData.QuadVertexBufferPtr->UVTiling = uvTiling;
+            drawCallData.QuadVertexBufferPtr->TexIndex = textureIndex;
+            drawCallData.QuadVertexBufferPtr++;
+        }
+        
+        drawCallData.QuadIndexCount += 6;
+        s_RendererData.Stats.QuadCount++;
+    }
+    
+    float Renderer2D::GetOrCreateTextureIndex(const Ref<const Texture2D>& texture)
+    {
+        float textureIndex = 0;
+        
+        // Fetch the texture index if it already exists.
+        for (uint32_t i = 0; i < s_RendererData.TextureSlotIndex; i++)
+        {
+            if (*s_RendererData.TextureSlots[i] == *texture)
+            {
+                textureIndex = (float)i;
+                break;
+            }
+        }
+        
+        // If not, store it for the current batch.
+        if (textureIndex <= 0)
+        {
+            textureIndex = (float)s_RendererData.TextureSlotIndex;
+            s_RendererData.TextureSlots[s_RendererData.TextureSlotIndex] = texture;
+            s_RendererData.TextureSlotIndex++;
+        }
+        return textureIndex;
     }
 }

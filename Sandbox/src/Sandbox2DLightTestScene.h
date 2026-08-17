@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "PurrKatEngine.h"
-#include "PurrKatEngine/Profiling/Timer.h"
 
 class Sandbox2DLightTestScene : public PKE::Layer
 {
@@ -26,21 +25,18 @@ private:
     float m_LightRadius = 2.0f;
     float m_ElapsedTime = 0.0f;
     
-    glm::vec4 m_BackgroundColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+    glm::vec4 m_BackgroundColor = { 0.0f, 0.0f, 0.0f, 1.0f };
     glm::vec4 m_CheckerColor = { 0.05f, 0.05f, 0.12f, 1.0f };
     glm::vec3 m_LightColor = { 1.0f, 0.95f, 0.8f };
     
     // Textures
-    PKE::Scope<PKE::Texture2D> m_RazowskiTexture;
-    PKE::Scope<PKE::Texture2D> m_LoveTexture;
-    PKE::Scope<PKE::Texture2D> m_CppTexture;
-    PKE::Scope<PKE::Texture2D> m_FreddyTexture;
-    PKE::Scope<PKE::Texture2D> m_BackgroundTexture;
-    PKE::Scope<PKE::Texture2D> m_MobTexture;
-    PKE::Scope<PKE::Texture2D> m_CreeperTexture;
+    PKE::Ref<PKE::Texture2D> m_RazowskiTexture;
+    PKE::Ref<PKE::Texture2D> m_LoveTexture;
+    PKE::Ref<PKE::Texture2D> m_CppTexture;
+    PKE::Ref<PKE::Texture2D> m_FreddyTexture;
+    PKE::Ref<PKE::Texture2D> m_BackgroundTexture;
+    PKE::Ref<PKE::Texture2D> m_MobTexture;
+    PKE::Ref<PKE::Texture2D> m_CreeperTexture;
 
     PKE::ShaderLibrary m_ShaderLibrary;
-    
-    // Profiling
-    std::vector<PKE::ProfileResults> m_ProfileResults;
 };

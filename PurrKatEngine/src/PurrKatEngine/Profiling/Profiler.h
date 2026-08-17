@@ -2,7 +2,7 @@
 
 #include <fstream>
 #include "Timer.h"
-#include "../imgui/imgui.h" // WHY
+#include "imgui.h"
 
 // TODO: Move to utility macro or something
 #define CONCAT_IMPL(x, y) x##y
@@ -53,7 +53,7 @@ namespace PurrKatEngine
         constexpr static int OUTPUT_PRECISION = 3; // Precision after the comma.
         
         inline static bool s_EnableLiveProfiling = false;
-        inline static bool s_EnableFileProfiling = true;
+        inline static bool s_EnableFileProfiling = false;
         
         inline static std::vector<ProfileResults> s_ProfileResults = std::vector<ProfileResults>();
         
@@ -82,7 +82,6 @@ namespace PurrKatEngine
             std::string name = profileResults.Name;
             std::ranges::replace(name, '"', '\'');
             
-            PKE_CORE_DEBUG("Start: {}, {}, {}", (double)profileResults.StartTime, (double)profileResults.StartTime/1000, (double)profileResults.StartTime/1000000);
             double duration = (double)profileResults.Duration/OUTPUT_PRECISION_DIVIDE;
             double startTime = (double)profileResults.StartTime/OUTPUT_PRECISION_DIVIDE;
             
@@ -139,7 +138,7 @@ namespace PurrKatEngine
             
             if (s_EnableFileProfiling)
             {
-                if (s_CurrentSession)   ImGui::TextColored(ImVec4(1, 0, 0, 1), "RECORDING (session '%s')", s_CurrentSession->m_Name);
+                if (s_CurrentSession)   ImGui::TextColored(ImVec4(1, 0, 0, 1), "RECORDING (session %s)", s_CurrentSession->m_Name.c_str());
                 else                    ImGui::TextColored(ImVec4(0.4f, 0.4f, 0.4f, 1), "There is no session to record to.");
             }
             

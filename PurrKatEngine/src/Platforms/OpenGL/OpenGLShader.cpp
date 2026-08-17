@@ -63,6 +63,12 @@ namespace PurrKatEngine
     	glUniform1i(location, value);
     }
 
+    void OpenGLShader::SetUniformIntArray(const std::string& name, int* values, uint32_t count) const
+	{
+		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+		glUniform1iv(location, (GLint)count, values);
+	}
+
     void OpenGLShader::SetUniformFloat(const std::string& name, float value) const
     {
     	PROFILE_FUNCTION();
