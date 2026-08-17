@@ -7,7 +7,7 @@ namespace PurrKatEngine
     {
     protected:
         bool IsKeyPressedImpl(KeyCode keyCode) override;
-        bool IsMouseButtonPressedImpl(int button) override;
+        bool IsMouseButtonPressedImpl(MouseButtonCode mouseButtonCode) override;
         double GetMouseXImpl() override;
         double GetMouseYImpl() override;
         glm::dvec2 GetMousePositionImpl() override;

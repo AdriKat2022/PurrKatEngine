@@ -29,9 +29,9 @@ namespace PurrKatEngine
         void RecalculateViewMatrix();
         
     private:
-        glm::mat4 m_ProjectionMatrix; // How the camera will render (orthographic == 
+        glm::mat4 m_ProjectionMatrix; // How the camera will render
         glm::mat4 m_ViewMatrix;
-        glm::mat4 m_ViewProjectionMatrix; // Cached multiplied projection and view matrixes
+        glm::mat4 m_ViewProjectionMatrix;
         
         glm::vec3 m_Position = { 0, 0, 0 };
         glm::vec3 m_Rotation = { 0, 0, 0 };

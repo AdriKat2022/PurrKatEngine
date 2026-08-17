@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+// The following macros offer a quick way to get the width and height vec while specifying one axis and adjust the other according to its aspect ratio.
 #define SET_WIDTH(texture, width) { width, width/texture->GetAspectRatio() }
 #define SET_HEIGHT(texture, height) { height*texture->GetAspectRatio(), height }
 

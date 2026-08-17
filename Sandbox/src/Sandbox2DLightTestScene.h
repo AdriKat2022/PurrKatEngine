@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "PurrKatEngine.h"
+#include "ParticleSystem.h"
 
 class Sandbox2DLightTestScene : public PKE::Layer
 {
@@ -17,6 +18,9 @@ private:
     
     PKE::Standard2DInputController m_InputMoveSquareController;
     PKE::Transform m_SquareTransform;
+    
+    ParticleProperties m_Particle;
+    ParticleSystem m_ParticleSystem;
     
     // Lighting Settings
     bool m_LightOn = true;

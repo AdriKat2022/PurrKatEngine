@@ -39,9 +39,9 @@ namespace PurrKatEngine
     
     struct Renderer2DData
     {
-        static constexpr uint32_t BUFFER_CAPACITY_PERSISTENCE = 9999; // Frames until a draw call's allocated memory gets freed if unused.
+        static constexpr uint32_t BUFFER_CAPACITY_PERSISTENCE = 144; // Frames until a draw call's allocated memory gets freed if unused.
         static constexpr uint32_t MAX_DRAW_CALLS = 1000;
-        static constexpr uint32_t MAX_QUADS = 50;
+        static constexpr uint32_t MAX_QUADS = 5000;
         static constexpr uint32_t MAX_VERTICES = MAX_QUADS * 4;
         static constexpr uint32_t MAX_INDICES = MAX_QUADS * 6;
         static constexpr uint32_t MAX_TEXTURE_SLOTS = 32;
@@ -211,17 +211,12 @@ namespace PurrKatEngine
 
     void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
     {
-        DrawQuad({ position.x, position.y, 0}, size, color);
+        DrawQuad({ position.x, position.y, 0}, size, nullptr, {1, 1}, color);
     }
 
     void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
     {
-        glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0f});
-        
-        constexpr float textureIndex = 0;
-        constexpr glm::vec2 uvTiling = {1, 1};
-
-        WriteToVertexBuffer(color, transform, textureIndex, uvTiling);
+        DrawQuad(position, size, nullptr, {1, 1}, color);
     }
 
     void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<const Texture2D>& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor)
@@ -231,12 +226,12 @@ namespace PurrKatEngine
 
     void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<const Texture2D>& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor)
     {
-        glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0f});
-        glm::vec4 color = tintColor;
+        glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+        * glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0f});
         
         float textureIndex = GetOrCreateTextureIndex(texture);
 
-        WriteToVertexBuffer(color, transform, textureIndex, uvTiling);
+        WriteToVertexBuffer(tintColor, transform, textureIndex, uvTiling);
     }
 
     void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<const Texture2D>& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor)
@@ -246,17 +241,13 @@ namespace PurrKatEngine
     
     void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<const Texture2D>& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor)
     {
-        PKE_CORE_ASSERT(texture, "Texture is null!")
-        
-        glm::vec4 color = tintColor;
-        
         float textureIndex = GetOrCreateTextureIndex(texture);
         
-        glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
-            * glm::rotate(glm::mat4(1.0f), glm::radians(rotation), {0.0f, 0.0f, 1.0f})
+        const glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+            * glm::rotate(glm::mat4(1.0f), rotation, {0.0f, 0.0f, 1.0f})
             * glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0f});
 
-        WriteToVertexBuffer(color, transform, textureIndex, uvTiling);
+        WriteToVertexBuffer(tintColor, transform, textureIndex, uvTiling);
     }
     
     // ################## LIT FUNCTIONS ##################
@@ -268,11 +259,7 @@ namespace PurrKatEngine
 
     void Renderer2D::DrawLitQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, float ambientStrength)
     {
-        const glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1), {size.x, size.y, 1.0f});
-        constexpr glm::vec2 uvTiling = glm::vec2(1.0f, 1.0f);
-        constexpr float textureIndex = 0;
-        
-        WriteToVertexBuffer(color, transform, textureIndex, uvTiling);
+        DrawLitQuad(position, size, nullptr, color, ambientStrength, {1, 1});
     }
     
     void Renderer2D::DrawLitQuad(const glm::vec2& position, const glm::vec2& size, const Ref<const Texture2D>& texture, const glm::vec4& tintColor, float ambientStrength, const glm::vec2& uvTiling)
@@ -285,7 +272,8 @@ namespace PurrKatEngine
         PROFILE_FUNCTION();
 
         glm::vec4 color = tintColor;
-        const glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1), {size.x, size.y, 1.0f});
+        const glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+            * glm::scale(glm::mat4(1), {size.x, size.y, 1.0f});
         
         float textureIndex = GetOrCreateTextureIndex(texture);
 
@@ -314,7 +302,7 @@ namespace PurrKatEngine
             s_RendererData.TextureSlots[i]->Bind(i);
         }
         
-        RenderCommand::DisableDepthTest();
+        // RenderCommand::DisableDepthTest();
         
         for (uint32_t drawCallIndex = 0; drawCallIndex < s_RendererData.DrawCallsCount; drawCallIndex++)
         {
@@ -330,16 +318,17 @@ namespace PurrKatEngine
     
     void Renderer2D::FreeUnusedBuffers()
     {
-        for (uint32_t i = s_RendererData.DrawCallsCapacity-1; i >= s_RendererData.DrawCallsCount; i--)
+        auto start = s_RendererData.DrawCalls + (s_RendererData.DrawCallsCapacity - 1);
+        auto end = s_RendererData.DrawCalls + (s_RendererData.DrawCallsCount - 1);
+        
+        for (DrawCallData* drawCallDataPtr = start; drawCallDataPtr > end; drawCallDataPtr--)
         {
-            s_RendererData.DrawCalls[i].PersistenceTTL--;
-            if (s_RendererData.DrawCalls[i].PersistenceTTL == 0)
+            if (drawCallDataPtr->PersistenceTTL == 0)
             {
-                delete s_RendererData.DrawCalls[i].QuadVertexBufferBase;
+                delete drawCallDataPtr->QuadVertexBufferBase;
                 s_RendererData.DrawCallsCapacity--;
             }
-            
-            if (i == 0) break;
+            drawCallDataPtr->PersistenceTTL--;
         }
     }
 
@@ -391,6 +380,11 @@ namespace PurrKatEngine
     
     float Renderer2D::GetOrCreateTextureIndex(const Ref<const Texture2D>& texture)
     {
+        if (texture == nullptr)
+        {
+            return 0; // Return the white texture.
+        }
+        
         float textureIndex = 0;
         
         // Fetch the texture index if it already exists.

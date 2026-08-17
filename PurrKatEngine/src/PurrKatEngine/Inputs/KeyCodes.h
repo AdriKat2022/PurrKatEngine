@@ -1,5 +1,20 @@
 ﻿#pragma once
 
+#include "KeyCodes.h"
+
+#define PKE_BUTTON_MouseLeft ::PurrKatEngine::MouseButtonCode::MouseLeft
+#define PKE_BUTTON_MouseRight ::PurrKatEngine::MouseButtonCode::MouseRight
+#define PKE_BUTTON_MouseMiddle ::PurrKatEngine::MouseButtonCode::MouseMiddle
+#define PKE_BUTTON_MouseButton4 ::PurrKatEngine::MouseButtonCode::MouseButton4
+#define PKE_BUTTON_MouseButton5 ::PurrKatEngine::MouseButtonCode::MouseButton5
+#define PKE_BUTTON_MouseButton6 ::PurrKatEngine::MouseButtonCode::MouseButton6
+#define PKE_BUTTON_MouseButton7 ::PurrKatEngine::MouseButtonCode::MouseButton7
+#define PKE_BUTTON_MouseButton8 ::PurrKatEngine::MouseButtonCode::MouseButton8
+#define PKE_BUTTON_MouseButtonLast ::PurrKatEngine::MouseButtonCode::MouseButtonLast
+#define PKE_BUTTON_MouseButtonLeft ::PurrKatEngine::MouseButtonCode::MouseButtonLeft
+#define PKE_BUTTON_MouseButtonRight ::PurrKatEngine::MouseButtonCode::MouseButtonRight
+#define PKE_BUTTON_MouseButtonMiddle ::PurrKatEngine::MouseButtonCode::MouseButtonMiddle
+
 #define PKE_KEY_None PurrKatEngine::KeyCode::None
 #define PKE_KEY_Tab PurrKatEngine::KeyCode::Tab
 #define PKE_KEY_Space PurrKatEngine::KeyCode::Space

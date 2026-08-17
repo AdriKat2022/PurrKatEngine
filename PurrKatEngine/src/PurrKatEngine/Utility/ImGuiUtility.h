@@ -4,14 +4,38 @@
 #include "PurrKatEngine/Components/Transform.h"
 #include "imgui.h"
 
-#define ADD_DEBUG_CONTROL(control) PurrKatEngine::ImGuiUtility::AddDebugControl(#control, &control)
+#define WATCH_VALUE(value) ::PurrKatEngine::ImGuiUtility::WatchValue(#value, &value)
+#define ADD_DEBUG_CONTROL(control) ::PurrKatEngine::ImGuiUtility::AddDebugControl(#control, &control)
 #define MAKE_DEBUG_CONTROL(type, control, defaultValue) static type control = defaultValue; ADD_DEBUG_CONTROL(control)
+
+#define AUTO_FIELD_IMGUI(field) ::PurrKatEngine::ImGuiUtility::AutoFieldImGui(#field, &field);
 
 namespace PurrKatEngine
 {
     /* Utility class to help with the usage of ImGui. */
     class ImGuiUtility
     {
+    public:
+        struct DebugControl
+        {
+            enum class Type
+            {
+                None,
+                Int,
+                Float,
+                Double,
+                Bool,
+                String,
+                Vec2,
+                Vec3,
+                Vec4, 
+            };
+
+            std::string ControlName;
+            void* ControlPtr;
+            Type ControlType;
+        };
+        
     public:
         static void ApplicationInfoWindow(const Application& app)
         {
@@ -98,43 +122,199 @@ namespace PurrKatEngine
 
         //////////// DEBUG CONTROLS //////////////
         
-        template<typename T>
-        static void AddDebugControl(const char* name, T* ptr)
+        static void DisplayVector3Row(const char* label, const glm::vec3& value)
         {
-            DebugControl::Type type;
-
+            ImGui::TableNextRow();
+            ImGui::TableSetColumnIndex(0);
+            ImGui::TextUnformatted(label);
+            ImGui::TableSetColumnIndex(1);
+            ImGui::Text("%.3f", value.x);
+            ImGui::TableSetColumnIndex(2);
+            ImGui::Text("%.3f", value.y);
+            ImGui::TableSetColumnIndex(3);
+            ImGui::Text("%.3f", value.z);
+        }
+        
+        template<typename T>
+        static DebugControl::Type GetType()
+        {
             if constexpr (std::is_same_v<T, int>)
-            {
-                type = DebugControl::Type::Int;
-            }
+                return DebugControl::Type::Int;
             else if constexpr (std::is_same_v<T, float>)
-            {
-                type = DebugControl::Type::Float;
-            }
+                return DebugControl::Type::Float;
             else if constexpr (std::is_same_v<T, double>)
-            {
-                type = DebugControl::Type::Double;
-            }
+                return DebugControl::Type::Double;
             else if constexpr (std::is_same_v<T, bool>)
-            {
-                type = DebugControl::Type::Bool;
-            }
+                return DebugControl::Type::Bool;
             else if constexpr (std::is_same_v<T, std::string>)
-            {
-                type = DebugControl::Type::String;
-            }
+                return DebugControl::Type::String;
+            else if constexpr (std::is_same_v<T, glm::vec2>)
+                return DebugControl::Type::Vec2;
+            else if constexpr (std::is_same_v<T, glm::vec3>)
+                return DebugControl::Type::Vec3;
+            else if constexpr (std::is_same_v<T, glm::vec4>)
+                return DebugControl::Type::Vec4;
             else
-            {
                 static_assert([] { return false; }(), "Unsupported debug control type");
-            }
+            
+            return DebugControl::Type::None;
+        }
+        
+        #pragma region ImGui Draw Functions
+        
+        template<class T>
+        static void AutoImGuiField(const char* label, T* controlPtr)
+        {
+            AutoImGuiField(label, static_cast<void*>(controlPtr), GetType<T>());
+        }        
+        
+        template<typename T, typename Getter, typename Setter>
+        static void AutoImGuiField(const char* label, T* obj, Getter getter, Setter setter, DebugControl::Type type)
+        {
+            auto current = (obj->*getter)();
+            auto newValue = current;
+            AutoImGuiField(label, static_cast<void*>(&newValue), type);
+            
+            if (newValue != current)
+                (obj->*setter)(newValue);
+        }
+        
+        static void AutoImGuiField(const char* label, void* controlPtr, DebugControl::Type type)
+        {
+            switch (type)
+            {
+                case DebugControl::Type::None:
+                    break;
+                    
+                case DebugControl::Type::Int:
+                {
+                    int* value = static_cast<int*>(controlPtr);
+                    ImGui::DragInt(label, value);
+                    break;
+                }
+                
+                case DebugControl::Type::Float:
+                case DebugControl::Type::Double:
+                {
+                    float* value = static_cast<float*>(controlPtr);
+                    ImGui::DragFloat(label, value, 0.01f);
+                    break;
+                }
+                
+                case DebugControl::Type::Bool:
+                {
+                    bool* value = static_cast<bool*>(controlPtr);
+                    ImGui::Checkbox(label, value);
+                    break;
+                }
+                
+                case DebugControl::Type::String:
+                {
+                    std::string* value = static_cast<std::string*>(controlPtr);
 
-            s_DebugControls.push_back({
-                name,
-                static_cast<void*>(ptr),
-                type
+                    char buffer[256];
+                    std::snprintf(buffer, sizeof(buffer), "%s", value->c_str());
+
+                    if (ImGui::InputText(label, buffer, sizeof(buffer)))
+                        *value = buffer;
+
+                    break;
+                }
+                
+                case DebugControl::Type::Vec2:
+                    ImGui::DragFloat2(label, static_cast<float*>(controlPtr));
+                    break;
+                case DebugControl::Type::Vec3:
+                    ImGui::DragFloat3(label, static_cast<float*>(controlPtr));
+                    break;
+                case DebugControl::Type::Vec4:
+                    if (std::string(label).find_last_of("Color") != std::string::npos)
+                        ImGui::ColorEdit4(label, static_cast<float*>(controlPtr));
+                    else
+                        ImGui::DragFloat4(label, static_cast<float*>(controlPtr));
+                    break;
+            }
+        }
+
+        template<typename T, typename Getter, typename Setter>
+        static void SliderFloat(const char* label, T* obj, Getter getter, Setter setter, float min, float max)
+        {
+            auto current = (obj->*getter)();
+            auto newValue = current;
+            
+            ImGui::SliderFloat(label, &newValue, min, max);
+            
+            if (newValue != current)
+                (obj->*setter)(newValue);
+        }
+        
+        template<typename T, typename Getter, typename Setter>
+        static void SliderInt(const char* label, T* obj, Getter getter, Setter setter, int min, int max)
+        {
+            int current = (obj->*getter)();
+            int newValue = current;
+            
+            ImGui::SliderInt(label, &newValue, min, max);
+            
+            if (newValue != current)
+                (obj->*setter)(newValue);
+        }
+        
+        #pragma endregion
+        
+        template<typename T>
+        static void WatchValue(const char* name, T* ptr)
+        {
+            s_DebugWatchers.push_back({
+                .ControlName = name,
+                .ControlPtr = static_cast<void*>(ptr),
+                .ControlType = GetType<T>()
             });
         }
         
+        static void ShowWatchedValues(bool useNewWindow = false)
+        {
+            if (s_DebugWatchers.empty()) return;
+            
+            bool opened = false;
+            if (useNewWindow)
+            {
+                opened = ImGui::Begin("Watched Values");
+            }
+            else
+            {
+                opened = ImGui::CollapsingHeader("Watched Values");
+            }
+            
+            if (!opened)
+            {
+                if (useNewWindow) ImGui::End();
+                s_DebugWatchers.clear();
+                return;
+            }
+            
+            ImGui::BeginDisabled(true);
+            
+            for (auto& control : s_DebugWatchers)
+            {
+                AutoImGuiField(control.ControlName.c_str(), control.ControlPtr, control.ControlType);
+            }
+            
+            ImGui::EndDisabled();
+            
+            s_DebugWatchers.clear();
+        }
+        
+        template<typename T>
+        static void AddDebugControl(const char* name, T* ptr)
+        {
+            s_DebugControls.push_back({
+                .ControlName = name,
+                .ControlPtr = static_cast<void*>(ptr),
+                .ControlType = GetType<T>()
+            });
+        }
+
         static void ShowDebugControls(bool useNewWindow = false)
         {
             if (s_DebugControls.empty()) return;
@@ -158,78 +338,14 @@ namespace PurrKatEngine
             
             for (auto& control : s_DebugControls)
             {
-                switch (control.ControlType)
-                {
-                    case DebugControl::Type::Int:
-                    {
-                        int* value = static_cast<int*>(control.ControlPtr);
-                        ImGui::DragInt(control.ControlName.c_str(), value);
-                        break;
-                    }
-                    case DebugControl::Type::Float:
-                    case DebugControl::Type::Double:
-                    {
-                        float* value = static_cast<float*>(control.ControlPtr);
-                        ImGui::DragFloat(control.ControlName.c_str(), value, 0.01f);
-                        break;
-                    }
-                    case DebugControl::Type::Bool:
-                    {
-                        bool* value = static_cast<bool*>(control.ControlPtr);
-                        ImGui::Checkbox(control.ControlName.c_str(), value);
-                        break;
-                    }
-
-                    case DebugControl::Type::String:
-                    {
-                        std::string* value = static_cast<std::string*>(control.ControlPtr);
-
-                        char buffer[256];
-                        std::snprintf(buffer, sizeof(buffer), "%s", value->c_str());
-
-                        if (ImGui::InputText(control.ControlName.c_str(), buffer, sizeof(buffer)))
-                            *value = buffer;
-
-                        break;
-                    }
-                }
+                AutoImGuiField(control.ControlName.c_str(), control.ControlPtr, control.ControlType);
             }
             
             s_DebugControls.clear();
         }
         
     private:
-        static void DisplayVector3Row(const char* label, const glm::vec3& value)
-        {
-            ImGui::TableNextRow();
-            ImGui::TableSetColumnIndex(0);
-            ImGui::TextUnformatted(label);
-            ImGui::TableSetColumnIndex(1);
-            ImGui::Text("%.3f", value.x);
-            ImGui::TableSetColumnIndex(2);
-            ImGui::Text("%.3f", value.y);
-            ImGui::TableSetColumnIndex(3);
-            ImGui::Text("%.3f", value.z);
-        }
-        
-    private:
-        
-        struct DebugControl
-        {
-            enum class Type
-            {
-                Int,
-                Float,
-                Double,
-                Bool,
-                String
-            };
-
-            std::string ControlName;
-            void* ControlPtr;
-            Type ControlType;
-        };
-        
         inline static std::vector<DebugControl> s_DebugControls = {};
+        inline static std::vector<DebugControl> s_DebugWatchers = {};
     };
 }

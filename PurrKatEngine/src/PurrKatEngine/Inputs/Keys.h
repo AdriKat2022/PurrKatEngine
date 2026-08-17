@@ -41,10 +41,6 @@ namespace PurrKatEngine {
         MouseButton6      = 5,
         MouseButton7      = 6,
         MouseButton8      = 7,
-        MouseButtonLast   = MouseButton8,
-        MouseButtonLeft   = MouseLeft,
-        MouseButtonRight  = MouseRight,
-        MouseButtonMiddle = MouseMiddle
     };
     
     const char* to_string(KeyCode keyCode);

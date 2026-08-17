@@ -48,6 +48,8 @@ namespace PurrKatEngine
         
         // ########### LIT ############
         
+        // Currently the lit functions doesn't do anything. If the scene is marked as lit, all sprites within the scene will be lit.
+        
         static void DrawLitQuad( const glm::vec2& position, const glm::vec2& size, const glm::vec4& color = {1.0f, 1.0f, 1.0f, 1.0f}, float ambientStrength = 0.15f);
         static void DrawLitQuad( const glm::vec3& position, const glm::vec2& size, const glm::vec4& color = {1.0f, 1.0f, 1.0f, 1.0f}, float ambientStrength = 0.15f);
         

@@ -16,6 +16,15 @@ namespace PurrKatEngine
         MatchHeight,
     };
     
+    struct OrthographicCameraBounds
+    {
+        float Left, Right;
+        float Top, Bottom;
+        
+        float GetWidth() const { return Right - Left; }
+        float GetHeight() const { return Top - Bottom; }
+    };
+    
     class OrthographicCameraController
     {
     public:
@@ -26,8 +35,10 @@ namespace PurrKatEngine
         void OnUpdate();
         void OnEvent(Event& e);
         
-        float GetZoomLevel() const { return m_ZoomLevel; }
         void SetZoomLevel(float level) { m_ZoomLevel = level; }
+        
+        float GetZoomLevel() const { return m_ZoomLevel; }
+        const OrthographicCameraBounds& GetCameraBounds() const { return m_CameraBounds; }
         
         bool EnableMovement = true;
         bool EnableRotation = true;
@@ -41,7 +52,10 @@ namespace PurrKatEngine
     private:
         float m_AspectRatio = 1.0f;
         float m_ZoomLevel = 1.0f;
+        float m_CameraRotation = 0;
+        OrthographicCameraBounds m_CameraBounds;
         OrthographicCamera m_Camera;
+        
         Standard2DInputController m_CameraMovementInputController;
         Standard1DInputController m_CameraRotationInputController;
     };

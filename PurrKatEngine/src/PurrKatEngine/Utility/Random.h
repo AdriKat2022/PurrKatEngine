@@ -1,8 +1,9 @@
 ﻿#pragma once
 #include <random>
 
-#define PKE_RANDOM(min, max) ::PurrKatEngine::Random::Float(min, max);
-#define PKE_RANDOM_INT(min, max) ::PurrKatEngine::Random::Int(min, max);
+#define PKE_RAND01() ::PurrKatEngine::Random::Float()
+#define PKE_RANDOM(min, max) ::PurrKatEngine::Random::Float(min, max)
+#define PKE_RANDOM_INT(min, max) ::PurrKatEngine::Random::Int(min, max)
 
 namespace PurrKatEngine
 {

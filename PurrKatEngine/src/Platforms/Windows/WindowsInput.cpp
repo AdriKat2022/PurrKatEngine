@@ -15,11 +15,11 @@ namespace PurrKatEngine
         auto state = glfwGetKey(window, KeyCodeToGlfwCharCode(keyCode));
         return state == GLFW_PRESS || state == GLFW_REPEAT;
     }
-
-    bool WindowsInput::IsMouseButtonPressedImpl(int button)
+    
+    bool WindowsInput::IsMouseButtonPressedImpl(MouseButtonCode mouseButtonCode)
     {
         GLFWwindow* window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
-        auto state = glfwGetMouseButton(window, button);
+        auto state = glfwGetMouseButton(window, (int)mouseButtonCode);
         return state == GLFW_PRESS;
     }
 

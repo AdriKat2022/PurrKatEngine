@@ -21,6 +21,17 @@ Sandbox2DLightTestScene::Sandbox2DLightTestScene() :
     m_BackgroundTexture = ToRef(Texture2D::Create("assets/textures/hollowKnightBg.png"));
     m_MobTexture = ToRef(Texture2D::Create("assets/textures/mob.png"));
     m_CreeperTexture = ToRef(Texture2D::Create("assets/textures/creeper.png"));
+    
+    m_ParticleSystem.SetMaxParticleCount(1000);
+    
+    m_Particle.LifeTime = 1.0f;
+    m_Particle.Velocity = { 0.0f, 0.0f };
+    m_Particle.VelocityVariation = { 1.0f, 0.1f };
+    m_Particle.ColorBegin = { 1.0f, 1.0f, 0.5f, 1.0f };
+    m_Particle.ColorEnd = { 0.65f, 0.8f, 0.7f, 0.0f };
+    m_Particle.SizeVariation = 0.5f;
+    m_Particle.SizeBegin = 1.0f;
+    m_Particle.SizeEnd = 0;
 }
 
 void Sandbox2DLightTestScene::OnAttach()
@@ -77,11 +88,30 @@ void Sandbox2DLightTestScene::OnUpdate()
     PROFILE_SCOPE("Rendering");
     
     MAKE_DEBUG_CONTROL(float, rotation, 45);
-    MAKE_DEBUG_CONTROL(float, width, 50);
+    MAKE_DEBUG_CONTROL(float, width, 1);
     MAKE_DEBUG_CONTROL(float, speed, 1);
     MAKE_DEBUG_CONTROL(int, count, 20);
     
-    Renderer2D::BeginScene(m_CameraController.GetCamera(), true);
+    {
+        PROFILE_SCOPE("ParticleSystem");
+        if (Input::IsMouseButtonPressed(PKE_BUTTON_MouseLeft))
+        {
+            auto mousePos = Input::GetMousePosition();
+            auto worldPos = m_CameraController.GetCamera().ScreenToWorldPosition(mousePos);
+            
+            m_Particle.Position = { worldPos.x, worldPos.y };
+            for (int i = 0; i<5; i++)
+                m_ParticleSystem.Emit(m_Particle);
+        }
+        m_ParticleSystem.OnUpdate();
+        m_ParticleSystem.OnRender(m_CameraController.GetCamera());
+        
+        ADD_DEBUG_CONTROL(m_Particle.VelocityVariation);
+        ADD_DEBUG_CONTROL(m_Particle.ColorBegin);
+        ADD_DEBUG_CONTROL(m_Particle.ColorEnd);
+    }
+    
+    Renderer2D::BeginScene(m_CameraController.GetCamera(), false);
     
     Renderer2D::AddLightSource({
         .Position = m_SquareTransform.GetPosition(),
@@ -90,28 +120,22 @@ void Sandbox2DLightTestScene::OnUpdate()
         .Intensity = m_LightIntensity,
     });
     
-    Renderer2D::AddLightSource(mouseLightSource);
+    if (m_LightOn)
+        Renderer2D::AddLightSource(mouseLightSource);
     
     Renderer2D::DrawLitQuad({-0.5f, -0.5f, 0.0f}, {1, 1});
-    Renderer2D::DrawLitQuad(m_SquareTransform.GetPosition(), {1, 1});
-    
     Renderer2D::DrawLitQuad({0.0f, 0.0f, -0.5f}, SET_WIDTH(m_BackgroundTexture, 20), m_BackgroundTexture);
     Renderer2D::DrawLitQuad({3.8f, -2.2f}, m_SquareTransform.GetScale(), m_MobTexture);
     Renderer2D::DrawLitQuad({-14.0f, 0}, SET_WIDTH(m_FreddyTexture, 1.5f), m_FreddyTexture);
     Renderer2D::DrawLitQuad({3.0f, 1.9f}, SET_WIDTH(m_CreeperTexture, 0.8f), m_CreeperTexture);
     Renderer2D::DrawLitQuad({-7.3f, 1.0f}, SET_WIDTH(m_CppTexture, 1.0f), m_CppTexture);
-    Renderer2D::DrawLitQuad(m_SquareTransform.GetPosition(), SET_WIDTH(m_LoveTexture, width), m_LoveTexture);
+    Renderer2D::DrawRotatedQuad(m_SquareTransform.GetPosition(), SET_WIDTH(m_LoveTexture, width), glm::radians(rotation), m_LoveTexture);
+    Renderer2D::DrawRotatedQuad(m_SquareTransform.GetPosition(), SET_WIDTH(m_LoveTexture, width), glm::radians(rotation), nullptr);
     
     Renderer2D::EndScene();
     
+    
     Renderer2D::BeginScene(m_CameraController.GetCamera(), false);
-    
-    if (m_LightOn) Renderer2D::AddLightSource(mouseLightSource);
-    
-    // Renderer2D::DrawRotatedQuad({0, 0, -0.4f}, SET_WIDTH(m_BackgroundTexture, width), rotation, m_BackgroundTexture, {1, 1}, {1, 1, 1, 1});
-    // Renderer2D::DrawQuad({0, 0, -0.4f}, SET_WIDTH(m_BackgroundTexture, 50), m_BackgroundTexture, {1, 1});
-    // Renderer2D::DrawQuad({0, 3, 0}, {1, 1}, {1,1,1,1});
-    // Renderer2D::DrawQuad(m_SquareTransform.GetPosition(), {1, 1}, {0.5f, 0.5f, 0.5f, 1.0f});
     
     static float elapsedTime = 0.0f;
     elapsedTime += (float)Time::deltaTime * speed;
@@ -126,7 +150,7 @@ void Sandbox2DLightTestScene::OnUpdate()
             Renderer2D::DrawQuad(position + displacement, {1, 1}, color);
         }
     }
-
+    
     Renderer2D::EndScene();
 }
 
@@ -172,7 +196,14 @@ void Sandbox2DLightTestScene::OnImGuiRender()
         
         ImGui::Separator();
         
+        ImGuiUtility::SliderInt("Max Particle Count", &m_ParticleSystem, &ParticleSystem::GetMaxParticleCount, &ParticleSystem::SetMaxParticleCount, 0, 5000);
+        
+        static constexpr std::array<const char*, 3> aspectRatioOptions = {"None", "Match Width", "Match Height"};
+        ImGuiUtility::EnumCombo("Camera Auto Adjust Aspect Ratio", m_CameraController.AspectRatioAdjustment, aspectRatioOptions);
+        
         ImGuiUtility::ShowDebugControls();
+        
+        ImGuiUtility::ShowWatchedValues();
     }
     ImGui::End();
     
