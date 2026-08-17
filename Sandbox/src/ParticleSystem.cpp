@@ -14,6 +14,8 @@ void ParticleSystem::Emit(const ParticleProperties& props)
     
     Particle& particle = m_ParticlePool[m_PoolIndex];
     
+    if (!particle.Active) m_ActiveParticles++;
+    
     particle.Active = true;
     particle.Position = props.Position;
     particle.Velocity = props.Velocity;
@@ -34,6 +36,8 @@ void ParticleSystem::Emit(const ParticleProperties& props)
 
 void ParticleSystem::OnRender(const PurrKatEngine::OrthographicCamera& camera) const
 {
+    if (m_ParticlePool.empty() || m_ActiveParticles == 0) return;
+    
     PKE::Renderer2D::BeginScene(camera);
     
     for (const auto& particle : m_ParticlePool)
@@ -65,6 +69,10 @@ void ParticleSystem::OnUpdate()
 {
     Layer::OnUpdate();
     
+    WATCH_VALUE(m_ActiveParticles);
+    
+    if (m_ParticlePool.empty() || m_ActiveParticles == 0) return;
+    
     for (auto& particle : m_ParticlePool)
     {
         if (!particle.Active) continue;
@@ -74,6 +82,7 @@ void ParticleSystem::OnUpdate()
         if (particle.LifeRemaining <= 0.0f)
         {
             particle.Active = false;
+            m_ActiveParticles--;
             continue;
         }
         

@@ -138,26 +138,29 @@ namespace PurrKatEngine
         template<typename T>
         static DebugControl::Type GetType()
         {
-            if constexpr (std::is_same_v<T, int>)
+            using U = std::remove_cvref_t<T>;
+            
+            if constexpr (std::is_same_v<U, int> || std::is_same_v<U, uint32_t>)
                 return DebugControl::Type::Int;
-            else if constexpr (std::is_same_v<T, float>)
+            else if constexpr (std::is_same_v<U, float>)
                 return DebugControl::Type::Float;
-            else if constexpr (std::is_same_v<T, double>)
+            else if constexpr (std::is_same_v<U, double>)
                 return DebugControl::Type::Double;
-            else if constexpr (std::is_same_v<T, bool>)
+            else if constexpr (std::is_same_v<U, bool>)
                 return DebugControl::Type::Bool;
-            else if constexpr (std::is_same_v<T, std::string>)
+            else if constexpr (std::is_same_v<U, std::string>)
                 return DebugControl::Type::String;
-            else if constexpr (std::is_same_v<T, glm::vec2>)
+            else if constexpr (std::is_same_v<U, glm::vec2>)
                 return DebugControl::Type::Vec2;
-            else if constexpr (std::is_same_v<T, glm::vec3>)
+            else if constexpr (std::is_same_v<U, glm::vec3>)
                 return DebugControl::Type::Vec3;
-            else if constexpr (std::is_same_v<T, glm::vec4>)
+            else if constexpr (std::is_same_v<U, glm::vec4>)
                 return DebugControl::Type::Vec4;
             else
+            {
                 static_assert([] { return false; }(), "Unsupported debug control type");
-            
-            return DebugControl::Type::None;
+                return DebugControl::Type::None;
+            }
         }
         
         #pragma region ImGui Draw Functions
@@ -251,7 +254,7 @@ namespace PurrKatEngine
         template<typename T, typename Getter, typename Setter>
         static void SliderInt(const char* label, T* obj, Getter getter, Setter setter, int min, int max)
         {
-            int current = (obj->*getter)();
+            int current = (int)(obj->*getter)();
             int newValue = current;
             
             ImGui::SliderInt(label, &newValue, min, max);

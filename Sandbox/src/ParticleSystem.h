@@ -46,6 +46,8 @@ private:
         bool Active = false;
     };
     
+    
     std::vector<Particle> m_ParticlePool;
     uint32_t m_PoolIndex = 0;
+    uint32_t m_ActiveParticles = 0;
 };
