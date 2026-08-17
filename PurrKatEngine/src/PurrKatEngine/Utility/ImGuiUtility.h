@@ -1,6 +1,8 @@
 ﻿#pragma once
-#include "imgui/imgui.h"
+
+#include "PurrKatEngine/Application.h"
 #include "PurrKatEngine/Components/Transform.h"
+#include "imgui.h"
 
 #define ADD_DEBUG_CONTROL(control) PurrKatEngine::ImGuiUtility::AddDebugControl(#control, &control)
 #define MAKE_DEBUG_CONTROL(type, control, defaultValue) static type control = defaultValue; ADD_DEBUG_CONTROL(control)

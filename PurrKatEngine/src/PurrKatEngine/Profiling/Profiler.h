@@ -2,7 +2,7 @@
 
 #include <fstream>
 #include "Timer.h"
-#include "../imgui/imgui.h" // WHY
+#include "imgui.h"
 
 // TODO: Move to utility macro or something
 #define CONCAT_IMPL(x, y) x##y

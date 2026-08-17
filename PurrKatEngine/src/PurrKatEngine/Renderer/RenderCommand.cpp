@@ -31,4 +31,14 @@ namespace PurrKatEngine
     {
         s_RendererAPI->DrawIndexed(vertexArray, indexCount);
     }
+
+    void RenderCommand::EnableDepthTest()
+    {
+        s_RendererAPI->EnableDepthTest();
+    }
+
+    void RenderCommand::DisableDepthTest()
+    {
+        s_RendererAPI->DisableDepthTest();
+    }
 }

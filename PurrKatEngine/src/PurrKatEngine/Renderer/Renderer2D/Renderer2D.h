@@ -60,7 +60,10 @@ namespace PurrKatEngine
         static void ClearLightSources();
         
     private:
-        static void WriteToVertexBuffer(const glm::vec4& color, const glm::mat4& transform, const float textureIndex, const glm::vec2 uvTiling);
+        static void PassDrawCalls();
+        static void FreeUnusedBuffers();
+        static void IncreaseDrawCallMemoryIfNeeded(int countToFit);
+        static void WriteToVertexBuffer(const glm::vec4& color, const glm::mat4& transform, float textureIndex, const glm::vec2& uvTiling);
         static float GetOrCreateTextureIndex(const Ref<const Texture2D>& texture);
         
     };

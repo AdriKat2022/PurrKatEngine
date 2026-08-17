@@ -76,8 +76,12 @@ void Sandbox2DLightTestScene::OnUpdate()
     
     PROFILE_SCOPE("Rendering");
     
-    Renderer2D::BeginScene(m_CameraController.GetCamera(), true);
+    MAKE_DEBUG_CONTROL(float, rotation, 45);
+    MAKE_DEBUG_CONTROL(float, width, 50);
+    MAKE_DEBUG_CONTROL(float, speed, 1);
+    MAKE_DEBUG_CONTROL(int, count, 20);
     
+    // Renderer2D::BeginScene(m_CameraController.GetCamera(), true);
     
     // Renderer2D::AddLightSource({
     //     .Position = m_SquareTransform.GetPosition(),
@@ -86,15 +90,11 @@ void Sandbox2DLightTestScene::OnUpdate()
     //     .Intensity = m_LightIntensity,
     // });
     
-    MAKE_DEBUG_CONTROL(float, rotation, 45);
-    MAKE_DEBUG_CONTROL(float, width, 50);
-    MAKE_DEBUG_CONTROL(float, speed, 1);
-    MAKE_DEBUG_CONTROL(int, count, 20);
+    // Renderer2D::DrawLitQuad({-0.5f, -0.5f, 0.0f}, {1, 1});
+    // Renderer2D::DrawLitQuad(m_SquareTransform.GetPosition(), {1, 1});
     
-    Renderer2D::DrawLitQuad({-0.5f, -0.5f, 0.0f}, {1, 1});
-    Renderer2D::DrawLitQuad(m_SquareTransform.GetPosition(), {1, 1});
+    // Renderer2D::EndScene();
     
-    Renderer2D::EndScene();
     Renderer2D::BeginScene(m_CameraController.GetCamera(), false);
     
     if (m_LightOn) Renderer2D::AddLightSource(lightSource);
@@ -104,25 +104,26 @@ void Sandbox2DLightTestScene::OnUpdate()
     // Renderer2D::DrawQuad({0, 3, 0}, {1, 1}, {1,1,1,1});
     // Renderer2D::DrawQuad(m_SquareTransform.GetPosition(), {1, 1}, {0.5f, 0.5f, 0.5f, 1.0f});
     
+    static float elapsedTime = 0.0f;
+    elapsedTime += (float)Time::deltaTime * speed;
+    
     for (int i = 0; i < count; i++)
     {
         for (int j = 0; j < count; j++)
         {
-            static float elapsedTime = 0.0f;
-            elapsedTime += (float)Time::deltaTime/100 * speed;
-            glm::vec3 position = {i, j, 0};
-            glm::vec3 displacement = glm::vec3(glm::sin(elapsedTime * 0.5f + (float)(i + j) * 0.5f) * 0.1f, glm::cos(elapsedTime * 0.5f + (float)(i + j) * 0.5f) * 0.1f, 0);
+            glm::vec2 position = {i, j};
+            glm::vec2 displacement = { glm::sin(elapsedTime * 0.5f + (float)(i + j) * 0.5f) * 0.1f, glm::cos(elapsedTime * 0.5f + (float)(i + j) * 0.5f) * 0.1f };
             glm::vec4 color = ((i + j) % 2 == 0) ? glm::vec4(1, 0.5f, 1, 1) : glm::vec4(0, 0, 1, 1.0f);
             Renderer2D::DrawQuad(position + displacement, {1, 1}, color);
         }
     }
     
-    Renderer2D::DrawLitQuad({0.0f, 0.0f, -0.5f}, SET_WIDTH(m_BackgroundTexture, 20), m_BackgroundTexture);
-    Renderer2D::DrawLitQuad({3.8f, -2.2f}, m_SquareTransform.GetScale(), m_MobTexture);
-    Renderer2D::DrawLitQuad({-14.0f, 0}, SET_WIDTH(m_FreddyTexture, 1.5f), m_FreddyTexture);
-    Renderer2D::DrawLitQuad({3.0f, 1.9f}, SET_WIDTH(m_CreeperTexture, 0.8f), m_CreeperTexture);
-    Renderer2D::DrawLitQuad({-7.3f, 1.0f}, SET_WIDTH(m_CppTexture, 1.0f), m_CppTexture);
-    Renderer2D::DrawLitQuad(m_SquareTransform.GetPosition(), SET_WIDTH(m_LoveTexture, width), m_LoveTexture);
+    // Renderer2D::DrawLitQuad({0.0f, 0.0f, -0.5f}, SET_WIDTH(m_BackgroundTexture, 20), m_BackgroundTexture);
+    // Renderer2D::DrawLitQuad({3.8f, -2.2f}, m_SquareTransform.GetScale(), m_MobTexture);
+    // Renderer2D::DrawLitQuad({-14.0f, 0}, SET_WIDTH(m_FreddyTexture, 1.5f), m_FreddyTexture);
+    // Renderer2D::DrawLitQuad({3.0f, 1.9f}, SET_WIDTH(m_CreeperTexture, 0.8f), m_CreeperTexture);
+    // Renderer2D::DrawLitQuad({-7.3f, 1.0f}, SET_WIDTH(m_CppTexture, 1.0f), m_CppTexture);
+    // Renderer2D::DrawLitQuad(m_SquareTransform.GetPosition(), SET_WIDTH(m_LoveTexture, width), m_LoveTexture);
 
     Renderer2D::EndScene();
 }

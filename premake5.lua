@@ -114,6 +114,7 @@ project "Sandbox"
         "%{wks.location}/PurrKatEngine/vendor",
         "%{wks.location}/PurrKatEngine/src",
         "%{IncludeDirs.Glm}",
+        "%{IncludeDirs.ImGui}",
     }
 
     links

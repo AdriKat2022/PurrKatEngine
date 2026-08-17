@@ -1,8 +1,9 @@
 ﻿#pragma once
 
+#include "imgui.h"
 #include "glm/gtc/type_ptr.hpp"
-#include "imgui/imgui.h"
 #include "PurrKatEngine/Application.h"
+#include "PurrKatEngine/Profiling/Timer.h"
 #include "PurrKatEngine/Components/Standard2DInputController.h"
 #include "PurrKatEngine/Components/Transform.h"
 #include "PurrKatEngine/ImGui/ImGuiLayer.h"

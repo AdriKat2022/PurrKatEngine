@@ -35,6 +35,15 @@ namespace PurrKatEngine
         if (count == 0) count = vertexArray->GetIndexBuffer()->GetCount();
         
         glDrawElements(GL_TRIANGLES, (GLsizei)count, GL_UNSIGNED_INT, nullptr);
-        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
+    void OpenGLRendererAPI::EnableDepthTest()
+    {
+        glEnable(GL_DEPTH_TEST);
+    }
+
+    void OpenGLRendererAPI::DisableDepthTest()
+    {
+        glDisable(GL_DEPTH_TEST);
     }
 }

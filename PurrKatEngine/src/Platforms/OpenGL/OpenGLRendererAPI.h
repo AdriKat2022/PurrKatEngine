@@ -13,6 +13,9 @@ namespace PurrKatEngine
         void Clear() override;
         
         void DrawIndexed(const VertexArray* vertexArray, uint32_t indexCount = 0) override;
+        
+        void EnableDepthTest() override;
+        void DisableDepthTest() override;
     };
     
 }

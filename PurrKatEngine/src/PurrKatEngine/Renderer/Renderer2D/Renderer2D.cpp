@@ -8,10 +8,10 @@
 #include "PurrKatEngine/Renderer/RenderCommand.h"
 #include "PurrKatEngine/Renderer/Shader.h"
 #include "PurrKatEngine/Renderer/VertexArray.h"
+#include "PurrKatEngine/Utility/ImGuiUtility.h"
 
 namespace PurrKatEngine
 {
-    constexpr int MAX_LIGHT_COUNT = 16;
     constexpr glm::vec2 QUAD_TEX_COORDS[4] = {{0, 0}, {1 ,0}, {1, 1}, {0, 1}};
     
     struct QuadVertex
@@ -23,21 +23,36 @@ namespace PurrKatEngine
         float TexIndex;
     };
     
+    struct DrawCallData
+    {
+        uint32_t PersistenceTTL; // If reaches zero, the memory gets freed.
+        uint32_t QuadIndexCount = 0;
+        QuadVertex* QuadVertexBufferBase = nullptr;
+        QuadVertex* QuadVertexBufferPtr = nullptr;
+
+        void ResetCountAndPtr()
+        {
+            QuadVertexBufferPtr = QuadVertexBufferBase;
+            QuadIndexCount = 0;
+        }
+    };
+    
     struct Renderer2DData
     {
-        // Per draw call, the following is the maximum.
-        static constexpr uint32_t MAX_QUADS = 10000;
+        static constexpr uint32_t BUFFER_CAPACITY_PERSISTENCE = 9999; // Frames until a draw call's allocated memory gets freed if unused.
+        static constexpr uint32_t MAX_DRAW_CALLS = 1000;
+        static constexpr uint32_t MAX_QUADS = 50;
         static constexpr uint32_t MAX_VERTICES = MAX_QUADS * 4;
         static constexpr uint32_t MAX_INDICES = MAX_QUADS * 6;
         static constexpr uint32_t MAX_TEXTURE_SLOTS = 32;
-        static constexpr uint32_t MAX_LIGHT_SLOTS = 16;
+        static constexpr uint32_t MAX_LIGHT_COUNT = 16;
         
         Ref<VertexArray> QuadVertexArray;
         Ref<VertexBuffer> QuadVertexBuffer;
         
-        uint32_t QuadIndexCount = 0;
-        QuadVertex* QuadVertexBufferBase = nullptr;
-        QuadVertex* QuadVertexBufferPtr = nullptr;
+        uint32_t DrawCallsCount;
+        uint32_t DrawCallsCapacity;
+        DrawCallData* DrawCalls = nullptr; // All different draw calls that will occur.
         
         Scope<Shader> SpriteColorShader;
         Scope<Shader> SpriteColorShaderLit;
@@ -56,8 +71,10 @@ namespace PurrKatEngine
     
     void Renderer2D::Init()
     {
-        s_RendererData.QuadVertexArray = ToRef(VertexArray::Create());
-
+        s_RendererData.DrawCallsCount = 0;
+        s_RendererData.DrawCallsCapacity = 0;
+        s_RendererData.DrawCalls = new DrawCallData[Renderer2DData::MAX_DRAW_CALLS];
+        
         s_RendererData.QuadVertexBuffer = ToRef(VertexBuffer::Create(PurrKatEngine::Renderer2DData::MAX_VERTICES * sizeof(QuadVertex)));
         s_RendererData.QuadVertexBuffer->SetLayout({
             { ShaderDataType::Float3, "a_Position" },
@@ -66,9 +83,8 @@ namespace PurrKatEngine
             { ShaderDataType::Float2, "a_UVTiling" },
             { ShaderDataType::Float, "a_TexIndex" }
         });
+        s_RendererData.QuadVertexArray = ToRef(VertexArray::Create());
         s_RendererData.QuadVertexArray->AddVertexBuffer(s_RendererData.QuadVertexBuffer);
-        
-        s_RendererData.QuadVertexBufferBase = new QuadVertex[Renderer2DData::MAX_VERTICES];
         
         uint32_t* quadIndices = new uint32_t[Renderer2DData::MAX_INDICES];
         
@@ -109,16 +125,12 @@ namespace PurrKatEngine
         s_RendererData.SpriteColorShaderLit->Bind();
         s_RendererData.SpriteColorShaderLit->SetUniformIntArray("u_Textures", samplers, Renderer2DData::MAX_TEXTURE_SLOTS);
         
-        s_RendererData.TextureSlots[0] = blankTexture;
-        
         s_RendererData.QuadVertexPositions[0] = {-0.5f, -0.5f, 0.0f, 1.0f};
         s_RendererData.QuadVertexPositions[1] = {0.5f, -0.5f, 0.0f, 1.0f};
         s_RendererData.QuadVertexPositions[2] = {0.5f, 0.5f, 0.0f, 1.0f};
         s_RendererData.QuadVertexPositions[3] = {-0.5f, 0.5f, 0.0f, 1.0f};
         
-        s_RendererData.QuadVertexBufferPtr = s_RendererData.QuadVertexBufferBase;
-        s_RendererData.QuadIndexCount = 0;
-        
+        s_RendererData.TextureSlots[0] = blankTexture;
         s_RendererData.TextureSlotIndex = 1;
     }
     
@@ -147,29 +159,20 @@ namespace PurrKatEngine
 
     void Renderer2D::FlushScene()
     {
-        uint32_t dataSize = (uint32_t)((uint8_t*)s_RendererData.QuadVertexBufferPtr - (uint8_t*)s_RendererData.QuadVertexBufferBase);
-        s_RendererData.QuadVertexBuffer->SetData(s_RendererData.QuadVertexBufferBase, dataSize);
-        
-        for (uint32_t i = 0; i < s_RendererData.TextureSlotIndex; i++)
+        if (s_RendererData.DrawCallsCount != 0)
         {
-            s_RendererData.TextureSlots[i]->Bind(i);
+            UploadLights();
+            PassDrawCalls();
         }
-
-        UploadLights();
         
-        RenderCommand::DrawIndexed(s_RendererData.QuadVertexArray.get(), s_RendererData.QuadIndexCount);
-        
+        FreeUnusedBuffers();
         ClearLightSources();
         
-        // Reset QuadVertexBuffer
-        s_RendererData.QuadVertexBufferPtr = s_RendererData.QuadVertexBufferBase;
-        s_RendererData.QuadIndexCount = 0;
+        s_RendererData.DrawCallsCount = 0;
         
         s_RendererData.TextureSlotIndex = 1;
-        
-        s_RendererData.Stats.DrawCalls++;
     }
-
+    
     void Renderer2D::UploadLights()
     {
         int lightCount = 0;
@@ -208,7 +211,7 @@ namespace PurrKatEngine
 
     void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
     {
-        DrawQuad({ position.x, position.y, 0.0f }, size, color);
+        DrawQuad({ position.x, position.y, 0}, size, color);
     }
 
     void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
@@ -223,7 +226,7 @@ namespace PurrKatEngine
 
     void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<const Texture2D>& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor)
     {
-        DrawQuad({ position.x, position.y, 0.0f }, size, texture, uvTiling, tintColor);
+        DrawQuad({ position.x, position.y, 0}, size, texture, uvTiling, tintColor);
     }
 
     void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<const Texture2D>& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor)
@@ -238,7 +241,7 @@ namespace PurrKatEngine
 
     void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<const Texture2D>& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor)
     {
-        DrawRotatedQuad({ position.x, position.y, 0.0f }, size, rotation, texture, uvTiling, tintColor);
+        DrawRotatedQuad({ position.x, position.y, 0}, size, rotation, texture, uvTiling, tintColor);
     }
     
     void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<const Texture2D>& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor)
@@ -260,7 +263,7 @@ namespace PurrKatEngine
     
     void Renderer2D::DrawLitQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color, float ambientStrength)
     {
-        DrawLitQuad({position.x, position.y, 0.0f}, size, color, ambientStrength);
+        DrawLitQuad({position.x, position.y, 0}, size, color, ambientStrength);
     }
 
     void Renderer2D::DrawLitQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, float ambientStrength)
@@ -274,7 +277,7 @@ namespace PurrKatEngine
     
     void Renderer2D::DrawLitQuad(const glm::vec2& position, const glm::vec2& size, const Ref<const Texture2D>& texture, const glm::vec4& tintColor, float ambientStrength, const glm::vec2& uvTiling)
     {
-        DrawLitQuad({position.x, position.y, 0.0f}, size, texture, tintColor, ambientStrength, uvTiling);
+        DrawLitQuad({position.x, position.y, 0}, size, texture, tintColor, ambientStrength, uvTiling);
     }
 
     void Renderer2D::DrawLitQuad(const glm::vec3& position, const glm::vec2& size, const Ref<const Texture2D>& texture, const glm::vec4& tintColor, float ambientStrength, const glm::vec2& uvTiling)
@@ -303,25 +306,86 @@ namespace PurrKatEngine
     
     // ################## UTILITY FUNCTIONS ####################
     
-    void Renderer2D::WriteToVertexBuffer(const glm::vec4& color, const glm::mat4& transform, const float textureIndex, const glm::vec2 uvTiling)
+    void Renderer2D::PassDrawCalls()
     {
-        if (s_RendererData.QuadIndexCount >= Renderer2DData::MAX_INDICES)
+        // Prepare textures.
+        for (uint32_t i = 0; i < s_RendererData.TextureSlotIndex; i++)
         {
-            FlushScene();
+            s_RendererData.TextureSlots[i]->Bind(i);
         }
+        
+        RenderCommand::DisableDepthTest();
+        
+        for (uint32_t drawCallIndex = 0; drawCallIndex < s_RendererData.DrawCallsCount; drawCallIndex++)
+        {
+            const DrawCallData& drawCallData = s_RendererData.DrawCalls[drawCallIndex];
+            
+            uint32_t dataSize = (uint32_t)((uint8_t*)drawCallData.QuadVertexBufferPtr - (uint8_t*)drawCallData.QuadVertexBufferBase);
+            s_RendererData.QuadVertexBuffer->SetData(drawCallData.QuadVertexBufferBase, dataSize);
+            RenderCommand::DrawIndexed(s_RendererData.QuadVertexArray.get(), drawCallData.QuadIndexCount);
+        }
+        
+        s_RendererData.Stats.DrawCalls += s_RendererData.DrawCallsCount;
+    }
+    
+    void Renderer2D::FreeUnusedBuffers()
+    {
+        for (uint32_t i = s_RendererData.DrawCallsCapacity-1; i >= s_RendererData.DrawCallsCount; i--)
+        {
+            s_RendererData.DrawCalls[i].PersistenceTTL--;
+            if (s_RendererData.DrawCalls[i].PersistenceTTL == 0)
+            {
+                delete s_RendererData.DrawCalls[i].QuadVertexBufferBase;
+                s_RendererData.DrawCallsCapacity--;
+            }
+            
+            if (i == 0) break;
+        }
+    }
+
+    void Renderer2D::IncreaseDrawCallMemoryIfNeeded(int countToFit)
+    {
+        if (s_RendererData.DrawCallsCount == 0 ||
+            s_RendererData.DrawCalls[s_RendererData.DrawCallsCount-1].QuadIndexCount + countToFit > Renderer2DData::MAX_INDICES)
+        {
+            // Create a new draw call.
+            if (s_RendererData.DrawCallsCount == s_RendererData.DrawCallsCapacity)
+            {
+                // Allocate for the new draw call.
+                
+                if (s_RendererData.DrawCallsCapacity == Renderer2DData::MAX_DRAW_CALLS)
+                {
+                    PKE_CORE_ERROR("Renderer2D: Maximum draw calls reached! Cannot allocate more memory for new draw calls.");
+                    throw std::runtime_error("Renderer2D: Maximum draw calls reached!");
+                }
+                
+                auto quadVertexAllocation = new QuadVertex[Renderer2DData::MAX_VERTICES];
+                s_RendererData.DrawCalls[s_RendererData.DrawCallsCount].QuadVertexBufferBase = quadVertexAllocation;
+                s_RendererData.DrawCallsCapacity++;
+            }
+            s_RendererData.DrawCalls[s_RendererData.DrawCallsCount].ResetCountAndPtr();
+            s_RendererData.DrawCalls[s_RendererData.DrawCallsCount].PersistenceTTL = Renderer2DData::BUFFER_CAPACITY_PERSISTENCE;
+            s_RendererData.DrawCallsCount++;
+        }
+    }
+
+    void Renderer2D::WriteToVertexBuffer(const glm::vec4& color, const glm::mat4& transform, float textureIndex, const glm::vec2& uvTiling)
+    {
+        IncreaseDrawCallMemoryIfNeeded(6);
+     
+        auto& drawCallData = s_RendererData.DrawCalls[s_RendererData.DrawCallsCount-1];
         
         for (int i = 0; i < 4; ++i)
         {
-            s_RendererData.QuadVertexBufferPtr->Position = transform * s_RendererData.QuadVertexPositions[i];
-            s_RendererData.QuadVertexBufferPtr->Color = color;
-            s_RendererData.QuadVertexBufferPtr->TexCoord = QUAD_TEX_COORDS[i];
-            s_RendererData.QuadVertexBufferPtr->UVTiling = uvTiling;
-            s_RendererData.QuadVertexBufferPtr->TexIndex = textureIndex;
-            s_RendererData.QuadVertexBufferPtr++;
+            drawCallData.QuadVertexBufferPtr->Position = transform * s_RendererData.QuadVertexPositions[i];
+            drawCallData.QuadVertexBufferPtr->Color = color;
+            drawCallData.QuadVertexBufferPtr->TexCoord = QUAD_TEX_COORDS[i];
+            drawCallData.QuadVertexBufferPtr->UVTiling = uvTiling;
+            drawCallData.QuadVertexBufferPtr->TexIndex = textureIndex;
+            drawCallData.QuadVertexBufferPtr++;
         }
         
-        s_RendererData.QuadIndexCount += 6;
-        
+        drawCallData.QuadIndexCount += 6;
         s_RendererData.Stats.QuadCount++;
     }
     

@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "PurrKatEngine.h"
-#include "PurrKatEngine/Profiling/Timer.h"
 
 class Sandbox2DLightTestScene : public PKE::Layer
 {
