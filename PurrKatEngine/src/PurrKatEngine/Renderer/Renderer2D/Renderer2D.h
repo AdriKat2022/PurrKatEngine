@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "PurrKatEngine/Components/Transform.h"
 #include "PurrKatEngine/Renderer/OrthographicCamera.h"
 #include "PurrKatEngine/Renderer/Texture.h"
 
@@ -21,7 +22,6 @@ namespace PurrKatEngine
         static void BeginScene(const OrthographicCamera& camera, bool litScene = false);
         static void EndScene();
         static void FlushScene();
-        static void UploadLights();
         
         struct Statistics
         {
@@ -42,6 +42,7 @@ namespace PurrKatEngine
         
         static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<const Texture2D>& texture, const glm::vec2& uvTiling = {1, 1}, const glm::vec4& tintColor = {1.0f, 1.0f, 1.0f, 1.0f});
         static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<const Texture2D>& texture, const glm::vec2& uvTiling = {1, 1}, const glm::vec4& tintColor = {1.0f, 1.0f, 1.0f, 1.0f});
+        static void DrawQuad(const Transform& transform, const Ref<const Texture2D>& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor);
         
         static void DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<const Texture2D>& texture, const glm::vec2& uvTiling = {1, 1}, const glm::vec4& tintColor = {1.0f, 1.0f, 1.0f, 1.0f});
         static void DrawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<const Texture2D>& texture, const glm::vec2& uvTiling = {1, 1}, const glm::vec4& tintColor = {1.0f, 1.0f, 1.0f, 1.0f});
@@ -62,6 +63,7 @@ namespace PurrKatEngine
         static void ClearLightSources();
         
     private:
+        static void UploadLights();
         static void PassDrawCalls();
         static void FreeUnusedBuffers();
         static void IncreaseDrawCallMemoryIfNeeded(int countToFit);

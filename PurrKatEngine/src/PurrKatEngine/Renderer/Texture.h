@@ -26,7 +26,15 @@ namespace PurrKatEngine
     class Texture2D : public Texture
     {
     public:
+        enum class FilterType : byte { Linear, Nearest };
+        
+        struct TextureOptions
+        {
+            FilterType Filter = FilterType::Linear;
+        };
+        
+    public:
         static Texture2D* Create(uint32_t width, uint32_t height);
-        static Texture2D* Create(const std::string& path);
+        static Texture2D* Create(const std::string& path, const TextureOptions& textureOptions = {});
     };
 }

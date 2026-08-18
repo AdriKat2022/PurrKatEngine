@@ -65,6 +65,8 @@ namespace PurrKatEngine
         glm::vec4 QuadVertexPositions[4];
         
         Renderer2D::Statistics Stats;
+        
+        bool IsLitScene;
     };
     
     static Renderer2DData s_RendererData;
@@ -140,6 +142,8 @@ namespace PurrKatEngine
     
     void Renderer2D::BeginScene(const OrthographicCamera& camera, bool litScene)
     {
+        s_RendererData.IsLitScene = litScene;
+        
         if (litScene)
         {
             s_RendererData.SpriteColorShaderLit->Bind();
@@ -161,7 +165,9 @@ namespace PurrKatEngine
     {
         if (s_RendererData.DrawCallsCount != 0)
         {
-            UploadLights();
+            if (s_RendererData.IsLitScene)
+                UploadLights();
+            
             PassDrawCalls();
         }
         
@@ -171,29 +177,6 @@ namespace PurrKatEngine
         s_RendererData.DrawCallsCount = 0;
         
         s_RendererData.TextureSlotIndex = 1;
-    }
-    
-    void Renderer2D::UploadLights()
-    {
-        int lightCount = 0;
-        Shader& shader = *s_RendererData.SpriteColorShaderLit;
-        for (const LightSource2D& light : s_RendererData.LightSources)
-        {
-            if (light.Radius <= 0.0f || light.Intensity <= 0.0f) continue;
-
-            // const glm::vec2 closestPoint = glm::clamp(light.Position, quadMin, quadMax);
-            // const glm::vec2 offset = light.Position - closestPoint;
-            // if (glm::dot(offset, offset) > light.Radius * light.Radius) continue;
-
-            const std::string uniform = "u_Lights[" + std::to_string(lightCount) + "]";
-            shader.SetUniformFloat2(uniform + ".Position", light.Position);
-            shader.SetUniformFloat3(uniform + ".Color", light.Color);
-            shader.SetUniformFloat(uniform + ".Radius", light.Radius);
-            shader.SetUniformFloat(uniform + ".Intensity", light.Intensity);
-            lightCount++;
-        }
-
-        shader.SetUniformInt("u_LightCount", lightCount);
     }
 
     const Renderer2D::Statistics& Renderer2D::GetStatistics()
@@ -223,15 +206,22 @@ namespace PurrKatEngine
     {
         DrawQuad({ position.x, position.y, 0}, size, texture, uvTiling, tintColor);
     }
-
+    
     void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<const Texture2D>& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor)
     {
         glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
-        * glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0f});
+            * glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0f});
         
         float textureIndex = GetOrCreateTextureIndex(texture);
 
         WriteToVertexBuffer(tintColor, transform, textureIndex, uvTiling);
+    }
+
+    void Renderer2D::DrawQuad(const Transform& transform, const Ref<const Texture2D>& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor)
+    {
+        auto position = transform.GetPosition();
+        auto size = transform.GetScale();
+        DrawQuad(position, size, texture, uvTiling, tintColor);
     }
 
     void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<const Texture2D>& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor)
@@ -284,7 +274,8 @@ namespace PurrKatEngine
     
     void Renderer2D::AddLightSource(const LightSource2D& lightSource)
     {
-        s_RendererData.LightSources.push_back(lightSource);
+        if (s_RendererData.IsLitScene)
+            s_RendererData.LightSources.push_back(lightSource);
     }
     
     void Renderer2D::ClearLightSources()
@@ -294,6 +285,25 @@ namespace PurrKatEngine
     
     // ################## UTILITY FUNCTIONS ####################
     
+    void Renderer2D::UploadLights()
+    {
+        int lightCount = 0;
+        Shader& shader = *s_RendererData.SpriteColorShaderLit;
+        for (const LightSource2D& light : s_RendererData.LightSources)
+        {
+            if (light.Radius <= 0.0f || light.Intensity <= 0.0f) continue;
+
+            const std::string uniform = "u_Lights[" + std::to_string(lightCount) + "]";
+            shader.SetUniformFloat2(uniform + ".Position", light.Position);
+            shader.SetUniformFloat3(uniform + ".Color", light.Color);
+            shader.SetUniformFloat(uniform + ".Radius", light.Radius);
+            shader.SetUniformFloat(uniform + ".Intensity", light.Intensity);
+            lightCount++;
+        }
+
+        shader.SetUniformInt("u_LightCount", lightCount);
+    }
+    
     void Renderer2D::PassDrawCalls()
     {
         // Prepare textures.
@@ -302,7 +312,7 @@ namespace PurrKatEngine
             s_RendererData.TextureSlots[i]->Bind(i);
         }
         
-        // RenderCommand::DisableDepthTest();
+        RenderCommand::DisableDepthTest();
         
         for (uint32_t drawCallIndex = 0; drawCallIndex < s_RendererData.DrawCallsCount; drawCallIndex++)
         {

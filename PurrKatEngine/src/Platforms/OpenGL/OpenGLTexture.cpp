@@ -23,7 +23,7 @@ namespace PurrKatEngine
         glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
     }
 
-    OpenGLTexture2D::OpenGLTexture2D(std::string path) : m_Path(std::move(path))
+    OpenGLTexture2D::OpenGLTexture2D(std::string path, const TextureOptions& textureOptions) : m_Path(std::move(path))
     {
         int width, height, channels;
         stbi_set_flip_vertically_on_load(true);
@@ -56,8 +56,10 @@ namespace PurrKatEngine
         glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
         glTextureStorage2D(m_RendererID, 1, m_InternalFormat, width, height);
         
+        auto filter = textureOptions.Filter == FilterType::Linear ? GL_LINEAR : GL_NEAREST;
+        
         glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, filter);
 
         glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
