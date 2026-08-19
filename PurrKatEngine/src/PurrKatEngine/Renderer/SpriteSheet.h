@@ -13,6 +13,7 @@ namespace PurrKatEngine
         SpriteSheet(const Ref<const Texture2D>& texture, const Tex2D::SpriteSheetOptions& options = { .CellSize = {32, 32} }) : m_Texture(texture), m_SpriteSheetOptions(options) {}
         
         void SetTexture(const Ref<const Texture2D>& texture) { m_Texture = texture; }
+        void SetSpriteSheetOptions(const Tex2D::SpriteSheetOptions& newOptions) { m_SpriteSheetOptions = newOptions; }
         
         std::vector<Tex2D> GetSpriteArray();
         Tex2D::SpriteSheetOptions& GetSpriteSheetOptions() { return m_SpriteSheetOptions; }

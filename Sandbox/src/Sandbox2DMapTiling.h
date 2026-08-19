@@ -14,5 +14,8 @@ public:
 
 private:
     PKE::OrthographicCameraController m_CameraController;
-    PKE::SpriteSheet m_SpriteSheet;
+    PKE::SpriteSheet m_DirtSpriteSheet;
+    PKE::SpriteSheet m_GrassSpriteSheet;
+    
+    std::unordered_map<char, PKE::Tex2D> m_TileMap;
 };
