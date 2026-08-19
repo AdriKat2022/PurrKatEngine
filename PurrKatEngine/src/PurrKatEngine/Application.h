@@ -24,6 +24,8 @@ namespace PurrKatEngine
         void PushLayer(Layer* layer);
         void PushOverlay(Layer* overlay);
         
+        void QuitApplication();
+        
         Window& GetWindow() const { return *m_Window; }
         
     protected:

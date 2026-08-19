@@ -95,6 +95,11 @@ namespace PurrKatEngine
         overlay->OnAttach();
     }
 
+    void Application::QuitApplication()
+    {
+        m_IsRunning = false;
+    }
+
     bool Application::OnWindowResized(WindowResizeEvent& windowResizeEvent)
     {
         PROFILE_FUNCTION();
@@ -113,7 +118,7 @@ namespace PurrKatEngine
     
     bool Application::OnWindowClosed(WindowCloseEvent& windowCloseEvent)
     {
-        m_IsRunning = false;
+        QuitApplication();
         return false;
     }
 }

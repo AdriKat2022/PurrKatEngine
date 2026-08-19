@@ -26,7 +26,6 @@ Sandbox2DMapTiling::Sandbox2DMapTiling()
     
     m_TileMap['G'] = m_GrassSpriteSheet.GetSprite({1, 1});
     m_TileMap['D'] = m_DirtSpriteSheet.GetSprite({1, 1});
-    
 }
 
 void Sandbox2DMapTiling::OnAttach()
@@ -65,7 +64,7 @@ void Sandbox2DMapTiling::OnImGuiRender()
 {
     Layer::OnImGuiRender();
     ImGuiUtility::ShowOrthographicCameraInfos(m_CameraController);
-    ImGuiUtility::ShowApplicationInfoWindow(Application::Get());
+    ImGuiUtility::ShowApplicationInfoWindow();
 }
 
 void Sandbox2DMapTiling::OnEvent(Event& event)

@@ -1,6 +1,7 @@
 #include <PurrKatEngine.h>
 #include <PurrKatEngine/EntryPoint.h>
 
+#include "EditorViewLayer.h"
 #include "Sandbox2DLightTestScene.h"
 #include "Sandbox2DMapTiling.h"
 
@@ -15,7 +16,7 @@ public:
         // auto texture = PurrKatEngine::Texture2D::CreateRef("assets/textures/TileSets/Tilled_Dirt_Wide.png", { .Filter = PurrKatEngine::Texture2D::FilterType::Nearest });
         // PushLayer(new PurrKatEngine::SpriteSheetLayerDebugging(texture));
         
-        PushLayer(new Sandbox2DMapTiling);
+        PushLayer(new EditorViewLayer());
     }
 };
 

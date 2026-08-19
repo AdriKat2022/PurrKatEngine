@@ -185,7 +185,7 @@ void Sandbox2DLightTestScene::OnImGuiRender()
     
     PROFILE_FUNCTION();
     
-    ImGuiUtility::ShowApplicationInfoWindow(Application::Get());
+    ImGuiUtility::ShowApplicationInfoWindow();
     
     static bool infos = true;
     if (ImGui::Begin("Infos", &infos, ImGuiWindowFlags_AlwaysAutoResize))

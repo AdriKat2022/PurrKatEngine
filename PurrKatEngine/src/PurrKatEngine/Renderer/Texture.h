@@ -3,12 +3,14 @@
 #include "Tex2D.h"
 
 // The following macros offer a quick way to get the width and height vec while specifying one axis and adjust the other according to its aspect ratio.
+#define SET_WIDTH_GEN(texture, width) { width, (width)/(texture)->GetAspectRatio() }
+#define SET_HEIGHT_GEN(texture, height) { (height) * (texture)->GetAspectRatio(), height }
+
 #define SET_WIDTH(texture, width) SetWidthWithAspectRatio(texture, width)
 #define SET_HEIGHT(texture, height) SetWidthWithAspectRatio(texture, height)
 
 namespace PurrKatEngine
 {
-    // template<typename T>
     inline glm::vec2 SetWidthWithAspectRatio(const Tex2D& texture, float width)
     {
         return {
@@ -17,7 +19,6 @@ namespace PurrKatEngine
         };
     }
 
-    // template<typename T>
     inline glm::vec2 SetHeightWithAspectRatio(const Tex2D& texture, float height)
     {
         return {
@@ -33,6 +34,8 @@ namespace PurrKatEngine
         
         virtual uint32_t GetWidth() const = 0;
         virtual uint32_t GetHeight() const = 0;
+        
+        virtual uint32_t GetRendererID() const = 0;
         
         virtual float GetAspectRatio() const { return (float)GetWidth() / (float)GetHeight(); }
         

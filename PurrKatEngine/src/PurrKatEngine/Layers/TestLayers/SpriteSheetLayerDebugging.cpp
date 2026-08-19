@@ -230,7 +230,7 @@ namespace PurrKatEngine
 
         ImGui::End();
         
-        ImGuiUtility::ShowApplicationInfoWindow(Application::Get());
+        ImGuiUtility::ShowApplicationInfoWindow();
         
         static bool profilerOpen = true;
         if (ImGui::Begin("Profiler", &profilerOpen, ImGuiWindowFlags_AlwaysAutoResize))
