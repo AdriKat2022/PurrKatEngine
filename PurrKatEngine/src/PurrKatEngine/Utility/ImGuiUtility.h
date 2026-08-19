@@ -1,9 +1,10 @@
 ﻿#pragma once
 
+#include "imgui.h"
 #include "PurrKatEngine/Application.h"
 #include "PurrKatEngine/Components/Transform.h"
 #include "PurrKatEngine/Renderer/Renderer2D/Renderer2D.h"
-#include "imgui.h"
+#include "PurrKatEngine/Renderer/OrthographicCameraController.h"
 
 #define WATCH_VALUE(value) ::PurrKatEngine::ImGuiUtility::WatchValue(#value, &value)
 #define ADD_DEBUG_CONTROL(control) ::PurrKatEngine::ImGuiUtility::AddDebugControl(#control, &control)
@@ -143,6 +144,109 @@ namespace PurrKatEngine
             Renderer2D::EndFrameStatistics();
         }
         
+        static void ShowOrthographicCameraInfos(OrthographicCameraController& cameraController)
+        {
+            if (!ImGui::Begin("Orthographic Camera"))
+            {
+                ImGui::End();
+                return;
+            }
+
+            // -------------------------------------------------------------------------
+            // Transform
+            // -------------------------------------------------------------------------
+            if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                glm::vec3 position = cameraController.GetPosition();
+                if (ImGui::DragFloat3("Position", (float*)&position, 0.01f))
+                    cameraController.SetPosition(position);
+
+                float rotation = cameraController.GetCameraRotation();
+                if (ImGui::DragFloat("Rotation", &rotation, 0.5f))
+                    cameraController.SetRotation(rotation);
+
+                float zoom = cameraController.GetZoomLevel();
+                if (ImGui::DragFloat("Zoom Level", &zoom, 0.01f, 0.01f, 100.0f))
+                    cameraController.SetZoomLevel(zoom);
+                
+                if (ImGui::Button("Reset Position"))
+                    cameraController.SetPosition({ 0.0f, 0.0f, 0.0f });
+
+                ImGui::SameLine();
+
+                if (ImGui::Button("Reset Rotation"))
+                    cameraController.SetRotation(0.0f);
+
+                ImGui::SameLine();
+
+                if (ImGui::Button("Reset Zoom"))
+                    cameraController.SetZoomLevel(1.0f);
+            }
+
+            // -------------------------------------------------------------------------
+            // Camera
+            // -------------------------------------------------------------------------
+            if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                const auto& bounds = cameraController.GetCameraBounds();
+
+                ImGui::Text("Bounds");
+                ImGui::Indent();
+                ImGui::Text("Left   %.3f", bounds.Left);
+                ImGui::Text("Right  %.3f", bounds.Right);
+                ImGui::Text("Bottom %.3f", bounds.Bottom);
+                ImGui::Text("Top    %.3f", bounds.Top);
+                ImGui::Unindent();
+
+                ImGui::Spacing();
+
+                ImGui::Text("Size");
+                ImGui::SameLine();
+                ImGui::TextDisabled("%.3f x %.3f", bounds.GetWidth(), bounds.GetHeight());
+
+                const float aspect = bounds.GetHeight() != 0.0f
+                    ? bounds.GetWidth() / bounds.GetHeight()
+                    : 0.0f;
+
+                ImGui::Text("Aspect Ratio");
+                ImGui::SameLine();
+                ImGui::TextDisabled("%.3f", aspect);
+            }
+
+            // -------------------------------------------------------------------------
+            // Controller
+            // -------------------------------------------------------------------------
+            if (ImGui::CollapsingHeader("Controller", ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                ImGui::Checkbox("Enable Movement", &cameraController.EnableMovement);
+                ImGui::Checkbox("Enable Rotation", &cameraController.EnableRotation);
+                ImGui::Checkbox("Enable Zoom", &cameraController.EnableZoom);
+
+                ImGui::Spacing();
+
+                const char* modes[] = {
+                    "None",
+                    "Match Width",
+                    "Match Height"
+                };
+
+                int mode = (int)cameraController.AspectRatioAdjustment;
+
+                if (ImGui::Combo("Aspect Ratio", &mode, modes, IM_ARRAYSIZE(modes)))
+                    cameraController.AspectRatioAdjustment = (AspectRatioAdjustmentMode)mode;
+            }
+
+            // -------------------------------------------------------------------------
+            // Quick actions
+            // -------------------------------------------------------------------------
+            // if (ImGui::CollapsingHeader("Actions"))
+            // {
+            //     
+            // }
+
+            ImGui::End();
+        }
+        
         static bool SliderIntControl(const char* label, int& value, int min, int max, int btnStep = 1)
         {
             bool changed = false;
@@ -208,9 +312,9 @@ namespace PurrKatEngine
         template<typename T, size_t N>
         static bool EnumCombo(const char* label, T& value, const std::array<const char*, N>& items)
         {
-            int current = static_cast<int>(value);
+            int current = (int)value;
             bool changed = ImGui::Combo(label, &current, items.data(), (int)N);
-            if (changed) value = static_cast<T>(current);
+            if (changed) value = (T)current;
             return changed;
         }
 
@@ -249,7 +353,7 @@ namespace PurrKatEngine
         template<class T>
         static void AutoImGuiField(const char* label, T* controlPtr)
         {
-            AutoImGuiField(label, static_cast<void*>(controlPtr), GetType<T>());
+            AutoImGuiField(label, (void*)controlPtr, GetType<T>());
         }        
         
         template<typename T, typename Getter, typename Setter>
@@ -257,7 +361,7 @@ namespace PurrKatEngine
         {
             auto current = (obj->*getter)();
             auto newValue = current;
-            AutoImGuiField(label, static_cast<void*>(&newValue), type);
+            AutoImGuiField(label, (void*)&newValue, type);
             
             if (newValue != current)
                 (obj->*setter)(newValue);
@@ -272,7 +376,7 @@ namespace PurrKatEngine
                     
                 case DebugControl::Type::Int:
                 {
-                    int* value = static_cast<int*>(controlPtr);
+                    int* value = (int*)controlPtr;
                     ImGui::DragInt(label, value);
                     break;
                 }
@@ -280,21 +384,21 @@ namespace PurrKatEngine
                 case DebugControl::Type::Float:
                 case DebugControl::Type::Double:
                 {
-                    float* value = static_cast<float*>(controlPtr);
+                    float* value = (float*)controlPtr;
                     ImGui::DragFloat(label, value, 0.01f);
                     break;
                 }
                 
                 case DebugControl::Type::Bool:
                 {
-                    bool* value = static_cast<bool*>(controlPtr);
+                    bool* value = (bool*)controlPtr;
                     ImGui::Checkbox(label, value);
                     break;
                 }
                 
                 case DebugControl::Type::String:
                 {
-                    std::string* value = static_cast<std::string*>(controlPtr);
+                    std::string* value = (std::string*)controlPtr;
 
                     char buffer[256];
                     std::snprintf(buffer, sizeof(buffer), "%s", value->c_str());
@@ -306,16 +410,16 @@ namespace PurrKatEngine
                 }
                 
                 case DebugControl::Type::Vec2:
-                    ImGui::DragFloat2(label, static_cast<float*>(controlPtr));
+                    ImGui::DragFloat2(label, (float*)controlPtr);
                     break;
                 case DebugControl::Type::Vec3:
-                    ImGui::DragFloat3(label, static_cast<float*>(controlPtr));
+                    ImGui::DragFloat3(label, (float*)controlPtr);
                     break;
                 case DebugControl::Type::Vec4:
                     if (std::string(label).find_last_of("Color") != std::string::npos)
-                        ImGui::ColorEdit4(label, static_cast<float*>(controlPtr));
+                        ImGui::ColorEdit4(label, (float*)controlPtr);
                     else
-                        ImGui::DragFloat4(label, static_cast<float*>(controlPtr));
+                        ImGui::DragFloat4(label, (float*)controlPtr);
                     break;
             }
         }
@@ -351,7 +455,7 @@ namespace PurrKatEngine
         {
             s_DebugWatchers.push_back({
                 .ControlName = name,
-                .ControlPtr = static_cast<void*>(ptr),
+                .ControlPtr = (void*)ptr,
                 .ControlType = GetType<T>()
             });
         }
@@ -360,7 +464,7 @@ namespace PurrKatEngine
         {
             if (s_DebugWatchers.empty()) return;
             
-            bool opened = false;
+            bool opened;
             if (useNewWindow)
             {
                 opened = ImGui::Begin("Watched Values");
@@ -394,7 +498,7 @@ namespace PurrKatEngine
         {
             s_DebugControls.push_back({
                 .ControlName = name,
-                .ControlPtr = static_cast<void*>(ptr),
+                .ControlPtr = (void*)ptr,
                 .ControlType = GetType<T>()
             });
         }
@@ -403,7 +507,7 @@ namespace PurrKatEngine
         {
             if (s_DebugControls.empty()) return;
             
-            bool opened = false;
+            bool opened;
             if (useNewWindow)
             {
                 opened = ImGui::Begin("Debug Controls");

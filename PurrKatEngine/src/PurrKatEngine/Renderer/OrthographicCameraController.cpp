@@ -6,6 +6,30 @@
 
 namespace PurrKatEngine
 {
+    OrthographicCameraController::OrthographicCameraController()
+        : m_CameraBounds({.Left = -m_AspectRatio * m_ZoomLevel, .Right = m_AspectRatio * m_ZoomLevel, .Top = m_ZoomLevel, .Bottom = -m_ZoomLevel}),
+          m_Camera(m_CameraBounds.Left, m_CameraBounds.Right, m_CameraBounds.Bottom, m_CameraBounds.Top),
+          m_CameraMovementInputController([&](glm::vec2 input)
+          {
+              auto camPos = m_Camera.GetPosition();
+              
+              camPos.x += (
+                  cos(m_CameraRotation) * input.x
+                  -sin(m_CameraRotation) * input.y
+              ) * (float)Time::deltaTime * m_ZoomLevel;
+              camPos.y += (
+                  cos(m_CameraRotation) * input.y +
+                  sin(m_CameraRotation) * input.x
+              ) * (float)Time::deltaTime * m_ZoomLevel;
+              
+              m_Camera.SetPosition(camPos);
+          }, KeyCode::A, KeyCode::D, KeyCode::S, KeyCode::W),
+          m_CameraRotationInputController([this](float input)
+          {
+              m_CameraRotation += input * (float)Time::deltaTime;
+          }, KeyCode::Q, KeyCode::E)
+    {}
+
     OrthographicCameraController::OrthographicCameraController(float aspectRatio, float zoomLevel, bool useScrollToZoom)
         : EnableZoom(useScrollToZoom),
           m_AspectRatio(aspectRatio),
@@ -19,11 +43,11 @@ namespace PurrKatEngine
               camPos.x += (
                   cos(m_CameraRotation) * input.x
                   -sin(m_CameraRotation) * input.y
-                  ) * (float)Time::deltaTime * m_ZoomLevel;
+              ) * (float)Time::deltaTime * m_ZoomLevel;
               camPos.y += (
                   cos(m_CameraRotation) * input.y +
                   sin(m_CameraRotation) * input.x
-                  ) * (float)Time::deltaTime * m_ZoomLevel;
+              ) * (float)Time::deltaTime * m_ZoomLevel;
               
               m_Camera.SetPosition(camPos);
           }, KeyCode::A, KeyCode::D, KeyCode::S, KeyCode::W),
@@ -63,17 +87,23 @@ namespace PurrKatEngine
         
         m_ZoomLevel -= e.GetYOffset() * 0.25f;
         m_ZoomLevel = std::max(0.01f, m_ZoomLevel);
-        m_CameraBounds = {.Left = -m_AspectRatio * m_ZoomLevel, .Right = m_AspectRatio * m_ZoomLevel, .Top = m_ZoomLevel, .Bottom = -m_ZoomLevel};
-        m_Camera.SetProjection(m_CameraBounds.Left, m_CameraBounds.Right, m_CameraBounds.Bottom, m_CameraBounds.Top);
+        UpdateCameraProjection();
         return true;
     }
-    
+
     bool OrthographicCameraController::OnWindowResized(WindowResizeEvent& e)
     {
         if (AspectRatioAdjustment == AspectRatioAdjustmentMode::None) return false;
         
         m_AspectRatio = (float)e.GetWidth() / (float)e.GetHeight();
         
+        UpdateCameraProjection();
+        
+        return false;
+    }
+
+    void OrthographicCameraController::UpdateCameraProjection()
+    {
         if (AspectRatioAdjustment == AspectRatioAdjustmentMode::MatchHeight)
         {
             m_CameraBounds = {.Left = -m_AspectRatio * m_ZoomLevel, .Right = m_AspectRatio * m_ZoomLevel, .Top = m_ZoomLevel, .Bottom = -m_ZoomLevel};
@@ -84,7 +114,5 @@ namespace PurrKatEngine
         }
         
         m_Camera.SetProjection(m_CameraBounds.Left, m_CameraBounds.Right, m_CameraBounds.Bottom, m_CameraBounds.Top);
-        
-        return false;
     }
 }

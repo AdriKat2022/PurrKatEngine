@@ -7,9 +7,12 @@ namespace PurrKatEngine
     class SpriteSheet
     {
     public:
+        SpriteSheet() {}
         SpriteSheet(const std::string& sheetPath, const Tex2D::SpriteSheetOptions& options = { .CellSize = {32, 32} }) : m_SpriteSheetOptions(options) { m_Texture = Texture2D::CreateRef(sheetPath); }
         SpriteSheet(const Texture2D* texture, const Tex2D::SpriteSheetOptions& options = { .CellSize = {32, 32} }) : m_Texture(texture), m_SpriteSheetOptions(options) {}
         SpriteSheet(const Ref<const Texture2D>& texture, const Tex2D::SpriteSheetOptions& options = { .CellSize = {32, 32} }) : m_Texture(texture), m_SpriteSheetOptions(options) {}
+        
+        void SetTexture(const Ref<const Texture2D>& texture) { m_Texture = texture; }
         
         std::vector<Tex2D> GetSpriteArray();
         Tex2D::SpriteSheetOptions& GetSpriteSheetOptions() { return m_SpriteSheetOptions; }
