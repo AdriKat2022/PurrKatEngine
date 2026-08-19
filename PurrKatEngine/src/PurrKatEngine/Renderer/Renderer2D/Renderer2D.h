@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "PurrKatEngine/Components/Transform.h"
 #include "PurrKatEngine/Renderer/OrthographicCamera.h"
+#include "PurrKatEngine/Renderer/Tex2D.h"
 #include "PurrKatEngine/Renderer/Texture.h"
 
 namespace PurrKatEngine
@@ -35,27 +36,32 @@ namespace PurrKatEngine
         static const Statistics& GetStatistics();
         static void EndFrameStatistics();
         
-        // ########### UNLIT ############
+        struct DrawOptions
+        {
+            glm::vec3 Position = {0.0f, 0.0f, 0.0f};
+            glm::vec2 Size = {1.0f, 1.0f};
+            
+            float Rotation = 0;
+            
+            Tex2D Texture{};
+            glm::vec2 UVTiling = {1.0f, 1.0f};
+            glm::vec4 Color = {1.0f, 1.0f, 1.0f, 1.0f};
+        };
+        
+        // ########### DRAW FUNCTIONS ############
+        
+        static void DrawQuad(const DrawOptions& drawOptions);
         
         static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color = {1.0f, 1.0f, 1.0f, 1.0f});
         static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color = {1.0f, 1.0f, 1.0f, 1.0f});
         
-        static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<const Texture2D>& texture, const glm::vec2& uvTiling = {1, 1}, const glm::vec4& tintColor = {1.0f, 1.0f, 1.0f, 1.0f});
-        static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<const Texture2D>& texture, const glm::vec2& uvTiling = {1, 1}, const glm::vec4& tintColor = {1.0f, 1.0f, 1.0f, 1.0f});
-        static void DrawQuad(const Transform& transform, const Ref<const Texture2D>& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor);
+        static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const Tex2D& texture, const glm::vec2& uvTiling = {1, 1}, const glm::vec4& tintColor = {1.0f, 1.0f, 1.0f, 1.0f});
+        static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const Tex2D& texture, const glm::vec2& uvTiling = {1, 1}, const glm::vec4& tintColor = {1.0f, 1.0f, 1.0f, 1.0f});
+        static void DrawQuad(const Transform& transform, const Tex2D& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor);
         
-        static void DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<const Texture2D>& texture, const glm::vec2& uvTiling = {1, 1}, const glm::vec4& tintColor = {1.0f, 1.0f, 1.0f, 1.0f});
-        static void DrawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<const Texture2D>& texture, const glm::vec2& uvTiling = {1, 1}, const glm::vec4& tintColor = {1.0f, 1.0f, 1.0f, 1.0f});
+        static void DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Tex2D& texture, const glm::vec2& uvTiling = {1, 1}, const glm::vec4& tintColor = {1.0f, 1.0f, 1.0f, 1.0f});
+        static void DrawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Tex2D& texture, const glm::vec2& uvTiling = {1, 1}, const glm::vec4& tintColor = {1.0f, 1.0f, 1.0f, 1.0f});
         
-        // ########### LIT ############
-        
-        // Currently the lit functions doesn't do anything. If the scene is marked as lit, all sprites within the scene will be lit.
-        
-        static void DrawLitQuad( const glm::vec2& position, const glm::vec2& size, const glm::vec4& color = {1.0f, 1.0f, 1.0f, 1.0f}, float ambientStrength = 0.15f);
-        static void DrawLitQuad( const glm::vec3& position, const glm::vec2& size, const glm::vec4& color = {1.0f, 1.0f, 1.0f, 1.0f}, float ambientStrength = 0.15f);
-        
-        static void DrawLitQuad(const glm::vec2& position, const glm::vec2& size, const Ref<const Texture2D>& texture, const glm::vec4& tintColor = {1.0f, 1.0f, 1.0f, 1.0f}, float ambientStrength = 0.15f, const glm::vec2& uvTiling = {1.0f, 1.0f});
-        static void DrawLitQuad(const glm::vec3& position, const glm::vec2& size, const Ref<const Texture2D>& texture, const glm::vec4& tintColor = {1.0f, 1.0f, 1.0f, 1.0f}, float ambientStrength = 0.15f, const glm::vec2& uvTiling = {1.0f, 1.0f});
         
         // ########## LIGHTING ###########
         
@@ -63,12 +69,14 @@ namespace PurrKatEngine
         static void ClearLightSources();
         
     private:
+        static void DrawQuadInternal(const glm::vec3& position, const glm::vec2& size, float rotation, const Tex2D& texture, const glm::vec2& uvTiling = {1, 1}, const glm::vec4& tintColor = {1.0f, 1.0f, 1.0f, 1.0f});
+        
         static void UploadLights();
         static void PassDrawCalls();
         static void FreeUnusedBuffers();
         static void IncreaseDrawCallMemoryIfNeeded(int countToFit);
-        static void WriteToVertexBuffer(const glm::vec4& color, const glm::mat4& transform, float textureIndex, const glm::vec2& uvTiling);
-        static float GetOrCreateTextureIndex(const Ref<const Texture2D>& texture);
+        static void WriteToVertexBuffer(const glm::vec4& color, const glm::mat4& transform, float textureIndex, const glm::vec2& uvTiling, const glm::vec2* texCoords);
+        static float GetOrCreateTextureIndex(const Tex2D& texture);
         
     };
 }

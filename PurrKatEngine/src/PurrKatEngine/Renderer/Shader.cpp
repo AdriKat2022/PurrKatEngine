@@ -55,14 +55,14 @@ namespace PurrKatEngine
 
     Ref<Shader> ShaderLibrary::Load(const std::string& filePath)
     {
-        auto shader = ToRef(Shader::Create(filePath));
+        auto shader = CreateRef(Shader::Create(filePath));
         Add(shader);
         return shader;
     }
     
     Ref<Shader> ShaderLibrary::Load(const std::string& filePath, const std::string& name)
     {
-        auto shader = ToRef(Shader::Create(filePath));
+        auto shader = CreateRef(Shader::Create(filePath));
         Add(shader, name);
         return shader;
     }

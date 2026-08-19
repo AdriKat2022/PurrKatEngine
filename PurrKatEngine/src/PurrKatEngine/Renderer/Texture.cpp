@@ -8,12 +8,12 @@ namespace PurrKatEngine
 {
     // ************** TEXTURE 2D *******************
 
-    Texture2D* Texture2D::Create(uint32_t width, uint32_t height)
+    Texture2D* Texture2D::Create(uint32_t width, uint32_t height, const TextureOptions& textureOptions)
     {
         switch(Renderer::GetAPI())
         {
             case RendererAPI::API::None:     PKE_CORE_ASSERT(false, "Having No RendererAPI is currently not supported.") return nullptr;
-            case RendererAPI::API::OpenGL:   return new OpenGLTexture2D(width, height);
+            case RendererAPI::API::OpenGL:   return new OpenGLTexture2D(width, height, textureOptions);
         }
         
         return nullptr;
@@ -29,4 +29,7 @@ namespace PurrKatEngine
         
         return nullptr;
     }
+
+    Ref<Texture2D> Texture2D::CreateRef(uint32_t width, uint32_t height, const TextureOptions& textureOptions) { return PurrKatEngine::CreateRef<Texture2D>(Create(width, height, textureOptions)); }
+    Ref<Texture2D> Texture2D::CreateRef(const std::string& path, const TextureOptions& textureOptions) { return PurrKatEngine::CreateRef<Texture2D>(Create(path, textureOptions)); }
 }

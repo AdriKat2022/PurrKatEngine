@@ -7,13 +7,12 @@
 #include "PurrKatEngine/Renderer/Buffer.h"
 #include "PurrKatEngine/Renderer/RenderCommand.h"
 #include "PurrKatEngine/Renderer/Shader.h"
+#include "PurrKatEngine/Renderer/Tex2D.h"
 #include "PurrKatEngine/Renderer/VertexArray.h"
 #include "PurrKatEngine/Utility/ImGuiUtility.h"
 
 namespace PurrKatEngine
 {
-    constexpr glm::vec2 QUAD_TEX_COORDS[4] = {{0, 0}, {1 ,0}, {1, 1}, {0, 1}};
-    
     struct QuadVertex
     {
         glm::vec3 Position;
@@ -77,7 +76,7 @@ namespace PurrKatEngine
         s_RendererData.DrawCallsCapacity = 0;
         s_RendererData.DrawCalls = new DrawCallData[Renderer2DData::MAX_DRAW_CALLS];
         
-        s_RendererData.QuadVertexBuffer = ToRef(VertexBuffer::Create(PurrKatEngine::Renderer2DData::MAX_VERTICES * sizeof(QuadVertex)));
+        s_RendererData.QuadVertexBuffer = CreateRef(VertexBuffer::Create(PurrKatEngine::Renderer2DData::MAX_VERTICES * sizeof(QuadVertex)));
         s_RendererData.QuadVertexBuffer->SetLayout({
             { ShaderDataType::Float3, "a_Position" },
             { ShaderDataType::Float4, "a_Color" },
@@ -85,7 +84,7 @@ namespace PurrKatEngine
             { ShaderDataType::Float2, "a_UVTiling" },
             { ShaderDataType::Float, "a_TexIndex" }
         });
-        s_RendererData.QuadVertexArray = ToRef(VertexArray::Create());
+        s_RendererData.QuadVertexArray = CreateRef(VertexArray::Create());
         s_RendererData.QuadVertexArray->AddVertexBuffer(s_RendererData.QuadVertexBuffer);
         
         uint32_t* quadIndices = new uint32_t[Renderer2DData::MAX_INDICES];
@@ -104,13 +103,13 @@ namespace PurrKatEngine
             offset += 4;
         }
         
-        Ref<IndexBuffer> quadIB = ToRef(IndexBuffer::Create(quadIndices, Renderer2DData::MAX_INDICES));
+        Ref<IndexBuffer> quadIB = CreateRef(IndexBuffer::Create(quadIndices, Renderer2DData::MAX_INDICES));
         s_RendererData.QuadVertexArray->SetIndexBuffer(quadIB);
         
         delete[] quadIndices;
         
         uint32_t whitePixel = 0xffffffff;
-        Ref<Texture2D> blankTexture = ToRef(Texture2D::Create(1, 1));
+        Ref<Texture2D> blankTexture = CreateRef(Texture2D::Create(1, 1));
         blankTexture->SetData(&whitePixel, sizeof(whitePixel));
         
         int samplers[Renderer2DData::MAX_TEXTURE_SLOTS];
@@ -119,11 +118,11 @@ namespace PurrKatEngine
             samplers[i] = (int)i;
         }
         
-        s_RendererData.SpriteColorShader = ToScope(Shader::Create("assets/shaders/Texture.glsl"));
+        s_RendererData.SpriteColorShader = CreateScope(Shader::Create("assets/shaders/Texture.glsl"));
         s_RendererData.SpriteColorShader->Bind();
         s_RendererData.SpriteColorShader->SetUniformIntArray("u_Textures", samplers, Renderer2DData::MAX_TEXTURE_SLOTS);
 
-        s_RendererData.SpriteColorShaderLit = ToScope(Shader::Create("assets/shaders/TextureLit.glsl"));
+        s_RendererData.SpriteColorShaderLit = CreateScope(Shader::Create("assets/shaders/TextureLit.glsl"));
         s_RendererData.SpriteColorShaderLit->Bind();
         s_RendererData.SpriteColorShaderLit->SetUniformIntArray("u_Textures", samplers, Renderer2DData::MAX_TEXTURE_SLOTS);
         
@@ -190,86 +189,50 @@ namespace PurrKatEngine
         s_RendererData.Stats.QuadCount = 0;
     }
     
-    // ################## UNLIT FUNCTIONS ##################
+    // ################## DRAW FUNCTIONS ##################
+
+    void Renderer2D::DrawQuad(const DrawOptions& drawOptions)
+    {
+        DrawQuadInternal({drawOptions.Position.x, drawOptions.Position.y, 0}, drawOptions.Size, drawOptions.Rotation, drawOptions.Texture, drawOptions.UVTiling, drawOptions.Color);
+    }
 
     void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
     {
-        DrawQuad({ position.x, position.y, 0}, size, nullptr, {1, 1}, color);
+        DrawQuadInternal({ position.x, position.y, 0}, size, 0, {}, {1, 1}, color);
     }
 
     void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
     {
-        DrawQuad(position, size, nullptr, {1, 1}, color);
+        DrawQuadInternal(position, size, 0, {}, {1, 1}, color);
     }
 
-    void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<const Texture2D>& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor)
+    void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Tex2D& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor)
     {
-        DrawQuad({ position.x, position.y, 0}, size, texture, uvTiling, tintColor);
+        DrawQuadInternal({ position.x, position.y, 0}, size, 0, texture, uvTiling, tintColor);
     }
     
-    void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<const Texture2D>& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor)
+    void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Tex2D& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor)
     {
-        glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
-            * glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0f});
-        
-        float textureIndex = GetOrCreateTextureIndex(texture);
-
-        WriteToVertexBuffer(tintColor, transform, textureIndex, uvTiling);
+        DrawQuadInternal(position, size, 0, texture, uvTiling, tintColor);
     }
 
-    void Renderer2D::DrawQuad(const Transform& transform, const Ref<const Texture2D>& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor)
+    void Renderer2D::DrawQuad(const Transform& transform, const Tex2D& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor)
     {
         auto position = transform.GetPosition();
         auto size = transform.GetScale();
-        DrawQuad(position, size, texture, uvTiling, tintColor);
+        DrawQuadInternal(position, size, 0, texture, uvTiling, tintColor);
     }
 
-    void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<const Texture2D>& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor)
+    void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Tex2D& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor)
     {
-        DrawRotatedQuad({ position.x, position.y, 0}, size, rotation, texture, uvTiling, tintColor);
+        DrawQuadInternal({ position.x, position.y, 0}, size, rotation, texture, uvTiling, tintColor);
     }
     
-    void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<const Texture2D>& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor)
+    void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Tex2D& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor)
     {
-        float textureIndex = GetOrCreateTextureIndex(texture);
-        
-        const glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
-            * glm::rotate(glm::mat4(1.0f), rotation, {0.0f, 0.0f, 1.0f})
-            * glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0f});
-
-        WriteToVertexBuffer(tintColor, transform, textureIndex, uvTiling);
-    }
-    
-    // ################## LIT FUNCTIONS ##################
-    
-    void Renderer2D::DrawLitQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color, float ambientStrength)
-    {
-        DrawLitQuad({position.x, position.y, 0}, size, color, ambientStrength);
+        DrawQuadInternal(position, size, rotation, texture, uvTiling, tintColor);
     }
 
-    void Renderer2D::DrawLitQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, float ambientStrength)
-    {
-        DrawLitQuad(position, size, nullptr, color, ambientStrength, {1, 1});
-    }
-    
-    void Renderer2D::DrawLitQuad(const glm::vec2& position, const glm::vec2& size, const Ref<const Texture2D>& texture, const glm::vec4& tintColor, float ambientStrength, const glm::vec2& uvTiling)
-    {
-        DrawLitQuad({position.x, position.y, 0}, size, texture, tintColor, ambientStrength, uvTiling);
-    }
-
-    void Renderer2D::DrawLitQuad(const glm::vec3& position, const glm::vec2& size, const Ref<const Texture2D>& texture, const glm::vec4& tintColor, float ambientStrength, const glm::vec2& uvTiling)
-    {
-        PROFILE_FUNCTION();
-
-        glm::vec4 color = tintColor;
-        const glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
-            * glm::scale(glm::mat4(1), {size.x, size.y, 1.0f});
-        
-        float textureIndex = GetOrCreateTextureIndex(texture);
-
-        WriteToVertexBuffer(color, transform, textureIndex, uvTiling);
-    }
-    
     // ################## LIGHTNING FUNCTIONS ##################
     
     void Renderer2D::AddLightSource(const LightSource2D& lightSource)
@@ -284,6 +247,17 @@ namespace PurrKatEngine
     }
     
     // ################## UTILITY FUNCTIONS ####################
+    
+    void Renderer2D::DrawQuadInternal(const glm::vec3& position, const glm::vec2& size, float rotation, const Tex2D& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor)
+    {
+        float textureIndex = GetOrCreateTextureIndex(texture);
+        
+        const glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+            * glm::rotate(glm::mat4(1.0f), rotation, {0.0f, 0.0f, 1.0f})
+            * glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0f});
+
+        WriteToVertexBuffer(tintColor, transform, textureIndex, uvTiling, texture.GetTexCoords());
+    }
     
     void Renderer2D::UploadLights()
     {
@@ -368,7 +342,7 @@ namespace PurrKatEngine
         }
     }
 
-    void Renderer2D::WriteToVertexBuffer(const glm::vec4& color, const glm::mat4& transform, float textureIndex, const glm::vec2& uvTiling)
+    void Renderer2D::WriteToVertexBuffer(const glm::vec4& color, const glm::mat4& transform, float textureIndex, const glm::vec2& uvTiling, const glm::vec2* texCoords)
     {
         IncreaseDrawCallMemoryIfNeeded(6);
      
@@ -378,7 +352,7 @@ namespace PurrKatEngine
         {
             drawCallData.QuadVertexBufferPtr->Position = transform * s_RendererData.QuadVertexPositions[i];
             drawCallData.QuadVertexBufferPtr->Color = color;
-            drawCallData.QuadVertexBufferPtr->TexCoord = QUAD_TEX_COORDS[i];
+            drawCallData.QuadVertexBufferPtr->TexCoord = texCoords[i];
             drawCallData.QuadVertexBufferPtr->UVTiling = uvTiling;
             drawCallData.QuadVertexBufferPtr->TexIndex = textureIndex;
             drawCallData.QuadVertexBufferPtr++;
@@ -388,19 +362,29 @@ namespace PurrKatEngine
         s_RendererData.Stats.QuadCount++;
     }
     
-    float Renderer2D::GetOrCreateTextureIndex(const Ref<const Texture2D>& texture)
+    float Renderer2D::GetOrCreateTextureIndex(const Tex2D& texture)
     {
-        if (texture == nullptr)
+        const Ref<const Texture2D>& texture2D = texture.GetTexture();
+        
+        if (texture2D == nullptr)
         {
             return 0; // Return the white texture.
         }
         
-        float textureIndex = 0;
+        float textureIndex = -1;
         
         // Fetch the texture index if it already exists.
         for (uint32_t i = 0; i < s_RendererData.TextureSlotIndex; i++)
         {
-            if (*s_RendererData.TextureSlots[i] == *texture)
+            auto currentTextureSlot = s_RendererData.TextureSlots[i];
+            
+            if (currentTextureSlot == nullptr)
+            {
+                PKE_CORE_WARN("{}: current is NULL", i);
+                continue;
+            }
+            
+            if (currentTextureSlot == texture2D)
             {
                 textureIndex = (float)i;
                 break;
@@ -408,12 +392,13 @@ namespace PurrKatEngine
         }
         
         // If not, store it for the current batch.
-        if (textureIndex <= 0)
+        if (textureIndex < 0)
         {
             textureIndex = (float)s_RendererData.TextureSlotIndex;
-            s_RendererData.TextureSlots[s_RendererData.TextureSlotIndex] = texture;
+            s_RendererData.TextureSlots[s_RendererData.TextureSlotIndex] = texture2D;
             s_RendererData.TextureSlotIndex++;
         }
+        
         return textureIndex;
     }
 }

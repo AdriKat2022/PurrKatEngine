@@ -80,9 +80,9 @@ ExampleSandboxLayer::ExampleSandboxLayer() : m_CameraController(16.0f/9.0f, 1.0f
     m_SquareVertexArray->SetIndexBuffer(squareIB);
         
     // Load Textures
-    m_RazowskiTexture = ToRef(Texture2D::Create("assets/textures/razowski.png"));
-    m_LoveTexture = ToRef(Texture2D::Create("assets/textures/love.png"));
-    m_CppTexture = ToRef(Texture2D::Create("assets/textures/cpp.png"));
+    m_RazowskiTexture = CreateRef(Texture2D::Create("assets/textures/razowski.png"));
+    m_LoveTexture = CreateRef(Texture2D::Create("assets/textures/love.png"));
+    m_CppTexture = CreateRef(Texture2D::Create("assets/textures/cpp.png"));
 
     Ref<Shader> textureShader = m_ShaderLibrary.Load("assets/shaders/Texture.glsl");
     textureShader->Bind();

@@ -14,15 +14,21 @@ Sandbox2DLightTestScene::Sandbox2DLightTestScene() :
 {
     m_InputMoveSquareController.SetSpeed(0.1f);
     
-    m_RazowskiTexture = ToRef(Texture2D::Create("assets/textures/razowski.png"));
-    m_LoveTexture = ToRef(Texture2D::Create("assets/textures/love.png", { .Filter = Texture2D::FilterType::Nearest }));
-    m_CppTexture = ToRef(Texture2D::Create("assets/textures/cpp.png"));
-    m_FreddyTexture = ToRef(Texture2D::Create("assets/textures/freddy.png"));
-    m_BackgroundTexture = ToRef(Texture2D::Create("assets/textures/hollowKnightBg.png", { .Filter = Texture2D::FilterType::Nearest }));
-    m_MobTexture = ToRef(Texture2D::Create("assets/textures/mob.png"));
-    m_CreeperTexture = ToRef(Texture2D::Create("assets/textures/creeper.png"));
-    
     m_ParticleSystem.SetMaxParticleCount(1000);
+    
+    m_RazowskiTexture = CreateRef(Texture2D::Create("assets/textures/razowski.png"));
+    m_LoveTexture = CreateRef(Texture2D::Create("assets/textures/love.png", { .Filter = Texture2D::FilterType::Nearest }));
+    m_CppTexture = CreateRef(Texture2D::Create("assets/textures/cpp.png"));
+    m_FreddyTexture = CreateRef(Texture2D::Create("assets/textures/freddy.png"));
+    m_BackgroundTexture = CreateRef(Texture2D::Create("assets/textures/hollowKnightBg.png", { .Filter = Texture2D::FilterType::Nearest }));
+    m_MobTexture = CreateRef(Texture2D::Create("assets/textures/mob.png"));
+    m_CreeperTexture = CreateRef(Texture2D::Create("assets/textures/creeper.png"));
+    
+    m_SpriteSheet = CreateRef(Texture2D::Create("assets/textures/spriteSheet.png", { .Filter = Texture2D::FilterType::Nearest }));
+    
+    m_Exclamation = Tex2D::CreateFromCoords(m_SpriteSheet, {0, 2}, {72, 72});
+    m_Cross = Tex2D::CreateFromCoords(m_SpriteSheet, {0, 11}, {72, 72});
+    
     
     m_Particle.LifeTime = 1.0f;
     m_Particle.Velocity = { 0.0f, 0.0f };
@@ -105,11 +111,16 @@ void Sandbox2DLightTestScene::OnUpdate()
     if (m_LightOn)
         Renderer2D::AddLightSource(mouseLightSource);
  
-    Renderer2D::DrawQuad({0.0f, 0.0f, 0.5f}, SET_WIDTH(m_BackgroundTexture, 20), m_BackgroundTexture);
+    // Renderer2D::DrawQuad({ .Position = {0.0f, 0.0f, 0.5f}, .Size = {2,2} });
+    // Renderer2D::DrawQuad({ .Position = {-1.0f, 0.0f, 0.5f}, .Size = {2,2} });
+    
+    Renderer2D::DrawQuad({0.0f, 0.0f}, SET_WIDTH(m_BackgroundTexture, 20), m_BackgroundTexture);
     Renderer2D::DrawQuad({3.8f, -2.2f}, {1, 1}, m_MobTexture);
     Renderer2D::DrawQuad({-14.0f, 0}, SET_WIDTH(m_FreddyTexture, 1.5f), m_FreddyTexture);
     Renderer2D::DrawQuad({3.0f, 1.9f}, SET_WIDTH(m_CreeperTexture, 0.8f), m_CreeperTexture);
     Renderer2D::DrawQuad({-7.3f, 1.0f}, SET_WIDTH(m_CppTexture, 1.0f), m_CppTexture);
+    Renderer2D::DrawQuad({-7.3f, -0.5f}, SET_WIDTH(m_Exclamation, 1.0f), m_Exclamation);
+    Renderer2D::DrawQuad({-7.3f, -2.0f}, SET_WIDTH(m_Cross, 1.0f), m_Cross);
     Renderer2D::DrawRotatedQuad(m_SquareTransform.GetPosition(), SET_WIDTH(m_LoveTexture, width), glm::radians(rotation), m_LoveTexture);
     
     Renderer2D::EndScene();
@@ -208,6 +219,9 @@ void Sandbox2DLightTestScene::OnImGuiRender()
         ImGui::Separator();
         
         // ImGuiUtility::SliderInt("Max Particle Count", &m_ParticleSystem, &ParticleSystem::GetMaxParticleCount, &ParticleSystem::SetMaxParticleCount, 0, 5000);
+        
+        ImGui::SliderFloat4("TexMin", (float*)m_Cross.GetTexCoordsPtr(), 0.0f, 1.0f);
+        ImGui::SliderFloat4("TexMax", ((float*)m_Cross.GetTexCoordsPtr()+4), 0.0f, 1.0f);
         
         static constexpr std::array<const char*, 3> aspectRatioOptions = {"None", "Match Width", "Match Height"};
         ImGuiUtility::EnumCombo("Camera Auto Adjust Aspect Ratio", m_CameraController.AspectRatioAdjustment, aspectRatioOptions);

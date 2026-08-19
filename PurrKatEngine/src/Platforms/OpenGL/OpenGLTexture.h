@@ -12,7 +12,7 @@ namespace PurrKatEngine
     class OpenGLTexture2D : public Texture2D
     {
     public:
-        explicit OpenGLTexture2D(uint32_t width, uint32_t height);
+        explicit OpenGLTexture2D(uint32_t width, uint32_t height, const TextureOptions& textureOptions = {});
         explicit OpenGLTexture2D(std::string path, const TextureOptions& textureOptions = {});
         
         ~OpenGLTexture2D() override;

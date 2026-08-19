@@ -41,11 +41,11 @@ namespace PurrKatEngine
     }
     
     template<typename T, typename... Args>
-    Ref<T> ToRef(T* obj) { return Ref<T>(obj); }
+    Ref<T> CreateRef(T* obj) { return Ref<T>(obj); }
     
     template<typename T>
     using Scope = std::unique_ptr<T>;
     
     template<typename T, typename... Args>
-    Scope<T> ToScope(T* obj) { return Scope<T>(obj); }
+    Scope<T> CreateScope(T* obj) { return Scope<T>(obj); }
 }
