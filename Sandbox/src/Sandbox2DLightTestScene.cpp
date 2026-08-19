@@ -1,5 +1,6 @@
 ﻿#include "Sandbox2DLightTestScene.h"
 #include <glm/gtc/type_ptr.hpp>
+#include "PurrKatEngine/Renderer/SpriteSheet.h"
 
 using namespace PKE;
 
@@ -26,9 +27,10 @@ Sandbox2DLightTestScene::Sandbox2DLightTestScene() :
     
     m_SpriteSheet = CreateRef(Texture2D::Create("assets/textures/spriteSheet.png", { .Filter = Texture2D::FilterType::Nearest }));
     
-    m_Exclamation = Tex2D::CreateFromCoords(m_SpriteSheet, {0, 2}, {72, 72});
-    m_Cross = Tex2D::CreateFromCoords(m_SpriteSheet, {0, 11}, {72, 72});
+    m_SpriteSheetTest = CreateRef(new SpriteSheet(m_SpriteSheet, { .CellSize = {70, 70}, .Padding = {2, 2} }));
     
+    m_Exclamation = m_SpriteSheetTest->GetSprite({0, 2});
+    m_Cross = m_SpriteSheetTest->GetSprite({0, 11});
     
     m_Particle.LifeTime = 1.0f;
     m_Particle.Velocity = { 0.0f, 0.0f };
@@ -96,7 +98,7 @@ void Sandbox2DLightTestScene::OnUpdate()
     MAKE_DEBUG_CONTROL(float, rotation, 45);
     MAKE_DEBUG_CONTROL(float, width, 1);
     
-    static bool litScene = true;
+    static bool litScene = false;
     ADD_DEBUG_CONTROL(litScene);
     
     Renderer2D::BeginScene(m_CameraController.GetCamera(), litScene);
@@ -111,17 +113,18 @@ void Sandbox2DLightTestScene::OnUpdate()
     if (m_LightOn)
         Renderer2D::AddLightSource(mouseLightSource);
  
-    // Renderer2D::DrawQuad({ .Position = {0.0f, 0.0f, 0.5f}, .Size = {2,2} });
-    // Renderer2D::DrawQuad({ .Position = {-1.0f, 0.0f, 0.5f}, .Size = {2,2} });
+    Renderer2D::DrawQuad({ .Position = {0.0f, 0.0f, 0.5f}, .Size = {2,2} });
+    Renderer2D::DrawQuad({ .Position = {-1.0f, 0.0f, 0.5f}, .Size = {2,2} });
     
     Renderer2D::DrawQuad({0.0f, 0.0f}, SET_WIDTH(m_BackgroundTexture, 20), m_BackgroundTexture);
     Renderer2D::DrawQuad({3.8f, -2.2f}, {1, 1}, m_MobTexture);
     Renderer2D::DrawQuad({-14.0f, 0}, SET_WIDTH(m_FreddyTexture, 1.5f), m_FreddyTexture);
     Renderer2D::DrawQuad({3.0f, 1.9f}, SET_WIDTH(m_CreeperTexture, 0.8f), m_CreeperTexture);
     Renderer2D::DrawQuad({-7.3f, 1.0f}, SET_WIDTH(m_CppTexture, 1.0f), m_CppTexture);
+    Renderer2D::DrawRotatedQuad(m_SquareTransform.GetPosition(), SET_WIDTH(m_LoveTexture, width), glm::radians(rotation), m_LoveTexture);
+    
     Renderer2D::DrawQuad({-7.3f, -0.5f}, SET_WIDTH(m_Exclamation, 1.0f), m_Exclamation);
     Renderer2D::DrawQuad({-7.3f, -2.0f}, SET_WIDTH(m_Cross, 1.0f), m_Cross);
-    Renderer2D::DrawRotatedQuad(m_SquareTransform.GetPosition(), SET_WIDTH(m_LoveTexture, width), glm::radians(rotation), m_LoveTexture);
     
     Renderer2D::EndScene();
     
@@ -153,7 +156,7 @@ void Sandbox2DLightTestScene::OnUpdate()
     {
         PROFILE_SCOPE("ParticleSystem");
         
-        MAKE_DEBUG_CONTROL(int, emission, 1);
+        MAKE_DEBUG_CONTROL(int, emission, 0);
         
         if (Input::IsMouseButtonPressed(PKE_BUTTON_MouseLeft))
         {
@@ -182,18 +185,14 @@ void Sandbox2DLightTestScene::OnImGuiRender()
     
     PROFILE_FUNCTION();
     
-    ImGuiUtility::ApplicationInfoWindow(Application::Get());
+    ImGuiUtility::ShowApplicationInfoWindow(Application::Get());
     
     static bool infos = true;
     if (ImGui::Begin("Infos", &infos, ImGuiWindowFlags_AlwaysAutoResize))
     {
-        ImGuiUtility::DisplayMouseAndWorldPosition(&m_CameraController.GetCamera());
+        ImGuiUtility::ShowDisplayMouseAndWorldPosition(&m_CameraController.GetCamera());
         ImGui::Separator();
-        auto stats = Renderer2D::GetStatistics();
-        ImGui::Text("Draw Calls: %u", stats.DrawCalls);
-        ImGui::Text("Quad Count: %u", stats.QuadCount);
-        ImGui::Text("Indices: %u", stats.GetIndexCount());
-        ImGui::Text("Vertices: %u", stats.GetVertexCount());
+        ImGuiUtility::ShowRendererStatistics();
         Renderer2D::EndFrameStatistics();
     }
     ImGui::End();
@@ -218,6 +217,8 @@ void Sandbox2DLightTestScene::OnImGuiRender()
         
         ImGui::Separator();
         
+        
+        
         // ImGuiUtility::SliderInt("Max Particle Count", &m_ParticleSystem, &ParticleSystem::GetMaxParticleCount, &ParticleSystem::SetMaxParticleCount, 0, 5000);
         
         ImGui::SliderFloat4("TexMin", (float*)m_Cross.GetTexCoordsPtr(), 0.0f, 1.0f);
@@ -235,7 +236,7 @@ void Sandbox2DLightTestScene::OnImGuiRender()
     static bool profiling = true;
     if (ImGui::Begin("Profiling", &profiling, ImGuiWindowFlags_AlwaysAutoResize))
     {
-        PROFILE_DISPLAY();
+        PROFILE_IMGUI_DISPLAY();
     }
     ImGui::End();
 }

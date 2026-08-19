@@ -225,12 +225,12 @@ namespace PurrKatEngine
 
     void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Tex2D& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor)
     {
-        DrawQuadInternal({ position.x, position.y, 0}, size, rotation, texture, uvTiling, tintColor);
+        DrawQuadRotatedInternal({ position.x, position.y, 0}, size, rotation, texture, uvTiling, tintColor);
     }
     
     void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Tex2D& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor)
     {
-        DrawQuadInternal(position, size, rotation, texture, uvTiling, tintColor);
+        DrawQuadRotatedInternal(position, size, rotation, texture, uvTiling, tintColor);
     }
 
     // ################## LIGHTNING FUNCTIONS ##################
@@ -249,6 +249,16 @@ namespace PurrKatEngine
     // ################## UTILITY FUNCTIONS ####################
     
     void Renderer2D::DrawQuadInternal(const glm::vec3& position, const glm::vec2& size, float rotation, const Tex2D& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor)
+    {
+        float textureIndex = GetOrCreateTextureIndex(texture);
+        
+        const glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+            * glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0f});
+
+        WriteToVertexBuffer(tintColor, transform, textureIndex, uvTiling, texture.GetTexCoords());
+    }
+    
+    void Renderer2D::DrawQuadRotatedInternal(const glm::vec3& position, const glm::vec2& size, float rotation, const Tex2D& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor)
     {
         float textureIndex = GetOrCreateTextureIndex(texture);
         

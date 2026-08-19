@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "PurrKatEngine.h"
 #include "ParticleSystem.h"
+#include "PurrKatEngine/Renderer/SpriteSheet.h"
 
 class Sandbox2DLightTestScene : public PKE::Layer
 {
@@ -42,6 +43,7 @@ private:
     PKE::Ref<const PKE::Texture2D> m_MobTexture;
     PKE::Ref<const PKE::Texture2D> m_CreeperTexture;
     
+    PKE::Ref<PKE::SpriteSheet> m_SpriteSheetTest;
     PKE::Ref<const PKE::Texture2D> m_SpriteSheet;
     PKE::Tex2D m_Exclamation;
     PKE::Tex2D m_Cross;

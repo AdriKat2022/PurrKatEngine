@@ -11,8 +11,7 @@
 #define PROFILE_SCOPE(name)     ::PurrKatEngine::Timer CONCAT(timer, __LINE__)(name, [](const ProfileResults& profile) { Profiler::AddProfileResult(profile); })
 #define PROFILE_FUNCTION()      PROFILE_SCOPE(__FUNCTION__)
 
-#define PROFILE_DISPLAY()       Profiler::DisplayProfiledResults()
-#define PROFILE_CLEAR()         Profiler::EndFrame()
+#define PROFILE_IMGUI_DISPLAY()       Profiler::ShowProfiledResultsImGui()
 
 #define PKE_ENABLE_PROFILING 1
 #if PKE_ENABLE_PROFILING
@@ -131,7 +130,7 @@ namespace PurrKatEngine
         
         static void ClearProfilerData() { s_ProfileResults.clear(); }
         
-        static void DisplayProfiledResults()
+        static void ShowProfiledResultsImGui()
         {
             ImGui::Checkbox("Enable Live Profiling", &s_EnableLiveProfiling);
             ImGui::Checkbox("Enable File Profiling", &s_EnableFileProfiling);

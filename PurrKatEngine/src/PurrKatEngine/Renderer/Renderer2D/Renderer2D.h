@@ -69,8 +69,9 @@ namespace PurrKatEngine
         static void ClearLightSources();
         
     private:
-        static void DrawQuadInternal(const glm::vec3& position, const glm::vec2& size, float rotation, const Tex2D& texture, const glm::vec2& uvTiling = {1, 1}, const glm::vec4& tintColor = {1.0f, 1.0f, 1.0f, 1.0f});
-        
+        static void DrawQuadInternal(const glm::vec3& position, const glm::vec2& size, float rotation, const Tex2D& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor);
+        static void DrawQuadRotatedInternal(const glm::vec3& position, const glm::vec2& size, float rotation, const Tex2D& texture, const glm::vec2& uvTiling = {1, 1}, const glm::vec4& tintColor = {1.0f, 1.0f, 1.0f, 1.0f});
+
         static void UploadLights();
         static void PassDrawCalls();
         static void FreeUnusedBuffers();

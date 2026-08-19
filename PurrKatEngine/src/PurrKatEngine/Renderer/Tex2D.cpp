@@ -44,13 +44,32 @@ namespace PurrKatEngine
             return m_Texture->GetAspectRatio() * (uvWidth / uvHeight);
     }
 
-    Tex2D Tex2D::CreateFromCoords(const Ref<const Texture2D>& texture, const glm::vec2& coords, const glm::vec2& spriteSize)
+    Tex2D Tex2D::CreateFromCoords(const Ref<const Texture2D>& texture, const glm::vec2& coords, const SpriteSheetOptions& options, const glm::vec2& spriteSize)
     {
         const float width = (float)texture->GetWidth();
         const float height = (float)texture->GetHeight();
+
+        glm::vec2 padding = options.Padding;
+        glm::vec2 cellSize = options.CellSize;
         
-        glm::vec2 min = { coords.x * spriteSize.x / width, coords.y * spriteSize.y / height };
-        glm::vec2 max = { (coords.x + 1) * spriteSize.x / width, (coords.y + 1) * spriteSize.y / height };
+        if (options.CellCount.x > 0 && options.CellCount.y > 0)
+        {
+            glm::vec2 cellCount = options.CellCount;
+            glm::vec2 totalPadding = { padding.x*(cellCount.x-1), padding.y*(cellCount.y-1)};
+            cellSize = { (width-totalPadding.x)/cellCount.x, (height-totalPadding.y)/cellCount.y };
+        }
+
+        glm::vec2 rightPadding = { (coords.x + spriteSize.x - 1) * padding.x / width, (coords.y + spriteSize.y - 1) * padding.y / height };
+        
+        glm::vec2 min = { 
+            coords.x * (cellSize.x + padding.x) / width, 
+            coords.y * (cellSize.y + padding.y) / height
+        };
+        
+        glm::vec2 max = {
+            (coords.x + spriteSize.x) * cellSize.x / width + rightPadding.x,
+            (coords.y + spriteSize.y) * cellSize.y / height + rightPadding.y
+        };
         
         return {texture, min, max};
     }

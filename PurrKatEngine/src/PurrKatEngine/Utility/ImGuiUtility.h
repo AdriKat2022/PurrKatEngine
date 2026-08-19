@@ -2,6 +2,7 @@
 
 #include "PurrKatEngine/Application.h"
 #include "PurrKatEngine/Components/Transform.h"
+#include "PurrKatEngine/Renderer/Renderer2D/Renderer2D.h"
 #include "imgui.h"
 
 #define WATCH_VALUE(value) ::PurrKatEngine::ImGuiUtility::WatchValue(#value, &value)
@@ -37,7 +38,7 @@ namespace PurrKatEngine
         };
         
     public:
-        static void ApplicationInfoWindow(const Application& app)
+        static void ShowApplicationInfoWindow(const Application& app)
         {
             static bool showStatisticsWindow = true;
             if (ImGui::Begin("Application Infos", &showStatisticsWindow))
@@ -48,7 +49,7 @@ namespace PurrKatEngine
             ImGui::End();
         }
         
-        static void DisplayMouseAndWorldPosition(const OrthographicCamera* cam = nullptr)
+        static void ShowDisplayMouseAndWorldPosition(const OrthographicCamera* cam = nullptr)
         {
             ImVec2 mousePos = ImGui::GetMousePos();
             glm::vec3 worldPos = cam ? cam->ScreenToWorldPosition({mousePos.x, mousePos.y}) : glm::vec3(0);
@@ -84,7 +85,7 @@ namespace PurrKatEngine
             
         }
         
-        static void DisplayTransform(const std::string& name, const Transform& transform)
+        static void ShowTransform(const std::string& name, const Transform& transform)
         {
             const glm::vec3& position = transform.GetPosition();
             const glm::vec3& rotation = transform.GetRotation();
@@ -101,28 +102,17 @@ namespace PurrKatEngine
                     ImGui::TableSetupColumn("Z");
                     ImGui::TableHeadersRow();
 
-                    DisplayVector3Row("Position", position);
-                    DisplayVector3Row("Rotation", rotation);
-                    DisplayVector3Row("Scale", scale);
+                    ShowVector3Row("Position", position);
+                    ShowVector3Row("Rotation", rotation);
+                    ShowVector3Row("Scale", scale);
 
                     ImGui::EndTable();
                 }
             }
             ImGui::PopID();
         }
-
-        template<typename T, size_t N>
-        static bool EnumCombo(const char* label, T& value, const std::array<const char*, N>& items)
-        {
-            int current = static_cast<int>(value);
-            bool changed = ImGui::Combo(label, &current, items.data(), (int)N);
-            if (changed) value = static_cast<T>(current);
-            return changed;
-        }
-
-        //////////// DEBUG CONTROLS //////////////
         
-        static void DisplayVector3Row(const char* label, const glm::vec3& value)
+        static void ShowVector3Row(const char* label, const glm::vec3& value)
         {
             ImGui::TableNextRow();
             ImGui::TableSetColumnIndex(0);
@@ -134,6 +124,97 @@ namespace PurrKatEngine
             ImGui::TableSetColumnIndex(3);
             ImGui::Text("%.3f", value.z);
         }
+
+        static void ShowRendererStatistics(bool showHeader = false)
+        {
+            bool shouldShow = true;
+            
+            if (showHeader)
+                shouldShow = ImGui::CollapsingHeader("Renderer Statistics", ImGuiTreeNodeFlags_DefaultOpen);
+            
+            if (!shouldShow)
+                return;
+            
+            auto stats = Renderer2D::GetStatistics();
+            ImGui::Text("Draw Calls: %u", stats.DrawCalls);
+            ImGui::Text("Quad Count: %u", stats.QuadCount);
+            ImGui::Text("Indices: %u", stats.GetIndexCount());
+            ImGui::Text("Vertices: %u", stats.GetVertexCount());
+            Renderer2D::EndFrameStatistics();
+        }
+        
+        static bool SliderIntControl(const char* label, int& value, int min, int max, int btnStep = 1)
+        {
+            bool changed = false;
+            ImGui::PushID(label);
+            ImGui::Text("%s", label);
+            ImGui::SameLine();
+
+            if (ImGui::Button("-"))
+            {
+                value = std::max(min, value - btnStep);
+                changed = true;
+            }
+
+            ImGui::SameLine();
+
+            if (ImGui::Button("+"))
+            {
+                value = std::min(max, value + btnStep);
+                changed = true;
+            }
+
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+
+            if (ImGui::SliderInt("##value", &value, min, max))
+                changed = true;
+
+            ImGui::PopID();
+            return changed;
+        }
+        
+        static bool DragIntControl(const char* label, int& value, int min, int max, int btnStep = 1, float dragSpeed = 1)
+        {
+            bool changed = false;
+            ImGui::PushID(label);
+            ImGui::Text("%s", label);
+            ImGui::SameLine();
+
+            if (ImGui::Button("-"))
+            {
+                value = std::max(min, value - btnStep);
+                changed = true;
+            }
+
+            ImGui::SameLine();
+
+            if (ImGui::Button("+"))
+            {
+                value = std::min(max, value + btnStep);
+                changed = true;
+            }
+
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+
+            if (ImGui::DragInt("##value", &value, dragSpeed, min, max))
+                changed = true;
+
+            ImGui::PopID();
+            return changed;
+        }
+        
+        template<typename T, size_t N>
+        static bool EnumCombo(const char* label, T& value, const std::array<const char*, N>& items)
+        {
+            int current = static_cast<int>(value);
+            bool changed = ImGui::Combo(label, &current, items.data(), (int)N);
+            if (changed) value = static_cast<T>(current);
+            return changed;
+        }
+
+        //////////// DEBUG CONTROLS //////////////
         
         template<typename T>
         static DebugControl::Type GetType()
@@ -150,11 +231,11 @@ namespace PurrKatEngine
                 return DebugControl::Type::Bool;
             else if constexpr (std::is_same_v<U, std::string>)
                 return DebugControl::Type::String;
-            else if constexpr (std::is_same_v<U, glm::vec2>)
+            else if constexpr (std::is_convertible_v<U, glm::vec2>)
                 return DebugControl::Type::Vec2;
-            else if constexpr (std::is_same_v<U, glm::vec3>)
+            else if constexpr (std::is_convertible_v<U, glm::vec3>)
                 return DebugControl::Type::Vec3;
-            else if constexpr (std::is_same_v<U, glm::vec4>)
+            else if constexpr (std::is_convertible_v<U, glm::vec4>)
                 return DebugControl::Type::Vec4;
             else
             {

@@ -45,9 +45,6 @@ namespace PurrKatEngine
             m_CameraRotationInputController.OnUpdate();
             m_Camera.SetZRotation(m_CameraRotation);
         }
-        
-        ADD_DEBUG_CONTROL(m_CameraRotation);
-        ADD_DEBUG_CONTROL(m_ZoomLevel);
     }
     
     void OrthographicCameraController::OnEvent(Event& e)

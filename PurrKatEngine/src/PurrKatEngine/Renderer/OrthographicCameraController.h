@@ -28,15 +28,19 @@ namespace PurrKatEngine
     class OrthographicCameraController
     {
     public:
-        OrthographicCameraController(float aspectRatio, float zoomLevel, bool useScrollToZoom = false);
+        OrthographicCameraController(float aspectRatio, float zoomLevel, bool useScrollToZoom);
         
         OrthographicCamera& GetCamera() { return m_Camera; }
 
         void OnUpdate();
         void OnEvent(Event& e);
         
+        void SetPosition(const glm::vec3& position) { m_Camera.SetPosition(position); }
+        void SetRotation(float rotation) { m_CameraRotation = rotation; }
         void SetZoomLevel(float level) { m_ZoomLevel = level; }
         
+        const glm::vec3& GetPosition() const { return m_Camera.GetPosition(); }
+        float GetCameraRotation() const { return m_CameraRotation; }
         float GetZoomLevel() const { return m_ZoomLevel; }
         const OrthographicCameraBounds& GetCameraBounds() const { return m_CameraBounds; }
         

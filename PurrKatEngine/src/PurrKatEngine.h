@@ -10,6 +10,7 @@
 #include "PurrKatEngine/Inputs/Input.h"
 #include "PurrKatEngine/Inputs/KeyCodes.h"
 #include "PurrKatEngine/Inputs/Time.h"
+#include "PurrKatEngine/Layers/TestLayers/SpriteSheetLayerDebugging.h"
 #include "PurrKatEngine/Logs/Log.h"
 #include "PurrKatEngine/Profiling/Profiler.h"
 #include "PurrKatEngine/Renderer/OrthographicCamera.h"

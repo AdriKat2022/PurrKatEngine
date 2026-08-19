@@ -11,7 +11,10 @@ public:
     {
         PKE_LOG_TRACE("Sandbox application start. Hey, that's me! A log from the client!");
         // PushLayer(new ExampleSandboxLayer());
-        PushLayer(new Sandbox2DLightTestScene());
+        // PushLayer(new Sandbox2DLightTestScene());
+        
+        auto texture = PurrKatEngine::Texture2D::CreateRef("assets/textures/spriteSheet.png", { .Filter = PurrKatEngine::Texture2D::FilterType::Nearest });
+        PushLayer(new PurrKatEngine::SpriteSheetLayerDebugging(texture));
     }
 };
 
