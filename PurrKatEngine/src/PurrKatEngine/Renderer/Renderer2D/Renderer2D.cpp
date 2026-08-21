@@ -76,7 +76,7 @@ namespace PurrKatEngine
         s_RendererData.DrawCallsCapacity = 0;
         s_RendererData.DrawCalls = new DrawCallData[Renderer2DData::MAX_DRAW_CALLS];
         
-        s_RendererData.QuadVertexBuffer = CreateRef(VertexBuffer::Create(PurrKatEngine::Renderer2DData::MAX_VERTICES * sizeof(QuadVertex)));
+        s_RendererData.QuadVertexBuffer = CreateRef(VertexBuffer::Create(Renderer2DData::MAX_VERTICES * sizeof(QuadVertex)));
         s_RendererData.QuadVertexBuffer->SetLayout({
             { ShaderDataType::Float3, "a_Position" },
             { ShaderDataType::Float4, "a_Color" },

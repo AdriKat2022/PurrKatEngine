@@ -100,6 +100,7 @@ void EditorViewLayer::OnImGuiRender()
         ImGui::EndMenuBar();
     }
     
+    // This will be where the Viewport of Editor is rendered.
     ImGui::Begin("Editor Viewport");
     
     ImGui::Text("Viewport Size: %.0f x %.0f", ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y);

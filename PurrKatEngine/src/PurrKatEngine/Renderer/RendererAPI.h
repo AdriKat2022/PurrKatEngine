@@ -1,6 +1,18 @@
 ﻿#pragma once
 #include "VertexArray.h"
 
+#define SWITCH_ON_RENDERER_API(cases) switch (RendererAPI::GetAPI()) \
+{ cases } \
+\
+PKE_CORE_ASSERT(false, "Invalid RendererAPI.") \
+return nullptr;
+
+#define API_CASE_NONE                     case RendererAPI::API::None:
+#define API_CASE_NONE_NOT_SUPPORTED       case RendererAPI::API::None: PKE_CORE_ASSERT(false, "Having no RendererAPI is currently not supported.") return nullptr;
+
+#define API_CASE_OPENGL                   case RendererAPI::API::OpenGL:
+#define API_CASE_OPENGL_NOT_SUPPORTED     case RendererAPI::API::OpenGL: PKE_CORE_ASSERT(false, "Using OpenGL as a RendererAPI is currently not supported.") return nullptr;
+
 namespace PurrKatEngine
 {
     class RendererAPI

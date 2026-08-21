@@ -8,29 +8,18 @@ namespace PurrKatEngine
 {
     Shader* Shader::Create(const std::string& filePath)
     {
-        switch (RendererAPI::GetAPI()) {
-            case RendererAPI::API::None:
-                PKE_CORE_ASSERT(false, "RendererAPI::None is currently not supported.")
-                return nullptr;
-            case RendererAPI::API::OpenGL:
-                return new OpenGLShader(filePath);
-        }
-        
-        return nullptr;
+        SWITCH_ON_RENDERER_API(
+            API_CASE_NONE_NOT_SUPPORTED
+            API_CASE_OPENGL return new OpenGLShader(filePath);
+        )
     }
 
     Shader* Shader::Create(const std::string& name, const std::string& vertexSource, const std::string& fragmentSrc)
     {
-        switch (RendererAPI::GetAPI())
-        {
-            case RendererAPI::API::None:
-                PKE_CORE_ASSERT(false, "RendererAPI::None is currently not supported.")
-                return nullptr;
-            case RendererAPI::API::OpenGL:
-                return new OpenGLShader(name, vertexSource, fragmentSrc);
-        }
-        
-        return nullptr;
+        SWITCH_ON_RENDERER_API(
+            API_CASE_NONE_NOT_SUPPORTED
+            API_CASE_OPENGL return new OpenGLShader(name, vertexSource, fragmentSrc);
+        )
     }
 
     Shader* Shader::MakeTextureShader()

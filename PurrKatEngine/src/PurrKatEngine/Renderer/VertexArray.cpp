@@ -7,13 +7,9 @@ namespace PurrKatEngine
 {
     VertexArray* VertexArray::Create()
     {
-        switch (Renderer::GetAPI())
-        {
-            case RendererAPI::API::None:     PKE_CORE_ASSERT(false, "Having No RendererAPI is currently not supported.") return nullptr;
-            case RendererAPI::API::OpenGL:   return new OpenGLVertexArray();
-        }
-
-        PKE_CORE_ASSERT(false, "Invalid RendererAPI.")
-        return nullptr;
+        SWITCH_ON_RENDERER_API(
+            API_CASE_NONE_NOT_SUPPORTED
+            API_CASE_OPENGL return new OpenGLVertexArray();
+        )
     }
 }
