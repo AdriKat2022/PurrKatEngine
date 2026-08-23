@@ -109,6 +109,7 @@ namespace PurrKatEngine
         }
 
         // This will be where the Viewport of Editor is rendered.
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
         if (ImGui::Begin("Editor Viewport"))
         {
             ImVec2 contentSize = ImGui::GetContentRegionAvail();
@@ -116,16 +117,18 @@ namespace PurrKatEngine
             if (viewportSize != m_LastEditorViewportSize)
             {
                 m_LastEditorViewportSize = viewportSize;
-                m_FrameBuffer->GetSpecifications().Width = (uint32_t)viewportSize.x;
-                m_FrameBuffer->GetSpecifications().Height = (uint32_t)viewportSize.y;
-                m_FrameBuffer->Invalidate();
+                m_FrameBuffer->Resize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+                m_CameraController.SetAspectRatio(viewportSize.x/viewportSize.y);
             }
-
-            uint32_t textureID = m_FrameBuffer->GetColorAttachmentRendererID();
-            ImGui::Image(textureID, contentSize);
+            else
+            {
+                // Rendering in the else branch helps decrease the flickering while resizing the viewport.
+                uint32_t textureID = m_FrameBuffer->GetColorAttachmentRendererID();
+                ImGui::Image(textureID, contentSize, {0, 1}, {1, 0});
+            }
         }
-
         ImGui::End();
+        ImGui::PopStyleVar();
 
         if (ImGui::Begin("Editor Viewport Properties"))
         {

@@ -15,12 +15,21 @@ namespace PurrKatEngine
     OpenGLFrameBuffer::~OpenGLFrameBuffer()
     {
         glDeleteFramebuffers(1, &m_RendererID);
+        glDeleteTextures(1, &m_ColorAttachment);
+        glDeleteTextures(1, &m_DepthAttachment);
+    }
+
+    void OpenGLFrameBuffer::Resize(uint32_t width, uint32_t height)
+    {
+        m_FrameBufferSpecifications.Width = width;
+        m_FrameBufferSpecifications.Height = height;
+        
+        Invalidate();
     }
 
     void OpenGLFrameBuffer::Invalidate()
     {
         // Recreate the whole state.
-        
         if (m_RendererID)
         {
             // Delete previous state
@@ -112,6 +121,7 @@ namespace PurrKatEngine
     void OpenGLFrameBuffer::Bind()
     {
         glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
+        glViewport(0, 0, (GLsizei)m_FrameBufferSpecifications.Width, (GLsizei)m_FrameBufferSpecifications.Height);
     }
     
     void OpenGLFrameBuffer::Unbind()

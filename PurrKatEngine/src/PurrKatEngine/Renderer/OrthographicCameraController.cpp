@@ -80,7 +80,7 @@ namespace PurrKatEngine
         m_CameraMovementInputController.OnEvent(e);
         m_CameraRotationInputController.OnEvent(e);
     }
-    
+
     bool OrthographicCameraController::OnMouseScroll(MouseScrollEvent& e)
     {
         if (!EnableZoom) return false;

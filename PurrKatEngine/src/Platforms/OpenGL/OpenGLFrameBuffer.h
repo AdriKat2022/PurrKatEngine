@@ -9,6 +9,7 @@ namespace PurrKatEngine
         OpenGLFrameBuffer(const FrameBufferSpecifications& specs);
         ~OpenGLFrameBuffer() override;
         
+        void Resize(uint32_t width, uint32_t height) override;
         void Invalidate() override;
         void Bind() override;
         void Unbind() override;

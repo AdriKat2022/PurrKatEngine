@@ -39,12 +39,13 @@ namespace PurrKatEngine
         void SetPosition(const glm::vec3& position) { m_Camera.SetPosition(position); }
         void SetRotation(float rotation) { m_CameraRotation = rotation; }
         void SetZoomLevel(float level) { m_ZoomLevel = level; UpdateCameraProjection(); }
+        void SetAspectRatio(float aspectRatio) {m_AspectRatio = aspectRatio; UpdateCameraProjection(); }
         
         const glm::vec3& GetPosition() const { return m_Camera.GetPosition(); }
         float GetCameraRotation() const { return m_CameraRotation; }
         float GetZoomLevel() const { return m_ZoomLevel; }
         const OrthographicCameraBounds& GetCameraBounds() const { return m_CameraBounds; }
-        
+
         bool EnableMovement = true;
         bool EnableRotation = true;
         bool EnableZoom = true;
