@@ -6,6 +6,8 @@
 
 namespace PurrKatEngine
 {
+    static constexpr uint32_t s_MaxFrameBufferSize = 8192; 
+    
     OpenGLFrameBuffer::OpenGLFrameBuffer(const FrameBufferSpecifications& specs)
         : m_FrameBufferSpecifications(specs)
     {
@@ -21,6 +23,18 @@ namespace PurrKatEngine
 
     void OpenGLFrameBuffer::Resize(uint32_t width, uint32_t height)
     {
+        if (width == 0 || height == 0)
+        {
+            PKE_CORE_WARN("Attempted to resize framebuffer to {0}, {1} which is an invalid size", width, height);
+            return;
+        }
+        
+        if (width > s_MaxFrameBufferSize || height > s_MaxFrameBufferSize)
+        {
+            PKE_CORE_WARN("Attempted to resize framebuffer to {0}, {1} which exceeds the maximum size of {2}, {3}", width, height, s_MaxFrameBufferSize, s_MaxFrameBufferSize);
+            return;
+        }
+        
         m_FrameBufferSpecifications.Width = width;
         m_FrameBufferSpecifications.Height = height;
         

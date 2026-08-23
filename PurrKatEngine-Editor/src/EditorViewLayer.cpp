@@ -141,7 +141,9 @@ namespace PurrKatEngine
     {
         Layer::OnEvent(event);
         
-        m_CameraController.OnEvent(event);
+        // Block window events because we already handle the viewport manually via ImGui.
+        if (!event.IsInCategory(EventCategoryApplication))
+            m_CameraController.OnEvent(event);
     }
 
     void EditorViewLayer::RenderEditorViewport()
