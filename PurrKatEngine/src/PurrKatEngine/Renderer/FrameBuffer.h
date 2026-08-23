@@ -24,11 +24,12 @@ namespace PurrKatEngine
         virtual void Bind() = 0;
         virtual void Unbind() = 0;
 
-        virtual void ScaleFrom(FrameBuffer& source) = 0;
+        virtual void ScaleFrom(const FrameBuffer& source) = 0;
         
         virtual uint32_t GetRendererID() const = 0;
         virtual uint32_t GetColorAttachmentRendererID() const = 0;
         virtual FrameBufferSpecifications& GetSpecifications() = 0;
+        virtual const FrameBufferSpecifications& GetSpecifications() const = 0;
 
         static void PrintTextureInfo(uint32_t textureID);
 

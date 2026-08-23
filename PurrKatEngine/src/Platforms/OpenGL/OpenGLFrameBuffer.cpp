@@ -178,7 +178,7 @@ namespace PurrKatEngine
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    void OpenGLFrameBuffer::ScaleFrom(FrameBuffer& source)
+    void OpenGLFrameBuffer::ScaleFrom(const FrameBuffer& source)
     {
         auto& src = source.GetSpecifications();
 
@@ -206,4 +206,5 @@ namespace PurrKatEngine
     uint32_t OpenGLFrameBuffer::GetColorAttachmentRendererID() const { return m_ColorAttachment; }
 
     FrameBufferSpecifications& OpenGLFrameBuffer::GetSpecifications() { return m_FrameBufferSpecifications; }
+    const FrameBufferSpecifications& OpenGLFrameBuffer::GetSpecifications() const { return m_FrameBufferSpecifications; }
 }

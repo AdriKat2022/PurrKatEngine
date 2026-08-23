@@ -9,7 +9,9 @@ namespace PurrKatEngine
         m_GrassSpriteSheet.SetTexture(Texture2D::CreateRef("assets/textures/TileSets/Grass.png", {.Filter = Texture2D::FilterType::Nearest}));
         m_GrassSpriteSheet.SetSpriteSheetOptions({.CellCount = {11, 7}});
 
-        m_FrameBuffer = FrameBuffer::CreateRef({.Width = 1280, .Height = 720});
+        m_UpScaledFrameBuffer = FrameBuffer::CreateRef({.Width = 1280, .Height = 720, .UpscalingFilterType = FilterType::Nearest});
+        m_FrameBuffer = FrameBuffer::CreateRef({.Width = 1280, .Height = 720, .UpscalingFilterType = FilterType::Nearest});
+        m_Cpp = Texture2D::CreateRef("assets/textures/cpp.png", { .Filter = Texture2D::FilterType::Nearest});
     }
 
     void EditorViewLayer::OnAttach()
@@ -31,6 +33,8 @@ namespace PurrKatEngine
 
         RenderEditorViewport();
     }
+
+    
 
     void EditorViewLayer::OnImGuiRender()
     {
@@ -98,6 +102,9 @@ namespace PurrKatEngine
             ImGui::EndMenuBar();
         }
 
+        static ImVec2 contentSize;
+        static glm::vec2 viewportSize;
+        
         // This will be where the Viewport of Editor is rendered.
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
         if (ImGui::Begin("Editor Viewport"))
@@ -105,19 +112,22 @@ namespace PurrKatEngine
             m_IsEditorViewportFocused = ImGui::IsWindowFocused();
             m_IsEditorViewportHovered = ImGui::IsWindowHovered();
             Application::Get().GetImGuiLayer().SetBlockEvents(!m_IsEditorViewportHovered || !m_IsEditorViewportFocused);
-            ImVec2 contentSize = ImGui::GetContentRegionAvail();
-            glm::vec2 viewportSize = {contentSize.x, contentSize.y};
+            contentSize = ImGui::GetContentRegionAvail();
+            viewportSize = {contentSize.x, contentSize.y};
             if (viewportSize != m_LastEditorViewportSize)
             {
                 m_LastEditorViewportSize = viewportSize;
-                m_FrameBuffer->Resize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+                
+                m_UpScaledFrameBuffer->Resize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+                m_FrameBuffer->Resize((uint32_t)(viewportSize.x/(float)m_UpScaleFactor), (uint32_t)(viewportSize.y/(float)m_UpScaleFactor));
                 m_CameraController.SetAspectRatio(viewportSize.x/viewportSize.y);
             }
             else
             {
                 // Rendering in the else branch helps decrease the flickering while resizing the viewport.
-                uint32_t textureID = m_FrameBuffer->GetColorAttachmentRendererID();
-                ImGui::Image(textureID, contentSize, {0, 1}, {1, 0});
+                m_UpScaledFrameBuffer->ScaleFrom(*m_FrameBuffer);
+                
+                ImGui::Image(m_UpScaledFrameBuffer->GetColorAttachmentRendererID(), contentSize, {0, 1}, {1, 0});
             }
         }
         ImGui::End();
@@ -128,6 +138,21 @@ namespace PurrKatEngine
             ImGui::Text("Editor Viewport Size: %.0f x %.0f", m_LastEditorViewportSize.x, m_LastEditorViewportSize.y);
             ImGui::ColorEdit4("Background Color", glm::value_ptr(m_BackgroundColor));
             ImGui::Text("Editor Viewport Receiving Events: %s", (!m_IsEditorViewportHovered || !m_IsEditorViewportFocused) ? "No" : "Yes");
+            if (ImGui::DragInt("Upscale Factor", &m_UpScaleFactor, 0.2f, 1, 40, "%i x"))
+            {
+                m_FrameBuffer->Resize((uint32_t)(m_LastEditorViewportSize.x/(float)m_UpScaleFactor), (uint32_t)(m_LastEditorViewportSize.y/(float)m_UpScaleFactor));
+                PKE_CORE_TRACE(
+                    "Viewport: {}x{} | FB: {}x{} | Texture: {} | Filter: {}",
+                    (uint32_t)contentSize.x,
+                    (uint32_t)contentSize.y,
+                    m_FrameBuffer->GetSpecifications().Width,
+                    m_FrameBuffer->GetSpecifications().Height,
+                    m_FrameBuffer->GetColorAttachmentRendererID(),
+                    m_FrameBuffer->GetSpecifications().UpscalingFilterType == FilterType::Linear
+                        ? "LINEAR"
+                        : "NEAREST"
+                );
+            }
         }
         ImGui::End();
 
@@ -155,9 +180,9 @@ namespace PurrKatEngine
         RenderCommand::Clear();
 
         Renderer2D::BeginScene(m_CameraController.GetCamera(), false);
-
         Renderer2D::DrawQuad({0.0f, 0.0f}, {1.0f, 1.0f});
-
+        Renderer2D::DrawQuad({1.0f, 1.0f}, {1.0f, 1.0f}, m_GrassSpriteSheet.GetSprite({0, 0}));
+        Renderer2D::DrawQuad({1.0f, 1.0f}, SET_WIDTH(m_Cpp, 1), m_Cpp);
         Renderer2D::EndScene();
 
         m_FrameBuffer->Unbind();
