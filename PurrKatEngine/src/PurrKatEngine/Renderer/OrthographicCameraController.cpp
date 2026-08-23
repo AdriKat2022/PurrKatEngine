@@ -34,9 +34,6 @@ namespace PurrKatEngine
         EventDispatcher dispatcher(e);
         dispatcher.Dispatch<MouseScrollEvent>(PKE_BIND_FUNCTION(OnMouseScroll));
         dispatcher.Dispatch<WindowResizeEvent>(PKE_BIND_FUNCTION(OnWindowResized));
-        
-        m_CameraMovementInputController.OnEvent(e);
-        m_CameraRotationInputController.OnEvent(e);
     }
 
     void OrthographicCameraController::HandleMovement()

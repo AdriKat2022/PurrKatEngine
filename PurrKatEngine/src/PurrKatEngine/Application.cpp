@@ -54,7 +54,7 @@ namespace PurrKatEngine
         {
             // De-increment, as we go backwards, starting at the top of the stack.
             (*--it)->OnEvent(e);
-            if (e.IsHandled()) break;
+            if (e.Handled) break;
         }
     }
 
