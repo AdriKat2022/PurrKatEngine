@@ -116,8 +116,6 @@ namespace PurrKatEngine
                         
                         opts.CellCount = {0,0};
                     }
-                    
-                    PKE_CORE_WARN("Use Cell Count: {}", useCellCount ? "true" : "false");
                 }
 
                 bool rebuildSprites = false;

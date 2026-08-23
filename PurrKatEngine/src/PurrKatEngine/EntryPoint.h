@@ -1,18 +1,17 @@
 ﻿#pragma once
 
+#include "PurrKatEngine/Application.h"
 #include "Logs/InternalLog.h"
 #include "Profiling/Profiler.h"
 
-constexpr const char* VERSION = "1.0";
-
 #ifdef PKE_PLATFORM_WINDOWS
 
-int main(int argc, char** argv)
+inline int main(int argc, char** argv)
 {
     PROFILE_SESSION_BEGIN("Startup", "Profiling-Startup.json");
     
     PurrKatEngine::InternalLog::Init();
-    PKE_CORE_TRACE("Using PurrKatEngine version <{}>", VERSION);
+    PKE_CORE_TRACE("Using PurrKatEngine version <{}>", PKE_VERSION_STR);
     auto app = PurrKatEngine::CreateApplication();
     
     PROFILE_SESSION_END();

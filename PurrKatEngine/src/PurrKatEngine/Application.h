@@ -2,7 +2,6 @@
 
 #include "Core.h"
 #include "Events/ApplicationEvents.h"
-#include "ImGui/ImGuiLayer.h"
 #include "Inputs/Time.h"
 #include "Layers/LayerStack.h"
 #include "Renderer/VertexArray.h"
@@ -10,12 +9,18 @@
 
 namespace PurrKatEngine
 {
+    class ImGuiLayer;
+    
+    #define PKE_VERSION 1.0
+    #define PKE_VERSION_STR "1.0"
+    constexpr const char* VERSION = "1.0";
+    
     class PKE_API Application
     {
-    public:
+    public:        
         static Application& Get() { return *s_Instance; }
         
-        Application();
+        Application(const std::string& appName = "PurrKatEngine v" PKE_VERSION_STR);
         virtual ~Application();
 
         void Run();
@@ -35,11 +40,15 @@ namespace PurrKatEngine
     private:
         static Application* s_Instance;
         
+        // std::string m_WindowName = "PurrKatEngine v" PKE_VERSION_STR;
+        
         bool m_IsMinimized = false;
         bool m_IsRunning = true;
         
         Scope<Window> m_Window;
         LayerStack m_LayerStack;
+        
+        // Default Layer Stacks
         ImGuiLayer* m_ImGuiLayer;
         TimeManagerLayer* m_TimeManagerLayer;
     };

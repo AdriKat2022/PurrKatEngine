@@ -14,9 +14,9 @@ namespace PurrKatEngine
         ~WindowsWindow() override;
 
         void OnUpdate() override;
-        
-        unsigned int GetWidth() const override { return m_Data.Width; }
-        unsigned int GetHeight() const override { return m_Data.Height; }
+
+        uint32_t GetWidth() const override { return m_Data.Width; }
+        uint32_t GetHeight() const override { return m_Data.Height; }
 
         std::string ToString() const { return (std::stringstream()<<m_Data.Title<<" Window : "<<GetWidth()<<"x"<<GetHeight()).str(); }
         bool IsVSync() const override { return m_Data.VSync; }
@@ -24,7 +24,7 @@ namespace PurrKatEngine
         void* GetNativeWindow() const override { return m_Window; }
         
         void SetEventCallback(const EventCallbackFunction& callback) override { m_Data.EventCallback = callback; }
-        void SetVSync(const bool enabled) override;
+        void SetVSync(bool enabled) override;
         void SetupGLFWCallbacks() const;
 
     private:

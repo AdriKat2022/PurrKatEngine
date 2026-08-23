@@ -9,7 +9,7 @@ namespace PurrKatEngine
     OpenGLFrameBuffer::OpenGLFrameBuffer(const FrameBufferSpecifications& specs)
         : m_FrameBufferSpecifications(specs)
     {
-        Invalidate();
+        OpenGLFrameBuffer::Invalidate();
     }
 
     OpenGLFrameBuffer::~OpenGLFrameBuffer()
@@ -20,26 +20,93 @@ namespace PurrKatEngine
     void OpenGLFrameBuffer::Invalidate()
     {
         // Recreate the whole state.
+        
+        if (m_RendererID)
+        {
+            // Delete previous state
+            glDeleteFramebuffers(1, &m_RendererID);
+            glDeleteTextures(1, &m_ColorAttachment);
+            glDeleteTextures(1, &m_DepthAttachment);
+            
+            m_RendererID = 0;
+            m_ColorAttachment = 0;
+            m_DepthAttachment = 0;
+        }
+        
         glCreateFramebuffers(1, &m_RendererID);
-        Bind();
-        
+
         glCreateTextures(GL_TEXTURE_2D, 1, &m_ColorAttachment);
-        glBindTexture(GL_TEXTURE_2D, m_ColorAttachment);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, (GLsizei)m_FrameBufferSpecifications.Width, (GLsizei)m_FrameBufferSpecifications.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_ColorAttachment, 0);
-        
+
+        glTextureStorage2D(
+            m_ColorAttachment,
+            1,
+            GL_RGBA8,
+            (GLsizei)m_FrameBufferSpecifications.Width,
+            (GLsizei)m_FrameBufferSpecifications.Height
+        );
+
+        glTextureParameteri(m_ColorAttachment, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTextureParameteri(m_ColorAttachment, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        glNamedFramebufferTexture(
+            m_RendererID,
+            GL_COLOR_ATTACHMENT0,
+            m_ColorAttachment,
+            0
+        );
+
         glCreateTextures(GL_TEXTURE_2D, 1, &m_DepthAttachment);
-        glBindTexture(GL_TEXTURE_2D, m_DepthAttachment);
-        glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH24_STENCIL8, (GLsizei)m_FrameBufferSpecifications.Width, (GLsizei)m_FrameBufferSpecifications.Height);
-        // glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, (GLsizei)m_FrameBufferSpecifications.Width, (GLsizei)m_FrameBufferSpecifications.Height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_DepthAttachment, 0);
+
+        glTextureStorage2D(
+            m_DepthAttachment,
+            1,
+            GL_DEPTH24_STENCIL8,
+            (GLsizei)m_FrameBufferSpecifications.Width,
+            (GLsizei)m_FrameBufferSpecifications.Height
+        );
+
+        glNamedFramebufferTexture(
+            m_RendererID,
+            GL_DEPTH_STENCIL_ATTACHMENT,
+            m_DepthAttachment,
+            0
+        );
         
-        PKE_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is incomplete!")
+        GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         
-        Unbind();
+        if (status != GL_FRAMEBUFFER_COMPLETE)
+        {
+            switch (status)
+            {
+                case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+                    PKE_CORE_ERROR("INCOMPLETE_ATTACHMENT");
+                    break;
+
+                case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+                    PKE_CORE_ERROR("INCOMPLETE_MISSING_ATTACHMENT");
+                    break;
+
+                case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+                    PKE_CORE_ERROR("INCOMPLETE_DRAW_BUFFER");
+                    break;
+
+                case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
+                    PKE_CORE_ERROR("INCOMPLETE_READ_BUFFER");
+                    break;
+
+                case GL_FRAMEBUFFER_UNSUPPORTED:
+                    PKE_CORE_ERROR("UNSUPPORTED");
+                    break;
+
+                case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
+                    PKE_CORE_ERROR("INCOMPLETE_MULTISAMPLE");
+                    break;
+
+                default:
+                    PKE_CORE_ERROR("Unknown framebuffer error: {}", status);
+                    break;
+            }
+        }
     }
 
     void OpenGLFrameBuffer::Bind()

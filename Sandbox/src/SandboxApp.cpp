@@ -1,7 +1,6 @@
 #include <PurrKatEngine.h>
 #include <PurrKatEngine/EntryPoint.h>
 
-#include "EditorViewLayer.h"
 #include "Sandbox2DLightTestScene.h"
 #include "Sandbox2DMapTiling.h"
 
@@ -13,11 +12,9 @@ public:
         PKE_LOG_TRACE("Sandbox application start. Hey, that's me! A log from the client!");
         // PushLayer(new Sandbox2DLightTestScene());
         
-        // auto texture = PurrKatEngine::Texture2D::CreateRef("assets/textures/TileSets/Tilled_Dirt_Wide.png", { .Filter = PurrKatEngine::Texture2D::FilterType::Nearest });
-        // PushLayer(new PurrKatEngine::SpriteSheetLayerDebugging(texture));
-        
-        PushLayer(new EditorViewLayer());
+        auto texture = PurrKatEngine::Texture2D::CreateRef("assets/textures/TileSets/Tilled_Dirt_Wide.png", { .Filter = PurrKatEngine::Texture2D::FilterType::Nearest });
+        PushLayer(new PurrKatEngine::SpriteSheetLayerDebugging(texture));
     }
 };
 
-RUN_CLASS(SandboxApp);
+PKE_RUN_CLASS(SandboxApp);

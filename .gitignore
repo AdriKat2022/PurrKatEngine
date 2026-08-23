@@ -9,3 +9,4 @@
 *.vcxproj.filters
 *.log
 *.sln
+Profiling-*.json

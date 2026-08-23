@@ -62,13 +62,12 @@ namespace PurrKatEngine
     void ImGuiLayer::OnDetach()
     {
         Layer::OnDetach();
+        
         // We may encounter issues if we detach an ImGuiLayer while there are still others.
         ImGui_ImplOpenGL3_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
     }
-
-    static bool show = true;
     
     void ImGuiLayer::OnImGuiRender()
     {

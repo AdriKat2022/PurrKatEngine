@@ -2,7 +2,7 @@
 
 #include "Application.h"
 
-#include "Components/Standard2DInputController.h"
+#include "ImGui/ImGuiLayer.h"
 #include "Inputs/Time.h"
 #include "Logs/InternalLog.h"
 #include "Profiling/Profiler.h"
@@ -13,19 +13,24 @@ namespace PurrKatEngine
 {
     Application* Application::s_Instance = nullptr;
 
-    Application::Application()
+    Application::Application(const std::string& appName)
     {
         PROFILE_FUNCTION();
         
         PKE_CORE_ASSERT(s_Instance == nullptr, "An application already exists.")
         s_Instance = this;
         
-        m_Window = Scope<Window>(Window::Create());
+        m_Window = CreateScope(Window::Create({ .Title = appName }));
         m_Window->SetEventCallback(PKE_BIND_FUNCTION(OnEvent));
 
         Renderer::Init();
         
+        // TimeManagerLayer's got a special treatment
+        // We handle it manually in the update loop instead of handing it over the layer stack system.
         m_TimeManagerLayer = new TimeManagerLayer();
+        
+        // Same for the imgui layer, but we need the onAttach/onDetach methods
+        // We could call them also manually, but it's cleaner to leave that to the layer stack system to handle.
         m_ImGuiLayer = new ImGuiLayer();
         PushOverlay(m_ImGuiLayer);
     }
@@ -36,6 +41,8 @@ namespace PurrKatEngine
 
     void Application::OnEvent(Event& e)
     {
+        PROFILE_FUNCTION();
+        
         // PKE_CORE_TRACE("EVENT: {}", e.ToString());
 
         EventDispatcher dispatcher(e);
@@ -78,19 +85,23 @@ namespace PurrKatEngine
                 m_ImGuiLayer->End();
             }
 
-            PROFILE_SCOPE("Window Update");
-            m_Window->OnUpdate();
+            {
+                PROFILE_SCOPE("Window Update");
+                m_Window->OnUpdate();
+            }
         }
     }
 
     void Application::PushLayer(Layer* layer)
     {
+        PROFILE_FUNCTION();
         m_LayerStack.PushLayer(layer);
         layer->OnAttach();
     }
 
     void Application::PushOverlay(Layer* overlay)
     {
+        PROFILE_FUNCTION();
         m_LayerStack.PushOverlay(overlay);
         overlay->OnAttach();
     }

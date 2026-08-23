@@ -18,7 +18,7 @@ namespace PurrKatEngine
         PKE_CORE_ERROR("GLFW Error ({}) {}", errorCode, description);
     }
     
-    CREATE_WINDOW_SETUP(WindowsWindow)
+    PKE_CREATE_WINDOW_SETUP(WindowsWindow)
 
     WindowsWindow::WindowsWindow(const WindowProps& props)
     {
@@ -30,7 +30,7 @@ namespace PurrKatEngine
         WindowsWindow::Shutdown();
     }
 
-    void WindowsWindow::SetVSync(const bool enabled)
+    void WindowsWindow::SetVSync(bool enabled)
     {
         glfwSwapInterval(enabled ? 1 : 0);
         

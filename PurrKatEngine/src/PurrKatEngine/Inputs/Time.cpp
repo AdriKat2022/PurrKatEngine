@@ -29,7 +29,6 @@ namespace PurrKatEngine
         Time::time = glfwGetTime();
         Time::deltaTime = Time::time - Time::lastFrameTime;
         Time::lastFrameTime = Time::time;
-        // PKE_CORE_DEBUG("Time: {}, Delta Time: {}", Time::time, Time::deltaTime);
     }
 
     void TimeManagerLayer::OnImGuiRender()
