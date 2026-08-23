@@ -5,7 +5,7 @@ namespace PurrKatEngine
 {
     class EditorViewLayer : public Layer
     {
-        public:
+    public:
         EditorViewLayer();
 
         void OnAttach() override;
@@ -14,9 +14,14 @@ namespace PurrKatEngine
         void OnImGuiRender() override;
         void OnEvent(Event& event) override;
 
-        private:
+    private:
+        void RenderEditorViewport();
+        
+    private:
         glm::vec4 m_BackgroundColor{0.1f, 0.1f, 0.1f, 1.0f};
         glm::vec2 m_LastEditorViewportSize;
+        bool m_IsEditorViewportFocused = false;
+        bool m_IsEditorViewportHovered = false;
 
         Ref<FrameBuffer> m_FrameBuffer;
 

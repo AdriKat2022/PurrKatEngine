@@ -30,7 +30,7 @@ namespace PurrKatEngine
     public:
         OrthographicCameraController();
         OrthographicCameraController(float aspectRatio, float zoomLevel, bool useScrollToZoom);
-        
+
         OrthographicCamera& GetCamera() { return m_Camera; }
 
         void OnUpdate();
@@ -52,6 +52,8 @@ namespace PurrKatEngine
         AspectRatioAdjustmentMode AspectRatioAdjustment = AspectRatioAdjustmentMode::MatchHeight;
         
     private:
+        void HandleMovement();
+        void HandleRotation();
         bool OnMouseScroll(MouseScrollEvent& e);
         bool OnWindowResized(WindowResizeEvent& e);
         void UpdateCameraProjection();
@@ -62,8 +64,5 @@ namespace PurrKatEngine
         float m_CameraRotation = 0;
         OrthographicCameraBounds m_CameraBounds;
         OrthographicCamera m_Camera;
-        
-        Standard2DInputController m_CameraMovementInputController;
-        Standard1DInputController m_CameraRotationInputController;
     };
 }

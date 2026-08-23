@@ -25,21 +25,11 @@ namespace PurrKatEngine
     void EditorViewLayer::OnUpdate()
     {
         Layer::OnUpdate();
-        m_CameraController.OnUpdate();
+        
+        if (m_IsEditorViewportFocused && m_IsEditorViewportHovered)
+            m_CameraController.OnUpdate();
 
-        // Render in Frame Buffer
-        m_FrameBuffer->Bind();
-
-        RenderCommand::SetClearColor(m_BackgroundColor);
-        RenderCommand::Clear();
-
-        Renderer2D::BeginScene(m_CameraController.GetCamera(), false);
-
-        Renderer2D::DrawQuad({0.0f, 0.0f}, {1.0f, 1.0f});
-
-        Renderer2D::EndScene();
-
-        m_FrameBuffer->Unbind();
+        RenderEditorViewport();
     }
 
     void EditorViewLayer::OnImGuiRender()
@@ -112,6 +102,9 @@ namespace PurrKatEngine
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
         if (ImGui::Begin("Editor Viewport"))
         {
+            m_IsEditorViewportFocused = ImGui::IsWindowFocused();
+            m_IsEditorViewportHovered = ImGui::IsWindowHovered();
+            Application::Get().GetImGuiLayer().SetBlockEvents(!m_IsEditorViewportHovered || !m_IsEditorViewportFocused);
             ImVec2 contentSize = ImGui::GetContentRegionAvail();
             glm::vec2 viewportSize = {contentSize.x, contentSize.y};
             if (viewportSize != m_LastEditorViewportSize)
@@ -132,8 +125,9 @@ namespace PurrKatEngine
 
         if (ImGui::Begin("Editor Viewport Properties"))
         {
-            ImGui::Text("Viewport Size: %.0f x %.0f", m_LastEditorViewportSize.x, m_LastEditorViewportSize.y);
+            ImGui::Text("Editor Viewport Size: %.0f x %.0f", m_LastEditorViewportSize.x, m_LastEditorViewportSize.y);
             ImGui::ColorEdit4("Background Color", glm::value_ptr(m_BackgroundColor));
+            ImGui::Text("Editor Viewport Receiving Events: %s", (!m_IsEditorViewportHovered || !m_IsEditorViewportFocused) ? "No" : "Yes");
         }
         ImGui::End();
 
@@ -146,6 +140,24 @@ namespace PurrKatEngine
     void EditorViewLayer::OnEvent(Event& event)
     {
         Layer::OnEvent(event);
+        
         m_CameraController.OnEvent(event);
+    }
+
+    void EditorViewLayer::RenderEditorViewport()
+    {
+        // Render in Frame Buffer
+        m_FrameBuffer->Bind();
+
+        RenderCommand::SetClearColor(m_BackgroundColor);
+        RenderCommand::Clear();
+
+        Renderer2D::BeginScene(m_CameraController.GetCamera(), false);
+
+        Renderer2D::DrawQuad({0.0f, 0.0f}, {1.0f, 1.0f});
+
+        Renderer2D::EndScene();
+
+        m_FrameBuffer->Unbind();
     }
 }

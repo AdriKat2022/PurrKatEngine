@@ -31,6 +31,7 @@ namespace PurrKatEngine
         
         void QuitApplication();
         
+        ImGuiLayer& GetImGuiLayer() const { return *m_ImGuiLayer; }
         Window& GetWindow() const { return *m_Window; }
         
     protected:

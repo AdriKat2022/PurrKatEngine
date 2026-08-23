@@ -1,6 +1,7 @@
 ﻿#include "pkepch.h"
 #include "OrthographicCameraController.h"
 
+#include "PurrKatEngine/Inputs/Input.h"
 #include "PurrKatEngine/Inputs/Time.h"
 #include "PurrKatEngine/Utility/ImGuiUtility.h"
 
@@ -8,26 +9,7 @@ namespace PurrKatEngine
 {
     OrthographicCameraController::OrthographicCameraController()
         : m_CameraBounds({.Left = -m_AspectRatio * m_ZoomLevel, .Right = m_AspectRatio * m_ZoomLevel, .Top = m_ZoomLevel, .Bottom = -m_ZoomLevel}),
-          m_Camera(m_CameraBounds.Left, m_CameraBounds.Right, m_CameraBounds.Bottom, m_CameraBounds.Top),
-          m_CameraMovementInputController([&](glm::vec2 input)
-          {
-              auto camPos = m_Camera.GetPosition();
-              
-              camPos.x += (
-                  cos(m_CameraRotation) * input.x
-                  -sin(m_CameraRotation) * input.y
-              ) * (float)Time::deltaTime * m_ZoomLevel;
-              camPos.y += (
-                  cos(m_CameraRotation) * input.y +
-                  sin(m_CameraRotation) * input.x
-              ) * (float)Time::deltaTime * m_ZoomLevel;
-              
-              m_Camera.SetPosition(camPos);
-          }, KeyCode::A, KeyCode::D, KeyCode::S, KeyCode::W),
-          m_CameraRotationInputController([this](float input)
-          {
-              m_CameraRotation += input * (float)Time::deltaTime;
-          }, KeyCode::Q, KeyCode::E)
+          m_Camera(m_CameraBounds.Left, m_CameraBounds.Right, m_CameraBounds.Bottom, m_CameraBounds.Top)
     {}
 
     OrthographicCameraController::OrthographicCameraController(float aspectRatio, float zoomLevel, bool useScrollToZoom)
@@ -35,42 +17,18 @@ namespace PurrKatEngine
           m_AspectRatio(aspectRatio),
           m_ZoomLevel(zoomLevel),
           m_CameraBounds({.Left = -m_AspectRatio * m_ZoomLevel, .Right = m_AspectRatio * m_ZoomLevel, .Top = m_ZoomLevel, .Bottom = -m_ZoomLevel}),
-          m_Camera(m_CameraBounds.Left, m_CameraBounds.Right, m_CameraBounds.Bottom, m_CameraBounds.Top),
-          m_CameraMovementInputController([&](glm::vec2 input)
-          {
-              auto camPos = m_Camera.GetPosition();
-              
-              camPos.x += (
-                  cos(m_CameraRotation) * input.x
-                  -sin(m_CameraRotation) * input.y
-              ) * (float)Time::deltaTime * m_ZoomLevel;
-              camPos.y += (
-                  cos(m_CameraRotation) * input.y +
-                  sin(m_CameraRotation) * input.x
-              ) * (float)Time::deltaTime * m_ZoomLevel;
-              
-              m_Camera.SetPosition(camPos);
-          }, KeyCode::A, KeyCode::D, KeyCode::S, KeyCode::W),
-          m_CameraRotationInputController([this](float input)
-          {
-              m_CameraRotation += input * (float)Time::deltaTime;
-          }, KeyCode::Q, KeyCode::E)
+          m_Camera(m_CameraBounds.Left, m_CameraBounds.Right, m_CameraBounds.Bottom, m_CameraBounds.Top)
     {}
 
     void OrthographicCameraController::OnUpdate()
     {
         if (EnableMovement)
-        {
-            m_CameraMovementInputController.OnUpdate();
-        }
+            HandleMovement();
         
         if (EnableRotation)
-        {
-            m_CameraRotationInputController.OnUpdate();
-            m_Camera.SetZRotation(m_CameraRotation);
-        }
+            HandleRotation();
     }
-    
+
     void OrthographicCameraController::OnEvent(Event& e)
     {
         EventDispatcher dispatcher(e);
@@ -79,6 +37,31 @@ namespace PurrKatEngine
         
         m_CameraMovementInputController.OnEvent(e);
         m_CameraRotationInputController.OnEvent(e);
+    }
+
+    void OrthographicCameraController::HandleMovement()
+    {
+        auto camPos = m_Camera.GetPosition();
+        auto input = Input::GetAxis2D(KeyCode::W, KeyCode::A, KeyCode::S, KeyCode::D);
+        
+        camPos.x += (
+            cos(m_CameraRotation) * input.x
+            -sin(m_CameraRotation) * input.y
+        ) * (float)Time::deltaTime * m_ZoomLevel;
+        
+        camPos.y += (
+            cos(m_CameraRotation) * input.y +
+            sin(m_CameraRotation) * input.x
+        ) * (float)Time::deltaTime * m_ZoomLevel;
+              
+        m_Camera.SetPosition(camPos);
+    }
+    
+    void OrthographicCameraController::HandleRotation()
+    {
+        auto input = Input::GetAxis(KeyCode::Q, KeyCode::E);
+        m_CameraRotation += input * (float)Time::deltaTime;
+        m_Camera.SetZRotation(m_CameraRotation);
     }
 
     bool OrthographicCameraController::OnMouseScroll(MouseScrollEvent& e)

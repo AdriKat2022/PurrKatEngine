@@ -54,10 +54,10 @@ namespace PurrKatEngine
         virtual std::string ToString() const { return GetName(); }
 
         bool IsInCategory(const EventCategory category) const { return GetCategoryFlags() & category; }
-        bool IsHandled() const { return m_Handled; }
         
-    protected:
-        bool m_Handled = false;
+    public:
+        bool Handled = false;
+        
     };
 
     class EventDispatcher
@@ -77,7 +77,7 @@ namespace PurrKatEngine
         {
             if (m_Event.GetEventType() == T::GetStaticType())
             {
-                m_Event.m_Handled = eventFunction(static_cast<T&>(m_Event));
+                m_Event.Handled = eventFunction(static_cast<T&>(m_Event));
                 return true;
             }
             return false;

@@ -13,5 +13,9 @@ namespace PurrKatEngine
         static double GetMouseX();
         static double GetMouseY();
         static glm::dvec2 GetMousePosition();
+        
+        // Utility (premade)
+        static float GetAxis(KeyCode negativeKey, KeyCode positiveKey);
+        static glm::vec2 GetAxis2D(KeyCode upKey, KeyCode leftKey, KeyCode downKey, KeyCode rightKey);
     };
 }

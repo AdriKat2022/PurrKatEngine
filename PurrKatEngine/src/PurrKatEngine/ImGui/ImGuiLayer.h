@@ -12,12 +12,14 @@ namespace PurrKatEngine
 
         void OnAttach() override;
         void OnDetach() override;
-        void OnImGuiRender() override;
-
+        void OnEvent(Event& event) override;
         void Begin();
         void End();
         
+        void SetBlockEvents(bool blockEvents) { m_BlockEvents = blockEvents; }
+        
     private:
+        bool m_BlockEvents = false;
         float m_Time = 0.0f;
     };
 }
