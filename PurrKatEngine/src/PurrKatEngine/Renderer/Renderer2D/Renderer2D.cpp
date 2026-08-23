@@ -193,34 +193,34 @@ namespace PurrKatEngine
 
     void Renderer2D::DrawQuad(const DrawOptions& drawOptions)
     {
-        DrawQuadInternal({drawOptions.Position.x, drawOptions.Position.y, 0}, drawOptions.Size, drawOptions.Rotation, drawOptions.Texture, drawOptions.UVTiling, drawOptions.Color);
+        DrawQuadInternal({drawOptions.Position.x, drawOptions.Position.y, 0}, drawOptions.Size, drawOptions.Texture, drawOptions.UVTiling, drawOptions.Color);
     }
 
     void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
     {
-        DrawQuadInternal({ position.x, position.y, 0}, size, 0, {}, {1, 1}, color);
+        DrawQuadInternal({ position.x, position.y, 0}, size, {}, {1, 1}, color);
     }
 
     void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
     {
-        DrawQuadInternal(position, size, 0, {}, {1, 1}, color);
+        DrawQuadInternal(position, size, {}, {1, 1}, color);
     }
 
     void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Tex2D& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor)
     {
-        DrawQuadInternal({ position.x, position.y, 0}, size, 0, texture, uvTiling, tintColor);
+        DrawQuadInternal({ position.x, position.y, 0}, size, texture, uvTiling, tintColor);
     }
     
     void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Tex2D& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor)
     {
-        DrawQuadInternal(position, size, 0, texture, uvTiling, tintColor);
+        DrawQuadInternal(position, size, texture, uvTiling, tintColor);
     }
 
     void Renderer2D::DrawQuad(const Transform& transform, const Tex2D& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor)
     {
         auto position = transform.GetPosition();
         auto size = transform.GetScale();
-        DrawQuadInternal(position, size, 0, texture, uvTiling, tintColor);
+        DrawQuadInternal(position, size, texture, uvTiling, tintColor);
     }
 
     void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Tex2D& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor)
@@ -248,7 +248,7 @@ namespace PurrKatEngine
     
     // ################## UTILITY FUNCTIONS ####################
     
-    void Renderer2D::DrawQuadInternal(const glm::vec3& position, const glm::vec2& size, float rotation, const Tex2D& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor)
+    void Renderer2D::DrawQuadInternal(const glm::vec3& position, const glm::vec2& size, const Tex2D& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor)
     {
         float textureIndex = GetOrCreateTextureIndex(texture);
         

@@ -13,7 +13,10 @@ namespace PurrKatEngine
         void Invalidate() override;
         void Bind() override;
         void Unbind() override;
+
+        void ScaleFrom(FrameBuffer& source) override;
         
+        uint32_t GetRendererID() const override;
         uint32_t GetColorAttachmentRendererID() const override;
         FrameBufferSpecifications& GetSpecifications() override;
 

@@ -10,10 +10,10 @@ public:
     SandboxApp()
     {
         PKE_LOG_TRACE("Sandbox application start. Hey, that's me! A log from the client!");
-        // PushLayer(new Sandbox2DLightTestScene());
+        PushLayer(new Sandbox2DLightTestScene());
         
-        auto texture = PurrKatEngine::Texture2D::CreateRef("assets/textures/TileSets/Tilled_Dirt_Wide.png", { .Filter = PurrKatEngine::Texture2D::FilterType::Nearest });
-        PushLayer(new PurrKatEngine::SpriteSheetLayerDebugging(texture));
+        // auto texture = PurrKatEngine::Texture2D::CreateRef("assets/textures/TileSets/Tilled_Dirt_Wide.png", { .Filter = PurrKatEngine::Texture2D::FilterType::Nearest });
+        // PushLayer(new PurrKatEngine::SpriteSheetLayerDebugging(texture));
     }
 };
 

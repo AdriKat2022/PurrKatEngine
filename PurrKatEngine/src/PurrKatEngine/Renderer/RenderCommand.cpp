@@ -1,12 +1,15 @@
 ﻿#include "pkepch.h"
 #include "RenderCommand.h"
 
+#include "glad/glad.h"
 #include "Platforms/OpenGL/OpenGLRendererAPI.h"
 
 namespace PurrKatEngine
 {
     RendererAPI* RenderCommand::s_RendererAPI = new OpenGLRendererAPI();
 
+    
+    
     void RenderCommand::Init()
     {
         s_RendererAPI->Init();
@@ -40,5 +43,27 @@ namespace PurrKatEngine
     void RenderCommand::DisableDepthTest()
     {
         s_RendererAPI->DisableDepthTest();
+    }
+
+    // TEMP
+    void RenderCommand::BlitFramebuffer(uint32_t framebuffer, uint32_t sourceWidth, uint32_t sourceHeight, uint32_t destinationWidth, uint32_t destinationHeight)
+    {
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
+        glBlitFramebuffer(
+            0, 0,
+            sourceWidth,
+            sourceHeight,
+
+            0, 0,
+            destinationWidth,
+            destinationHeight,
+
+            GL_COLOR_BUFFER_BIT,
+            GL_NEAREST
+        );
+
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
     }
 }

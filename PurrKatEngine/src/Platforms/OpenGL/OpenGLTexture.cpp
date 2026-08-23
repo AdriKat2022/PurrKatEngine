@@ -18,7 +18,7 @@ namespace PurrKatEngine
         
         auto filter = textureOptions.Filter == FilterType::Linear ? GL_LINEAR : GL_NEAREST;
         
-        glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, filter);
         glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, filter);
 
         glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -60,7 +60,7 @@ namespace PurrKatEngine
         
         auto filter = textureOptions.Filter == FilterType::Linear ? GL_LINEAR : GL_NEAREST;
         
-        glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, filter);
         glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, filter);
 
         glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);

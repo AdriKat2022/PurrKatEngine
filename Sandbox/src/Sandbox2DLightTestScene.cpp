@@ -40,6 +40,11 @@ Sandbox2DLightTestScene::Sandbox2DLightTestScene() :
     m_Particle.SizeVariation = 0.5f;
     m_Particle.SizeBegin = 0.7f;
     m_Particle.SizeEnd = 0;
+    
+    m_FrameBuffer = FrameBuffer::CreateRef({
+        .Width = Application::Get().GetWindow().GetWidth()/m_Upscaling,
+        .Height = Application::Get().GetWindow().GetHeight()/m_Upscaling,
+        .UpscalingFilterType = FilterType::Nearest});
 }
 
 void Sandbox2DLightTestScene::OnAttach()
@@ -74,6 +79,7 @@ void Sandbox2DLightTestScene::OnUpdate()
         active = true;
     }
     
+    m_FrameBuffer->Bind();
     LightSource2D mouseLightSource;
     
     {
@@ -161,8 +167,7 @@ void Sandbox2DLightTestScene::OnUpdate()
         if (Input::IsMouseButtonPressed(PKE_BUTTON_MouseLeft))
         {
             auto mousePos = Input::GetMousePosition();
-            auto worldPos = m_CameraController.GetCamera().ScreenToWorldPosition(mousePos);
-            
+            glm::vec3 worldPos = m_CameraController.GetCamera().ScreenToWorldPosition(mousePos);
             
             m_Particle.Position = { worldPos.x, worldPos.y };
             for (int i = 0; i<emission; i++)
@@ -177,6 +182,15 @@ void Sandbox2DLightTestScene::OnUpdate()
         ADD_DEBUG_CONTROL(m_Particle.ColorEnd);
     }
 
+    m_FrameBuffer->Unbind();
+    
+    RenderCommand::BlitFramebuffer(
+        m_FrameBuffer->GetRendererID(),
+        m_FrameBuffer->GetSpecifications().Width,
+        m_FrameBuffer->GetSpecifications().Height,
+        Application::Get().GetWindow().GetWidth(),
+        Application::Get().GetWindow().GetHeight()
+    );
 }
 
 void Sandbox2DLightTestScene::OnImGuiRender()
@@ -217,12 +231,9 @@ void Sandbox2DLightTestScene::OnImGuiRender()
         
         ImGui::Separator();
         
-        
-        
         // ImGuiUtility::SliderInt("Max Particle Count", &m_ParticleSystem, &ParticleSystem::GetMaxParticleCount, &ParticleSystem::SetMaxParticleCount, 0, 5000);
-        
-        ImGui::SliderFloat4("TexMin", (float*)m_Cross.GetTexCoordsPtr(), 0.0f, 1.0f);
-        ImGui::SliderFloat4("TexMax", ((float*)m_Cross.GetTexCoordsPtr()+4), 0.0f, 1.0f);
+        if (ImGui::DragInt("Upscaling", &m_Upscaling, 0.5f, 1, 40, "%i x"))
+            m_FrameBuffer->Resize(Application::Get().GetWindow().GetWidth()/m_Upscaling, Application::Get().GetWindow().GetHeight()/m_Upscaling);
         
         static constexpr std::array<const char*, 3> aspectRatioOptions = {"None", "Match Width", "Match Height"};
         ImGuiUtility::EnumCombo("Camera Auto Adjust Aspect Ratio", m_CameraController.AspectRatioAdjustment, aspectRatioOptions);
@@ -233,7 +244,7 @@ void Sandbox2DLightTestScene::OnImGuiRender()
     }
     ImGui::End();
     
-    static bool profiling = true;
+    static bool profiling = false;
     if (ImGui::Begin("Profiling", &profiling, ImGuiWindowFlags_AlwaysAutoResize))
     {
         PROFILE_IMGUI_DISPLAY();

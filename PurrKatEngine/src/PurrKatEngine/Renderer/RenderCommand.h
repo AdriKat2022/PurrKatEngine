@@ -16,6 +16,14 @@ namespace PurrKatEngine
         
         static void EnableDepthTest();
         static void DisableDepthTest();
+        
+        static void BlitFramebuffer(
+            uint32_t framebuffer,
+            uint32_t sourceWidth,
+            uint32_t sourceHeight,
+            uint32_t destinationWidth,
+            uint32_t destinationHeight
+        );
 
     private:
         static RendererAPI* s_RendererAPI;

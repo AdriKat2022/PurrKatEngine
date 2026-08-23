@@ -35,17 +35,14 @@ namespace PurrKatEngine
     using Ref = std::shared_ptr<T>;
     
     template<typename T, typename... Args>
-    Ref<T> MakeRef(Args&&... args)
-    {
-        return std::make_shared<T>(std::forward<Args>(args)...);
-    }
+    Ref<T> MakeRef(Args&&... args) { return std::make_shared<T>(std::forward<Args>(args)...); }
     
-    template<typename T, typename... Args>
+    template<typename T>
     Ref<T> CreateRef(T* obj) { return Ref<T>(obj); }
     
     template<typename T>
     using Scope = std::unique_ptr<T>;
     
-    template<typename T, typename... Args>
+    template<typename T>
     Scope<T> CreateScope(T* obj) { return Scope<T>(obj); }
 }

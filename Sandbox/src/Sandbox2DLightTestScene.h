@@ -49,4 +49,7 @@ private:
     PKE::Tex2D m_Cross;
 
     PKE::ShaderLibrary m_ShaderLibrary;
+    PKE::Ref<PKE::FrameBuffer> m_FrameBuffer;
+    
+    int m_Upscaling = 1;
 };

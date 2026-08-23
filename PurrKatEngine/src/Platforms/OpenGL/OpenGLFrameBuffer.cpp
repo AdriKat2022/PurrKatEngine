@@ -8,6 +8,40 @@ namespace PurrKatEngine
 {
     static constexpr uint32_t s_MaxFrameBufferSize = 8192; 
     
+    void FrameBuffer::PrintTextureInfo(uint32_t textureID)
+    {
+        GLint minFilter;
+        GLint magFilter;
+
+        glGetTextureParameteriv(
+            textureID,
+            GL_TEXTURE_MIN_FILTER,
+            &minFilter
+        );
+
+        glGetTextureParameteriv(
+            textureID,
+            GL_TEXTURE_MAG_FILTER,
+            &magFilter
+        );
+
+        PKE_CORE_TRACE(
+            "FB texture {}: min={}, mag={}",
+            textureID,
+            minFilter,
+            magFilter
+        );
+        
+        GLint viewport[4];
+        glGetIntegerv(GL_VIEWPORT, viewport);
+
+        PKE_CORE_TRACE(
+            "OpenGL viewport: {}x{}",
+            viewport[2],
+            viewport[3]
+        );
+    }
+    
     OpenGLFrameBuffer::OpenGLFrameBuffer(const FrameBufferSpecifications& specs)
         : m_FrameBufferSpecifications(specs)
     {
@@ -68,8 +102,9 @@ namespace PurrKatEngine
             (GLsizei)m_FrameBufferSpecifications.Height
         );
 
-        glTextureParameteri(m_ColorAttachment, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTextureParameteri(m_ColorAttachment, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        auto filter = m_FrameBufferSpecifications.UpscalingFilterType == FilterType::Linear ? GL_LINEAR : GL_NEAREST;
+        glTextureParameteri(m_ColorAttachment, GL_TEXTURE_MIN_FILTER, filter);
+        glTextureParameteri(m_ColorAttachment, GL_TEXTURE_MAG_FILTER, filter);
 
         glNamedFramebufferTexture(
             m_RendererID,
@@ -142,6 +177,31 @@ namespace PurrKatEngine
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
+
+    void OpenGLFrameBuffer::ScaleFrom(FrameBuffer& source)
+    {
+        auto& src = source.GetSpecifications();
+
+        const GLsizei srcWidth  = (GLsizei)src.Width;
+        const GLsizei srcHeight = (GLsizei)src.Height;
+
+        const GLsizei dstWidth = (GLsizei)m_FrameBufferSpecifications.Width;
+        const GLsizei dstHeight = (GLsizei)m_FrameBufferSpecifications.Height;
+
+        glBindFramebuffer(GL_READ_FRAMEBUFFER,(GLuint)source.GetRendererID());
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER,m_RendererID);
+
+        glBlitFramebuffer(
+            0, 0, srcWidth, srcHeight,
+            0, 0, dstWidth, dstHeight,
+            GL_COLOR_BUFFER_BIT, m_FrameBufferSpecifications.UpscalingFilterType == FilterType::Linear ? GL_LINEAR : GL_NEAREST
+        );
+
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    }
+
+    uint32_t OpenGLFrameBuffer::GetRendererID() const { return m_RendererID; }
 
     uint32_t OpenGLFrameBuffer::GetColorAttachmentRendererID() const { return m_ColorAttachment; }
 

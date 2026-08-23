@@ -79,11 +79,11 @@ namespace PurrKatEngine
                 return DebugControl::Type::Bool;
             else if constexpr (std::is_same_v<U, std::string>)
                 return DebugControl::Type::String;
-            else if constexpr (std::is_convertible_v<U, glm::vec2>)
+            else if constexpr (std::is_assignable_v<U, glm::vec2>)
                 return DebugControl::Type::Vec2;
-            else if constexpr (std::is_convertible_v<U, glm::vec3>)
+            else if constexpr (std::is_assignable_v<U, glm::vec3>)
                 return DebugControl::Type::Vec3;
-            else if constexpr (std::is_convertible_v<U, glm::vec4>)
+            else if constexpr (std::is_assignable_v<U, glm::vec4>)
                 return DebugControl::Type::Vec4;
             else
             {
