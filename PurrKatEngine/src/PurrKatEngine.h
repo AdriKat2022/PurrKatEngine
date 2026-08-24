@@ -23,8 +23,10 @@
 #include "PurrKatEngine/Renderer/Renderer2D/Renderer2D.h"
 #include "PurrKatEngine/Scene/Components.h"
 #include "PurrKatEngine/Scene/Entity.h"
+#include "PurrKatEngine/Scene/ScriptableEntity.h"
 #include "PurrKatEngine/Utility/EventAction.h"
 #include "PurrKatEngine/Utility/ImGuiUtility.h"
+#include "PurrKatEngine/Utility/Random.h"
 
 // --- USER ENTRY POINT MACROS --- 
 // You will need to separately include the "EntryPoint.h" header file in your main.cpp file, preferably where you use these macros.

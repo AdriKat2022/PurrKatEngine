@@ -16,11 +16,65 @@ namespace PurrKatEngine
         m_SquareEntity = m_ActiveScene.CreateEntity("Square");
         m_SquareEntity.AddComponent<SpriteComponent>(glm::vec4{1.0f, 0, 0, 1.0f});
         
+        class CameraController : public ScriptableEntity
+        {
+        public:
+            bool EnableMovement = true;
+            bool EnableRotation = true;
+            
+            void OnStart() override
+            {
+                PKE_CORE_DEBUG("ON START!");
+                glm::mat4& transform = GetComponent<TransformComponent>();
+                SceneCamera& cam = GetComponent<CameraComponent>();
+                cam.SetOrthographicSize(Random::Float(0.5f, 15.0f));
+            }
+            
+            void OnUpdate() override
+            {
+                glm::mat4& transform = GetComponent<TransformComponent>();
+                SceneCamera& cam = GetComponent<CameraComponent>();
+                
+                float camRotation = 0;
+                
+                if (EnableMovement)
+                {
+                    glm::vec2 camPos = { transform[3][0], transform[3][1] };
+                    
+                    auto input = Input::GetAxis2D(KeyCode::W, KeyCode::A, KeyCode::S, KeyCode::D);
+        
+                    camPos.x += (
+                        cos(camRotation) * input.x
+                        -sin(camRotation) * input.y
+                    ) * (float)Time::deltaTime * cam.GetOrthographicSize();
+        
+                    camPos.y += (
+                        cos(camRotation) * input.y +
+                        sin(camRotation) * input.x
+                    ) * (float)Time::deltaTime * cam.GetOrthographicSize();
+                    
+                    transform[3][0] = camPos.x;
+                    transform[3][1] = camPos.y;
+                }
+
+                if (EnableRotation)
+                {
+                    auto input = Input::GetAxis(KeyCode::Q, KeyCode::E);
+                    camRotation += input * (float)Time::deltaTime;
+                    // transform[3][3] = camRotation;
+                }
+                
+            }
+        };
+        
         m_CameraEntity = m_ActiveScene.CreateEntity("Camera");
         m_CameraEntity.AddComponent<CameraComponent>();
+        m_CameraEntity.AddComponent<ScriptComponent>().Bind<CameraController>();
          
         m_CameraEntity2 = m_ActiveScene.CreateEntity("Camera2");
         m_CameraEntity2.AddComponent<CameraComponent>();
+        m_CameraEntity2.AddComponent<ScriptComponent>().Bind<CameraController>();
+        
     }
 
     void EditorViewLayer::OnAttach()

@@ -17,7 +17,7 @@ namespace PurrKatEngine
         }
         
         template<typename T, typename... Args>
-        T& AddComponent(Args&&... args) const
+        T& AddComponent(Args&&... args)
         {
             return m_Scene->m_Registry.emplace<T>(m_EntityId, std::forward<Args>(args)...);
         }

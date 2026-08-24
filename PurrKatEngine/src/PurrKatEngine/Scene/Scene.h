@@ -1,7 +1,7 @@
 ﻿#pragma once
 
+#include <entt.h>
 #include "Components.h"
-#include "entt.h"
 
 namespace PurrKatEngine
 {

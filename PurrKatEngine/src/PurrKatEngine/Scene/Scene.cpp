@@ -3,6 +3,7 @@
 
 #include "Components.h"
 #include "Entity.h"
+#include "ScriptableEntity.h"
 #include "PurrKatEngine/Logs/InternalLog.h"
 #include "PurrKatEngine/Renderer/Renderer2D/Renderer2D.h"
 
@@ -35,6 +36,19 @@ namespace PurrKatEngine
 
     void Scene::OnUpdate()
     {
+        // Update all Scriptable Entities.
+        m_Registry.view<ScriptComponent>().each([this](auto entity, const ScriptComponent& scriptComp)
+        {
+            if (!scriptComp.Instance)
+            {
+                scriptComp.InstantiateScript();
+                scriptComp.Instance->m_Entity = Entity{entity, this};
+                scriptComp.Instance->OnStart();
+            }
+            
+            scriptComp.Instance->OnUpdate();
+        });
+        
         // Find a camera if we don't have one.
         if (m_MainCameraComponent == nullptr)
             FindFirstCameraInScene();

@@ -4,6 +4,8 @@
 
 namespace PurrKatEngine
 {
+    class ScriptableEntity;
+
     struct TransformComponent
     {
         glm::mat4 Transform = {glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0)) * glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1))};
@@ -46,5 +48,20 @@ namespace PurrKatEngine
         
         operator PurrKatEngine::SceneCamera& () { return Camera; }
         operator const PurrKatEngine::SceneCamera& () const { return Camera; }
+    };
+    
+    struct ScriptComponent
+    {
+        ScriptableEntity* Instance = nullptr;
+        
+        std::function<void()> InstantiateScript;
+        std::function<void()> DestroyScript;
+        
+        template<typename T>
+        void Bind()
+        {
+            InstantiateScript = [&] { Instance = new T(); };
+            DestroyScript = [&] { delete (T*)Instance; Instance = nullptr; };
+        }
     };
 }

@@ -1,0 +1,23 @@
+﻿#pragma once
+#include "Entity.h"
+
+namespace PurrKatEngine
+{
+    class ScriptableEntity
+    {
+        friend class Scene;
+        
+    public:
+        virtual ~ScriptableEntity() = default;
+        
+        virtual void OnStart() {}
+        virtual void OnUpdate() {}
+        virtual void OnDestroy() {}
+        
+        template<typename T>
+        T& GetComponent() { return m_Entity.GetComponent<T>(); }
+        
+    private:
+        Entity m_Entity;
+    };
+}
