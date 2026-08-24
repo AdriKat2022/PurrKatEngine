@@ -1,5 +1,7 @@
 ﻿#include "EditorViewLayer.h"
 
+
+
 namespace PurrKatEngine
 {
     EditorViewLayer::EditorViewLayer()
@@ -12,6 +14,10 @@ namespace PurrKatEngine
         m_UpScaledFrameBuffer = FrameBuffer::CreateRef({.Width = 1280, .Height = 720, .UpscalingFilterType = FilterType::Nearest});
         m_FrameBuffer = FrameBuffer::CreateRef({.Width = 1280, .Height = 720, .UpscalingFilterType = FilterType::Nearest});
         m_Cpp = Texture2D::CreateRef("assets/textures/cpp.png", { .Filter = Texture2D::FilterType::Nearest});
+
+        auto myFirstObject = m_ActiveScene.CreateEntity();
+        m_ActiveScene.GetRegistry().emplace<TransformComponent>(myFirstObject);
+        m_ActiveScene.GetRegistry().emplace<SpriteComponent>(myFirstObject, glm::vec4{1.0f, 0, 0, 1.0f});
     }
 
     void EditorViewLayer::OnAttach()
@@ -28,13 +34,11 @@ namespace PurrKatEngine
     {
         Layer::OnUpdate();
         
-        if (m_IsEditorViewportFocused && m_IsEditorViewportHovered)
+        if (m_IsEditorViewportFocused)
             m_CameraController.OnUpdate();
 
         RenderEditorViewport();
     }
-
-    
 
     void EditorViewLayer::OnImGuiRender()
     {
@@ -111,7 +115,7 @@ namespace PurrKatEngine
         {
             m_IsEditorViewportFocused = ImGui::IsWindowFocused();
             m_IsEditorViewportHovered = ImGui::IsWindowHovered();
-            Application::Get().GetImGuiLayer().SetBlockEvents(!m_IsEditorViewportHovered || !m_IsEditorViewportFocused);
+            // Application::Get().GetImGuiLayer().SetBlockEvents(!m_IsEditorViewportHovered || !m_IsEditorViewportFocused);
             contentSize = ImGui::GetContentRegionAvail();
             viewportSize = {contentSize.x, contentSize.y};
             if (viewportSize != m_LastEditorViewportSize)
@@ -141,24 +145,25 @@ namespace PurrKatEngine
             if (ImGui::DragInt("Upscale Factor", &m_UpScaleFactor, 0.2f, 1, 40, "%i x"))
             {
                 m_FrameBuffer->Resize((uint32_t)(m_LastEditorViewportSize.x/(float)m_UpScaleFactor), (uint32_t)(m_LastEditorViewportSize.y/(float)m_UpScaleFactor));
-                PKE_CORE_TRACE(
-                    "Viewport: {}x{} | FB: {}x{} | Texture: {} | Filter: {}",
-                    (uint32_t)contentSize.x,
-                    (uint32_t)contentSize.y,
-                    m_FrameBuffer->GetSpecifications().Width,
-                    m_FrameBuffer->GetSpecifications().Height,
-                    m_FrameBuffer->GetColorAttachmentRendererID(),
-                    m_FrameBuffer->GetSpecifications().UpscalingFilterType == FilterType::Linear
-                        ? "LINEAR"
-                        : "NEAREST"
-                );
+                // PKE_CORE_TRACE(
+                //     "Viewport: {}x{} | FB: {}x{} | Texture: {} | Filter: {}",
+                //     (uint32_t)contentSize.x,
+                //     (uint32_t)contentSize.y,
+                //     m_FrameBuffer->GetSpecifications().Width,
+                //     m_FrameBuffer->GetSpecifications().Height,
+                //     m_FrameBuffer->GetColorAttachmentRendererID(),
+                //     m_FrameBuffer->GetSpecifications().UpscalingFilterType == FilterType::Linear
+                //         ? "LINEAR"
+                //         : "NEAREST"
+                // );
             }
         }
         ImGui::End();
 
         ImGuiUtility::ShowApplicationInfoWindow();
         ImGuiUtility::ShowOrthographicCameraInfos(m_CameraController);
-
+        ImGuiUtility::ShowRendererStatistics(true);
+        
         ImGui::End();
     }
 
@@ -167,7 +172,7 @@ namespace PurrKatEngine
         Layer::OnEvent(event);
         
         // Block window events because we already handle the viewport manually via ImGui.
-        if (!event.IsInCategory(EventCategoryApplication))
+        if (!event.IsInCategory(EventCategoryApplication) && m_IsEditorViewportHovered)
             m_CameraController.OnEvent(event);
     }
 
@@ -175,14 +180,15 @@ namespace PurrKatEngine
     {
         // Render in Frame Buffer
         m_FrameBuffer->Bind();
-
+        
         RenderCommand::SetClearColor(m_BackgroundColor);
         RenderCommand::Clear();
 
         Renderer2D::BeginScene(m_CameraController.GetCamera(), false);
-        Renderer2D::DrawQuad({0.0f, 0.0f}, {1.0f, 1.0f});
-        Renderer2D::DrawQuad({1.0f, 1.0f}, {1.0f, 1.0f}, m_GrassSpriteSheet.GetSprite({0, 0}));
-        Renderer2D::DrawQuad({1.0f, 1.0f}, SET_WIDTH(m_Cpp, 1), m_Cpp);
+        // Renderer2D::DrawQuad({0.0f, 0.0f}, {1.0f, 1.0f});
+        // Renderer2D::DrawQuad({1.0f, 1.0f}, {1.0f, 1.0f}, m_GrassSpriteSheet.GetSprite({0, 0}));
+        // Renderer2D::DrawQuad({1.0f, 1.0f}, SET_WIDTH(m_Cpp, 1), m_Cpp);
+        m_ActiveScene.OnUpdate();
         Renderer2D::EndScene();
 
         m_FrameBuffer->Unbind();

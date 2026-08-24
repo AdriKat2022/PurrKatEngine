@@ -52,7 +52,7 @@ namespace PurrKatEngine
     {
         PKE_CORE_ASSERT(vertexBuffer->GetLayout().GetElements().size(), "Vertex Buffer has no layout.")
         
-        glBindVertexArray(m_RendererID); // Bind to OpenGL (we could call our Bind() definition, but it's better to keep things untangled in this case.
+        glBindVertexArray(m_RendererID);
         vertexBuffer->Bind();
         
         uint32_t index = 0;

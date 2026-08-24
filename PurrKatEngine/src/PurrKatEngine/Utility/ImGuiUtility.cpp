@@ -90,22 +90,29 @@ namespace PurrKatEngine
         ImGui::Text("%.3f", value.z);
     }
 
-    void ImGuiUtility::ShowRendererStatistics(bool showHeader)
+    void ImGuiUtility::ShowRendererStatistics(bool showInNewWindow, bool showHeader)
     {
         bool shouldShow = true;
 
+        if (showInNewWindow)
+            shouldShow = ImGui::Begin("Renderer Statistics", &shouldShow, ImGuiWindowFlags_AlwaysAutoResize);
+        
         if (showHeader)
             shouldShow = ImGui::CollapsingHeader("Renderer Statistics", ImGuiTreeNodeFlags_DefaultOpen);
 
-        if (!shouldShow)
-            return;
-
-        auto stats = Renderer2D::GetStatistics();
-        ImGui::Text("Draw Calls: %u", stats.DrawCalls);
-        ImGui::Text("Quad Count: %u", stats.QuadCount);
-        ImGui::Text("Indices: %u", stats.GetIndexCount());
-        ImGui::Text("Vertices: %u", stats.GetVertexCount());
-        Renderer2D::EndFrameStatistics();
+        if (shouldShow)
+        {
+            auto stats = Renderer2D::GetStatistics();
+            ImGui::Text("Draw Calls: %u", stats.DrawCalls);
+            ImGui::Text("Quad Count: %u", stats.QuadCount);
+            ImGui::Text("Indices: %u", stats.GetIndexCount());
+            ImGui::Text("Vertices: %u", stats.GetVertexCount());
+            Renderer2D::EndFrameStatistics();
+        }
+        
+        
+        if (showInNewWindow)
+            ImGui::End();
     }
 
     void ImGuiUtility::ShowOrthographicCameraInfos(OrthographicCameraController& cameraController)

@@ -57,7 +57,7 @@ namespace PurrKatEngine
         
         static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const Tex2D& texture, const glm::vec2& uvTiling = {1, 1}, const glm::vec4& tintColor = {1.0f, 1.0f, 1.0f, 1.0f});
         static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const Tex2D& texture, const glm::vec2& uvTiling = {1, 1}, const glm::vec4& tintColor = {1.0f, 1.0f, 1.0f, 1.0f});
-        static void DrawQuad(const Transform& transform, const Tex2D& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor);
+        static void DrawQuad(const glm::mat4& transform, const Tex2D& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor);
         
         static void DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Tex2D& texture, const glm::vec2& uvTiling = {1, 1}, const glm::vec4& tintColor = {1.0f, 1.0f, 1.0f, 1.0f});
         static void DrawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Tex2D& texture, const glm::vec2& uvTiling = {1, 1}, const glm::vec4& tintColor = {1.0f, 1.0f, 1.0f, 1.0f});
@@ -69,7 +69,7 @@ namespace PurrKatEngine
         static void ClearLightSources();
         
     private:
-        static void DrawQuadInternal(const glm::vec3& position, const glm::vec2& size, const Tex2D& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor);
+        static void DrawQuadInternal(const glm::mat4& transform, const Tex2D& texture, const glm::vec2& uvTiling, const glm::vec4& tintColor);
         static void DrawQuadRotatedInternal(const glm::vec3& position, const glm::vec2& size, float rotation, const Tex2D& texture, const glm::vec2& uvTiling = {1, 1}, const glm::vec4& tintColor = {1.0f, 1.0f, 1.0f, 1.0f});
 
         static void UploadLights();

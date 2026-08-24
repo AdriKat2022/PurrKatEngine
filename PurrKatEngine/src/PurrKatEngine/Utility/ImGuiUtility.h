@@ -47,7 +47,7 @@ namespace PurrKatEngine
 
         static void ShowVector3Row(const char* label, const glm::vec3& value);
 
-        static void ShowRendererStatistics(bool showHeader = false);
+        static void ShowRendererStatistics(bool showInNewWindow = true, bool showHeader = false);
 
         static void ShowOrthographicCameraInfos(OrthographicCameraController& cameraController);
 

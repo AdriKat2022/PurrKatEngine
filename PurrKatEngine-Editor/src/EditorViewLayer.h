@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "PurrKatEngine.h"
+#include "PurrKatEngine/Scene/Scene.h"
 
 namespace PurrKatEngine
 {
@@ -32,5 +33,7 @@ namespace PurrKatEngine
         SpriteSheet m_DirtSpriteSheet;
         SpriteSheet m_GrassSpriteSheet;
         Ref<const Texture2D> m_Cpp;
+        
+        Scene m_ActiveScene;
     };
 }

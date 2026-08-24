@@ -13,6 +13,7 @@ IncludeDirs["Glad"] = "PurrKatEngine/vendor/glad/include"
 IncludeDirs["ImGui"] = "PurrKatEngine/vendor/imgui"
 IncludeDirs["Glm"] = "PurrKatEngine/vendor/glm"
 IncludeDirs["stb_image"] = "PurrKatEngine/vendor/stb_image"
+IncludeDirs["entt"] = "PurrKatEngine/vendor/entt/include"
 
 group "Dependencies"
     include "PurrKatEngine/vendor"
@@ -50,7 +51,8 @@ project "PurrKatEngine"
         "%{IncludeDirs.Glad}",
         "%{IncludeDirs.ImGui}",
         "%{IncludeDirs.Glm}",
-        "%{IncludeDirs.stb_image}"
+        "%{IncludeDirs.stb_image}",
+        "%{IncludeDirs.entt}"
     }
 
     links
@@ -115,6 +117,7 @@ project "PurrKatEngine-Editor"
         "%{wks.location}/PurrKatEngine/src",
         "%{IncludeDirs.Glm}",
         "%{IncludeDirs.ImGui}",
+        "%{IncludeDirs.entt}"
     }
 
     links
@@ -167,6 +170,7 @@ project "Sandbox"
         "%{wks.location}/PurrKatEngine/src",
         "%{IncludeDirs.Glm}",
         "%{IncludeDirs.ImGui}",
+        "%{IncludeDirs.entt}"
     }
 
     links
