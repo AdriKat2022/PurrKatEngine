@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <glm/ext/matrix_transform.hpp>
+#include "PurrKatEngine/Renderer/SceneCamera.h"
 
 namespace PurrKatEngine
 {
@@ -14,6 +15,17 @@ namespace PurrKatEngine
         operator const glm::mat4& () const { return Transform; }
     };
     
+    struct TagComponent
+    {
+        std::string Tag = "Default";
+        
+        TagComponent() = default;
+        TagComponent(std::string tag) : Tag(std::move(tag)) {}
+        
+        operator std::string& () { return Tag; }
+        operator const std::string& () const { return Tag; }
+    };
+    
     struct SpriteComponent
     {
         glm::vec4 Color = {1.0f, 1.0f, 1.0f, 1.0f};
@@ -23,5 +35,16 @@ namespace PurrKatEngine
         
         operator glm::vec4& () { return Color; }
         operator const glm::vec4& () const { return Color; }
+    };
+    
+    struct CameraComponent
+    {
+        SceneCamera Camera;
+        
+        CameraComponent() = default;
+        CameraComponent(SceneCamera camera) : Camera(std::move(camera)) {}
+        
+        operator PurrKatEngine::SceneCamera& () { return Camera; }
+        operator const PurrKatEngine::SceneCamera& () const { return Camera; }
     };
 }

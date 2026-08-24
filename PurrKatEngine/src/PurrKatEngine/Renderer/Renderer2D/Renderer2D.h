@@ -6,6 +6,8 @@
 
 namespace PurrKatEngine
 {
+    class Camera;
+
     struct LightSource2D
     {
         glm::vec2 Position{0.0f};
@@ -20,6 +22,7 @@ namespace PurrKatEngine
         static void Init();
         static void Shutdown();
         
+        static void BeginScene(const Camera& camera, const glm::mat4& transform, bool litScene = false);
         static void BeginScene(const OrthographicCamera& camera, bool litScene = false);
         static void EndScene();
         static void FlushScene();

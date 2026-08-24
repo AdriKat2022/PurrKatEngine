@@ -22,6 +22,7 @@
 #include "PurrKatEngine/Renderer/VertexArray.h"
 #include "PurrKatEngine/Renderer/Renderer2D/Renderer2D.h"
 #include "PurrKatEngine/Scene/Components.h"
+#include "PurrKatEngine/Scene/Entity.h"
 #include "PurrKatEngine/Utility/EventAction.h"
 #include "PurrKatEngine/Utility/ImGuiUtility.h"
 

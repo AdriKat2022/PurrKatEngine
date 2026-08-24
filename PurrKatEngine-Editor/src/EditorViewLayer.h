@@ -35,5 +35,8 @@ namespace PurrKatEngine
         Ref<const Texture2D> m_Cpp;
         
         Scene m_ActiveScene;
+        Entity m_SquareEntity;
+        Entity m_CameraEntity;
+        Entity m_CameraEntity2;
     };
 }

@@ -5,6 +5,7 @@
 #include <glm/gtc/type_ptr.inl>
 #include "PurrKatEngine/Profiling/Profiler.h"
 #include "PurrKatEngine/Renderer/Buffer.h"
+#include "PurrKatEngine/Renderer/Camera.h"
 #include "PurrKatEngine/Renderer/RenderCommand.h"
 #include "PurrKatEngine/Renderer/Shader.h"
 #include "PurrKatEngine/Renderer/Tex2D.h"
@@ -138,7 +139,25 @@ namespace PurrKatEngine
     void Renderer2D::Shutdown()
     {
     }
+
+    void Renderer2D::BeginScene(const Camera& camera, const glm::mat4& transform, bool litScene)
+    {
+        s_RendererData.IsLitScene = litScene;
     
+        auto projectionViewMatrix = camera.GetProjectionMatrix() * glm::inverse(transform);
+        
+        if (litScene)
+        {
+            s_RendererData.SpriteColorShaderLit->Bind();
+            s_RendererData.SpriteColorShaderLit->SetUniformMat4("u_ViewProjection", projectionViewMatrix);
+        }
+        else
+        {
+            s_RendererData.SpriteColorShader->Bind();
+            s_RendererData.SpriteColorShader->SetUniformMat4("u_ViewProjection", projectionViewMatrix);
+        }
+    }
+
     void Renderer2D::BeginScene(const OrthographicCamera& camera, bool litScene)
     {
         s_RendererData.IsLitScene = litScene;

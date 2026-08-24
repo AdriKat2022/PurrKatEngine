@@ -10,6 +10,7 @@ namespace PurrKatEngine
                std::to_string(mat[2][0]) + ", " + std::to_string(mat[2][1]) + ", " + std::to_string(mat[2][2]) + ", " + std::to_string(mat[2][3]) + "\n" +
                std::to_string(mat[3][0]) + ", " + std::to_string(mat[3][1]) + ", " + std::to_string(mat[3][2]) + ", " + std::to_string(mat[3][3]);
     }
+    
     inline std::string format_as(const glm::mat4& mat) { return to_string(mat); }
     
     /**

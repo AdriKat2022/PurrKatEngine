@@ -1,7 +1,5 @@
 ﻿#include "EditorViewLayer.h"
 
-
-
 namespace PurrKatEngine
 {
     EditorViewLayer::EditorViewLayer()
@@ -12,12 +10,17 @@ namespace PurrKatEngine
         m_GrassSpriteSheet.SetSpriteSheetOptions({.CellCount = {11, 7}});
 
         m_UpScaledFrameBuffer = FrameBuffer::CreateRef({.Width = 1280, .Height = 720, .UpscalingFilterType = FilterType::Nearest});
-        m_FrameBuffer = FrameBuffer::CreateRef({.Width = 1280, .Height = 720, .UpscalingFilterType = FilterType::Nearest});
+        m_FrameBuffer = FrameBuffer::CreateRef({.Width = 1920, .Height = 1080, .UpscalingFilterType = FilterType::Nearest});
         m_Cpp = Texture2D::CreateRef("assets/textures/cpp.png", { .Filter = Texture2D::FilterType::Nearest});
 
-        auto myFirstObject = m_ActiveScene.CreateEntity();
-        m_ActiveScene.GetRegistry().emplace<TransformComponent>(myFirstObject);
-        m_ActiveScene.GetRegistry().emplace<SpriteComponent>(myFirstObject, glm::vec4{1.0f, 0, 0, 1.0f});
+        m_SquareEntity = m_ActiveScene.CreateEntity("Square");
+        m_SquareEntity.AddComponent<SpriteComponent>(glm::vec4{1.0f, 0, 0, 1.0f});
+        
+        m_CameraEntity = m_ActiveScene.CreateEntity("Camera");
+        m_CameraEntity.AddComponent<CameraComponent>();
+         
+        m_CameraEntity2 = m_ActiveScene.CreateEntity("Camera2");
+        m_CameraEntity2.AddComponent<CameraComponent>();
     }
 
     void EditorViewLayer::OnAttach()
@@ -106,8 +109,59 @@ namespace PurrKatEngine
             ImGui::EndMenuBar();
         }
 
-        static ImVec2 contentSize;
-        static glm::vec2 viewportSize;
+        static ImVec2 contentSize = {};
+        static glm::vec2 viewportSize = {};
+
+        if (ImGui::Begin("Editor Viewport Properties"))
+        {
+            ImGui::Text("Editor Viewport Size: %.0f x %.0f", m_LastEditorViewportSize.x, m_LastEditorViewportSize.y);
+            ImGui::ColorEdit4("Background Color", glm::value_ptr(m_BackgroundColor));
+            ImGui::Text("Editor Viewport Receiving Events: %s", (!m_IsEditorViewportHovered || !m_IsEditorViewportFocused) ? "No" : "Yes");
+            if (ImGui::DragInt("Upscale Factor", &m_UpScaleFactor, 0.2f, 1, 40, "%i x"))
+            {
+                m_FrameBuffer->Resize((uint32_t)(m_LastEditorViewportSize.x/(float)m_UpScaleFactor), (uint32_t)(m_LastEditorViewportSize.y/(float)m_UpScaleFactor));
+            }
+        }
+        ImGui::End();
+
+        ImGuiUtility::ShowApplicationInfoWindow();
+        ImGuiUtility::ShowOrthographicCameraInfos(m_CameraController);
+        ImGuiUtility::ShowRendererStatistics(true);
+        
+        static bool inspector = true;
+        if (ImGui::Begin("Inspector", &inspector, ImGuiWindowFlags_AlwaysAutoResize))
+        {
+            std::string name = m_SquareEntity.GetComponent<TagComponent>();
+            ImGui::TextColored({0.2f, 0.8f, 0.2f, 1.0f}, "Entity: %s", name.c_str());
+            
+            static bool state = false;
+            if (ImGui::Button("Switch Camera"))
+                state = !state;
+            
+            auto& activeCam = state ? m_CameraEntity : m_CameraEntity2;
+            
+            m_ActiveScene.SetMainCamera(activeCam);
+            
+            ImGui::DragFloat3("Camera 1", glm::value_ptr(activeCam.GetComponent<TransformComponent>().Transform[3]), 0.01f);
+            
+            const char* modes[] = {
+                "None",
+                "Match Width",
+                "Match Height"
+            };
+
+            SceneCamera& camComponent = activeCam.GetComponent<CameraComponent>();
+            
+            float size = camComponent.GetOrthographicSize();
+            if (ImGui::DragFloat("Camera Size", &size, 0.01f))
+                camComponent.SetOrthographicSize(size);
+            
+            int mode = (int)camComponent.GetAspectRatioAdjustementMode();
+
+            if (ImGui::Combo("Aspect Ratio", &mode, modes, IM_ARRAYSIZE(modes)))
+                camComponent.SetAspectRatioAdjustementMode((SceneCamera::AspectRatioAdjustmentMode)mode);
+        }
+        ImGui::End();
         
         // This will be where the Viewport of Editor is rendered.
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
@@ -123,46 +177,19 @@ namespace PurrKatEngine
                 m_LastEditorViewportSize = viewportSize;
                 
                 m_UpScaledFrameBuffer->Resize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
-                m_FrameBuffer->Resize((uint32_t)(viewportSize.x/(float)m_UpScaleFactor), (uint32_t)(viewportSize.y/(float)m_UpScaleFactor));
+                // m_FrameBuffer->Resize((uint32_t)(viewportSize.x/(float)m_UpScaleFactor), (uint32_t)(viewportSize.y/(float)m_UpScaleFactor));
                 m_CameraController.SetAspectRatio(viewportSize.x/viewportSize.y);
+                m_ActiveScene.OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
             }
             else
             {
                 // Rendering in the else branch helps decrease the flickering while resizing the viewport.
-                m_UpScaledFrameBuffer->ScaleFrom(*m_FrameBuffer);
-                
-                ImGui::Image(m_UpScaledFrameBuffer->GetColorAttachmentRendererID(), contentSize, {0, 1}, {1, 0});
+                // m_UpScaledFrameBuffer->ScaleFrom(*m_FrameBuffer);
             }
+            ImGui::Image(m_FrameBuffer->GetColorAttachmentRendererID(), *(ImVec2*)&m_LastEditorViewportSize, {0, 1}, {1, 0});
         }
         ImGui::End();
         ImGui::PopStyleVar();
-
-        if (ImGui::Begin("Editor Viewport Properties"))
-        {
-            ImGui::Text("Editor Viewport Size: %.0f x %.0f", m_LastEditorViewportSize.x, m_LastEditorViewportSize.y);
-            ImGui::ColorEdit4("Background Color", glm::value_ptr(m_BackgroundColor));
-            ImGui::Text("Editor Viewport Receiving Events: %s", (!m_IsEditorViewportHovered || !m_IsEditorViewportFocused) ? "No" : "Yes");
-            if (ImGui::DragInt("Upscale Factor", &m_UpScaleFactor, 0.2f, 1, 40, "%i x"))
-            {
-                m_FrameBuffer->Resize((uint32_t)(m_LastEditorViewportSize.x/(float)m_UpScaleFactor), (uint32_t)(m_LastEditorViewportSize.y/(float)m_UpScaleFactor));
-                // PKE_CORE_TRACE(
-                //     "Viewport: {}x{} | FB: {}x{} | Texture: {} | Filter: {}",
-                //     (uint32_t)contentSize.x,
-                //     (uint32_t)contentSize.y,
-                //     m_FrameBuffer->GetSpecifications().Width,
-                //     m_FrameBuffer->GetSpecifications().Height,
-                //     m_FrameBuffer->GetColorAttachmentRendererID(),
-                //     m_FrameBuffer->GetSpecifications().UpscalingFilterType == FilterType::Linear
-                //         ? "LINEAR"
-                //         : "NEAREST"
-                // );
-            }
-        }
-        ImGui::End();
-
-        ImGuiUtility::ShowApplicationInfoWindow();
-        ImGuiUtility::ShowOrthographicCameraInfos(m_CameraController);
-        ImGuiUtility::ShowRendererStatistics(true);
         
         ImGui::End();
     }
@@ -184,12 +211,13 @@ namespace PurrKatEngine
         RenderCommand::SetClearColor(m_BackgroundColor);
         RenderCommand::Clear();
 
-        Renderer2D::BeginScene(m_CameraController.GetCamera(), false);
+        m_ActiveScene.OnUpdate();
+
+        // Renderer2D::BeginScene(m_CameraController.GetCamera(), false);
         // Renderer2D::DrawQuad({0.0f, 0.0f}, {1.0f, 1.0f});
         // Renderer2D::DrawQuad({1.0f, 1.0f}, {1.0f, 1.0f}, m_GrassSpriteSheet.GetSprite({0, 0}));
         // Renderer2D::DrawQuad({1.0f, 1.0f}, SET_WIDTH(m_Cpp, 1), m_Cpp);
-        m_ActiveScene.OnUpdate();
-        Renderer2D::EndScene();
+        // Renderer2D::EndScene();
 
         m_FrameBuffer->Unbind();
     }
