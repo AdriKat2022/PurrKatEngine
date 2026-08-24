@@ -37,11 +37,11 @@ namespace PurrKatEngine
     void Scene::OnUpdate()
     {
         // Update all Scriptable Entities.
-        m_Registry.view<ScriptComponent>().each([this](auto entity, const ScriptComponent& scriptComp)
+        m_Registry.view<ScriptComponent>().each([this](auto entity, ScriptComponent& scriptComp)
         {
             if (!scriptComp.Instance)
             {
-                scriptComp.InstantiateScript();
+                scriptComp.Instance = scriptComp.InstantiateScript();
                 scriptComp.Instance->m_Entity = Entity{entity, this};
                 scriptComp.Instance->OnStart();
             }

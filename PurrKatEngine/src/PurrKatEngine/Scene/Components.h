@@ -54,14 +54,15 @@ namespace PurrKatEngine
     {
         ScriptableEntity* Instance = nullptr;
         
-        std::function<void()> InstantiateScript;
-        std::function<void()> DestroyScript;
+        // Function pointers (saves the allocation of std::function).
+        ScriptableEntity*   (*InstantiateScript)    ();
+        void                (*DestroyScript)        (ScriptComponent&);
         
         template<typename T>
         void Bind()
         {
-            InstantiateScript = [&] { Instance = new T(); };
-            DestroyScript = [&] { delete (T*)Instance; Instance = nullptr; };
+            InstantiateScript = [] { return (ScriptableEntity*)new T(); };
+            DestroyScript = [](ScriptComponent& c) { delete (T*)c.Instance; c.Instance = nullptr; };
         }
     };
 }
