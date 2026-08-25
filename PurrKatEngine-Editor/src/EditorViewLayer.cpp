@@ -75,7 +75,7 @@ namespace PurrKatEngine
         m_CameraEntity2.AddComponent<CameraComponent>();
         m_CameraEntity2.AddComponent<ScriptComponent>().Bind<CameraController>();
         
-        m_SceneHierarchyPanel.SetContext(Ref<Scene>(&m_ActiveScene));
+        m_SceneHierarchyPanel.SetScene(&m_ActiveScene);
     }
 
     void EditorViewLayer::OnAttach()
@@ -186,7 +186,7 @@ namespace PurrKatEngine
         ImGuiUtility::ShowRendererStatistics(true);
         
         static bool inspector = true;
-        if (ImGui::Begin("Inspector", &inspector, ImGuiWindowFlags_AlwaysAutoResize))
+        if (ImGui::Begin("Others", &inspector, ImGuiWindowFlags_AlwaysAutoResize))
         {
             std::string name = m_SquareEntity.GetComponent<TagComponent>();
             ImGui::TextColored({0.2f, 0.8f, 0.2f, 1.0f}, "Entity: %s", name.c_str());
@@ -198,25 +198,6 @@ namespace PurrKatEngine
             auto& activeCam = state ? m_CameraEntity : m_CameraEntity2;
             
             m_ActiveScene.SetMainCamera(activeCam);
-            
-            ImGui::DragFloat3("Camera 1", glm::value_ptr(activeCam.GetComponent<TransformComponent>().Transform[3]), 0.01f);
-            
-            const char* modes[] = {
-                "None",
-                "Match Width",
-                "Match Height"
-            };
-
-            SceneCamera& camComponent = activeCam.GetComponent<CameraComponent>();
-            
-            float size = camComponent.GetOrthographicSize();
-            if (ImGui::DragFloat("Camera Size", &size, 0.01f))
-                camComponent.SetOrthographicSize(size);
-            
-            int mode = (int)camComponent.GetAspectRatioAdjustementMode();
-
-            if (ImGui::Combo("Aspect Ratio", &mode, modes, IM_ARRAYSIZE(modes)))
-                camComponent.SetAspectRatioAdjustementMode((SceneCamera::AspectRatioAdjustmentMode)mode);
         }
         ImGui::End();
         

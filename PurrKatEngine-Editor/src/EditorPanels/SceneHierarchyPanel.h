@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "PurrKatEngine/Core.h"
+#include "PurrKatEngine/Scene/Entity.h"
 
 namespace PurrKatEngine
 {
@@ -9,12 +9,17 @@ namespace PurrKatEngine
     {
     public:
         SceneHierarchyPanel();
-        SceneHierarchyPanel(const Ref<Scene>& scene);
+        SceneHierarchyPanel(Scene* scene);
 
-        void SetContext(const Ref<Scene>& scene);
+        void SetScene(Scene* scene);
         void OnImGuiRender();
         
     private:
-        Ref<Scene> m_Scene;
+        void DrawEntityNode(Entity entity);
+        void DrawComponents(Entity entity);
+
+    private:
+        Scene* m_Scene;
+        Entity m_ActiveSelection;
     };
 }

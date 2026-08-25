@@ -29,17 +29,31 @@ namespace PurrKatEngine
         }
         
         template<typename T>
-        bool TryGetComponent(T& outComponent) const
+        bool TryGetComponent(const T*& outComponent) const
         {
             if (m_Scene->m_Registry.any_of<T>(m_EntityId))
             {
                 outComponent = &m_Scene->m_Registry.get<T>(m_EntityId);
                 return true;
             }
-
+            
+            outComponent = nullptr;
             return false;
         }
-
+        
+        template<typename T>
+        void RemoveComponent() const
+        {
+            m_Scene->m_Registry.remove<T>(m_EntityId);
+        }
+        
+        operator bool() const { return m_EntityId != entt::null; }
+        operator uint32_t() const { return (uint32_t)m_EntityId; }
+        operator uint64_t() const { return (uint64_t)m_EntityId; }
+        
+        bool operator==(const Entity& other) const { return m_EntityId == other.m_EntityId && m_Scene == other.m_Scene; }
+        bool operator!=(const Entity& other) const { return m_EntityId != other.m_EntityId || m_Scene != other.m_Scene; }
+        
     private:
         entt::entity m_EntityId = {entt::null};
         Scene* m_Scene;

@@ -14,6 +14,8 @@ namespace PurrKatEngine
         virtual void OnUpdate() {}
         virtual void OnDestroy() {}
         
+        // virtual void OnImGuiRender() {}
+        
         template<typename T>
         T& GetComponent() { return m_Entity.GetComponent<T>(); }
         

@@ -8,7 +8,7 @@ namespace PurrKatEngine
     public:
         enum class AspectRatioAdjustmentMode : unsigned char
         {
-            FixedRatio,
+            Variable,
             MatchWidth,
             MatchHeight,
         };
