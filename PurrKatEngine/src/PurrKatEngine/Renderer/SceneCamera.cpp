@@ -16,20 +16,13 @@ namespace PurrKatEngine
         RecalculateProjectionMatrix();
     }
 
-    SceneCamera::AspectRatioAdjustmentMode SceneCamera::GetAspectRatioAdjustementMode() const
+    void SceneCamera::SetPerspective(float pov, float nearClip, float farClip)
     {
-        return m_AspectRatioAdjustementMode;
-    }
-
-    void SceneCamera::SetOrthographicSize(float size)
-    {
-        m_OrthographicSize = size;
+        m_PerspectivePov = pov;
+        m_PerspectiveNear = nearClip;
+        m_PerspectiveFar = farClip;
+        
         RecalculateProjectionMatrix();
-    }
-    
-    float SceneCamera::GetOrthographicSize() const
-    {
-        return m_OrthographicSize;
     }
 
     void SceneCamera::SetOrthographic(float size, float nearClip, float farClip)
@@ -41,9 +34,14 @@ namespace PurrKatEngine
         RecalculateProjectionMatrix();
     }
 
-    void SceneCamera::SetAspectRatioAdjustementMode(AspectRatioAdjustmentMode adjustementMode)
+    SceneCamera::ProjectionType SceneCamera::GetProjectionType() const
     {
-        m_AspectRatioAdjustementMode = adjustementMode;
+        return m_ProjectionType;
+    }
+
+    SceneCamera::AspectRatioAdjustmentMode SceneCamera::GetAspectRatioAdjustementMode() const
+    {
+        return m_AspectRatioAdjustementMode;
     }
 
     void SceneCamera::SetViewportSize(uint32_t width, uint32_t height)
@@ -56,31 +54,39 @@ namespace PurrKatEngine
 
     void SceneCamera::RecalculateProjectionMatrix()
     {
-        float orthoLeft, orthoBottom, orthoTop, orthoRight;
         float aspectRatio = (float)m_ViewportWidth / (float)m_ViewportHeight;
+        
+        if (m_ProjectionType == ProjectionType::Perspective)
+        {
+            m_ProjectionMatrix = glm::perspective(m_PerspectivePov, aspectRatio, m_PerspectiveNear, m_PerspectiveFar);
+        }
+        else // ORTHOGRAPHIC
+        {
+            float orthoLeft, orthoBottom, orthoTop, orthoRight;
 
-        if (m_AspectRatioAdjustementMode == AspectRatioAdjustmentMode::MatchWidth)
-        {
-            orthoLeft = -m_OrthographicSize * 0.5f;
-            orthoRight = m_OrthographicSize * 0.5f;
-            orthoBottom = -m_OrthographicSize / aspectRatio * 0.5f;
-            orthoTop = m_OrthographicSize / aspectRatio * 0.5f;
-        }
-        else if (m_AspectRatioAdjustementMode == AspectRatioAdjustmentMode::MatchHeight)
-        {
-            orthoLeft = -m_OrthographicSize * aspectRatio * 0.5f;
-            orthoRight = m_OrthographicSize * aspectRatio * 0.5f;
-            orthoBottom = -m_OrthographicSize * 0.5f;
-            orthoTop = m_OrthographicSize * 0.5f;
-        }
-        else
-        {
-            orthoLeft = -m_OrthographicSize * 0.5f;
-            orthoRight = m_OrthographicSize * 0.5f;
-            orthoBottom = -m_OrthographicSize * 0.5f;
-            orthoTop = m_OrthographicSize * 0.5f;
-        }
+            if (m_AspectRatioAdjustementMode == AspectRatioAdjustmentMode::MatchWidth)
+            {
+                orthoLeft = -m_OrthographicSize * 0.5f;
+                orthoRight = m_OrthographicSize * 0.5f;
+                orthoBottom = -m_OrthographicSize / aspectRatio * 0.5f;
+                orthoTop = m_OrthographicSize / aspectRatio * 0.5f;
+            }
+            else if (m_AspectRatioAdjustementMode == AspectRatioAdjustmentMode::MatchHeight)
+            {
+                orthoLeft = -m_OrthographicSize * aspectRatio * 0.5f;
+                orthoRight = m_OrthographicSize * aspectRatio * 0.5f;
+                orthoBottom = -m_OrthographicSize * 0.5f;
+                orthoTop = m_OrthographicSize * 0.5f;
+            }
+            else
+            {
+                orthoLeft = -m_OrthographicSize * 0.5f;
+                orthoRight = m_OrthographicSize * 0.5f;
+                orthoBottom = -m_OrthographicSize * 0.5f;
+                orthoTop = m_OrthographicSize * 0.5f;
+            }
 
-        m_ProjectionMatrix = glm::ortho(orthoLeft, orthoRight, orthoBottom, orthoTop, m_OrthographicNear, m_OrthographicFar);
+            m_ProjectionMatrix = glm::ortho(orthoLeft, orthoRight, orthoBottom, orthoTop, m_OrthographicNear, m_OrthographicFar);
+        }
     }
 }

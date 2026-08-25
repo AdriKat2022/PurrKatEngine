@@ -8,6 +8,7 @@
 namespace PurrKatEngine
 {
     SceneHierarchyPanel::SceneHierarchyPanel() = default;
+    
     SceneHierarchyPanel::SceneHierarchyPanel(Scene* scene): m_Scene(scene) {}
     
     void SceneHierarchyPanel::SetScene(Scene* scene) { m_Scene = scene; }
@@ -29,7 +30,9 @@ namespace PurrKatEngine
         
         static bool inspectorOpened = true;
         ImGui::Begin("Inspector", &inspectorOpened);
+        ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
         DrawComponents(m_ActiveSelection);
+        ImGui::PopStyleColor();
         ImGui::End();
         
         ImGui::ShowDemoWindow();
@@ -96,19 +99,64 @@ namespace PurrKatEngine
         {
             SceneCamera& camComponent = entity.GetComponent<CameraComponent>();
             
-            const char* modes[] = {
+            // const char* projectionTypes[] = {
+            //     "Perspective",
+            //     "Orthographic"
+            // };
+            
+            int projectionType = (int)camComponent.GetProjectionType(); 
+
+            if (ImGui::RadioButton("Perspective", &projectionType, (int)SceneCamera::ProjectionType::Perspective))
+                camComponent.SetProjectionType((SceneCamera::ProjectionType)projectionType);
+
+            ImGui::SameLine();
+            
+            if (ImGui::RadioButton("Orthographic", &projectionType, (int)SceneCamera::ProjectionType::Orthographic))
+                camComponent.SetProjectionType((SceneCamera::ProjectionType)projectionType);
+            
+            // if (ImGui::RadioButton("Projection Type", &projectionType, projectionTypes, IM_ARRAYSIZE(projectionTypes)))
+            //     camComponent.SetProjectionType((SceneCamera::ProjectionType)projectionType);
+            
+            if (projectionType == (int)SceneCamera::ProjectionType::Perspective)
+            {
+                float pov = glm::degrees(camComponent.GetPerspectivePov());
+                if (ImGui::DragFloat("POV", &pov, 0.01f))
+                    camComponent.SetPerspectivePov(glm::radians(pov));
+                
+                float nearClip = camComponent.GetPerspectiveNearClip();
+                if (ImGui::DragFloat("Near Clip", &nearClip, 0.01f, 0))
+                    camComponent.SetPerspectiveNearClip(nearClip);
+                
+                float farClip = camComponent.GetPerspectiveFarClip();
+                if (ImGui::DragFloat("Far Clip", &farClip, 0.01f))
+                    camComponent.SetPerspectiveFarClip(farClip);
+            }
+            else
+            {
+                float size = camComponent.GetOrthographicSize();
+                if (ImGui::DragFloat("Orthographic Size", &size, 0.01f))
+                    camComponent.SetOrthographicSize(size);
+                
+                float nearClip = camComponent.GetOrthographicNearClip();
+                if (ImGui::DragFloat("Near Clip", &nearClip, 0.01f))
+                    camComponent.SetOrthographicNearClip(nearClip);
+                
+                float farClip = camComponent.GetOrthographicFarClip();
+                if (ImGui::DragFloat("Far Clip", &farClip, 0.01f))
+                    camComponent.SetOrthographicFarClip(farClip);
+            }
+            
+            // ******** ASPECT RATIO ******* //
+            
+            const char* aspectRatioModes[] = {
                 "Variable: Match View",
                 "Fixed: Match Width",
                 "Fixed: Match Height"
             };
             
-            float size = camComponent.GetOrthographicSize();
-            if (ImGui::DragFloat("Camera Size", &size, 0.01f))
-                camComponent.SetOrthographicSize(size);
-            
             int mode = (int)camComponent.GetAspectRatioAdjustementMode();
 
-            if (ImGui::Combo("Aspect Ratio", &mode, modes, IM_ARRAYSIZE(modes)))
+            if (ImGui::Combo("Aspect Ratio", &mode, aspectRatioModes, IM_ARRAYSIZE(aspectRatioModes)))
                 camComponent.SetAspectRatioAdjustementMode((SceneCamera::AspectRatioAdjustmentMode)mode);
         }
     }

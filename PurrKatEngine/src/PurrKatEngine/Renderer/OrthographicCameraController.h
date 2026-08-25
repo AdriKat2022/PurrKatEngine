@@ -1,11 +1,11 @@
 ﻿#pragma once
 
 #include "OrthographicCamera.h"
-#include "PurrKatEngine/Components/Standard1DInputController.h"
-#include "PurrKatEngine/Components/Standard2DInputController.h"
 #include "PurrKatEngine/Events/Event.h"
 #include "PurrKatEngine/Events/MouseScrollEvent.h"
 #include "PurrKatEngine/Events/WindowResizeEvent.h"
+
+// DEPRECATED, WILL BE REMOVED SOON
 
 namespace PurrKatEngine
 {

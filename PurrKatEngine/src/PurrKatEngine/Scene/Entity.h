@@ -2,6 +2,8 @@
 #include <entt.h>
 #include "Scene.h"
 
+#define ENTITY_GET_NAME(entity) entity.GetComponent<TagComponent>().Tag
+
 namespace PurrKatEngine
 {
     class Entity

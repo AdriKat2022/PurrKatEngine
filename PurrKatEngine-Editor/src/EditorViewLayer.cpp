@@ -13,8 +13,13 @@ namespace PurrKatEngine
         m_FrameBuffer = FrameBuffer::CreateRef({.Width = 1920, .Height = 1080, .UpscalingFilterType = FilterType::Nearest});
         m_Cpp = Texture2D::CreateRef("assets/textures/cpp.png", { .Filter = Texture2D::FilterType::Nearest});
 
-        m_SquareEntity = m_ActiveScene.CreateEntity("Square");
-        m_SquareEntity.AddComponent<SpriteComponent>(glm::vec4{1.0f, 0, 0, 1.0f});
+
+        Entity square;
+        
+        square = m_ActiveScene.CreateEntity("Square");
+        square.AddComponent<SpriteComponent>(glm::vec4{1.0f, 0, 0, 1.0f});
+        square = m_ActiveScene.CreateEntity("Square");
+        square.AddComponent<SpriteComponent>(glm::vec4{1.0f, 0, 0, 1.0f});
         
         class CameraController : public ScriptableEntity
         {
@@ -67,13 +72,16 @@ namespace PurrKatEngine
             }
         };
         
-        m_CameraEntity = m_ActiveScene.CreateEntity("Camera");
-        m_CameraEntity.AddComponent<CameraComponent>();
-        m_CameraEntity.AddComponent<ScriptComponent>().Bind<CameraController>();
-         
-        m_CameraEntity2 = m_ActiveScene.CreateEntity("Camera2");
-        m_CameraEntity2.AddComponent<CameraComponent>();
-        m_CameraEntity2.AddComponent<ScriptComponent>().Bind<CameraController>();
+        Entity camera;
+        camera = m_ActiveScene.CreateEntity("Camera");
+        camera.AddComponent<CameraComponent>();
+        camera.AddComponent<ScriptComponent>().Bind<CameraController>();
+        m_CameraList.push_back(camera);
+        
+        camera = m_ActiveScene.CreateEntity("Camera2");
+        camera.AddComponent<CameraComponent>();
+        camera.AddComponent<ScriptComponent>().Bind<CameraController>();
+        m_CameraList.push_back(camera);
         
         m_SceneHierarchyPanel.SetScene(&m_ActiveScene);
     }
@@ -186,18 +194,20 @@ namespace PurrKatEngine
         ImGuiUtility::ShowRendererStatistics(true);
         
         static bool inspector = true;
-        if (ImGui::Begin("Others", &inspector, ImGuiWindowFlags_AlwaysAutoResize))
+        if (ImGui::Begin("Camera Switcher", &inspector, ImGuiWindowFlags_AlwaysAutoResize))
         {
-            std::string name = m_SquareEntity.GetComponent<TagComponent>();
-            ImGui::TextColored({0.2f, 0.8f, 0.2f, 1.0f}, "Entity: %s", name.c_str());
+            static int activeCamera = 0;
             
-            static bool state = false;
+            auto& activeCamEntity = m_CameraList[activeCamera%m_CameraList.size()];
+            
+            ImGui::TextColored({0.2f, 0.8f, 0.2f, 1.0f}, "Active Camera: %s", ENTITY_GET_NAME(activeCamEntity).c_str());
+            
             if (ImGui::Button("Switch Camera"))
-                state = !state;
-            
-            auto& activeCam = state ? m_CameraEntity : m_CameraEntity2;
-            
-            m_ActiveScene.SetMainCamera(activeCam);
+            {
+                activeCamera = (activeCamera+1)%m_CameraList.size();
+                auto& newActiveCamEntity = m_CameraList[activeCamera%m_CameraList.size()];
+                m_ActiveScene.SetMainCamera(newActiveCamEntity);
+            }
         }
         ImGui::End();
         
