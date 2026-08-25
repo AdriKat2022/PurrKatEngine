@@ -49,7 +49,7 @@ namespace PurrKatEngine
     class Texture2D : public Texture
     {
     public:
-        enum class FilterType : byte { Linear, Nearest };
+        enum class FilterType : unsigned char { Linear, Nearest };
         
         struct TextureOptions
         {

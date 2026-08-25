@@ -9,7 +9,7 @@
 
 namespace PurrKatEngine
 {
-    enum class AspectRatioAdjustmentMode : byte
+    enum class AspectRatioAdjustmentMode : unsigned char
     {
         None,
         MatchWidth,

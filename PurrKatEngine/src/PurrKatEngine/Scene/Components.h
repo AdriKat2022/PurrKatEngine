@@ -19,7 +19,7 @@ namespace PurrKatEngine
     
     struct TagComponent
     {
-        std::string Tag = "Default";
+        std::string Tag = "GameEntity";
         
         TagComponent() = default;
         TagComponent(std::string tag) : Tag(std::move(tag)) {}

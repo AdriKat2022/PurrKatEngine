@@ -6,7 +6,7 @@ namespace PurrKatEngine
     class SceneCamera : public Camera
     {
     public:
-        enum class AspectRatioAdjustmentMode : byte
+        enum class AspectRatioAdjustmentMode : unsigned char
         {
             FixedRatio,
             MatchWidth,
@@ -38,7 +38,5 @@ namespace PurrKatEngine
         
         uint32_t m_ViewportWidth = 0;
         uint32_t m_ViewportHeight = 0;
-        
-        
     };
 }

@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "PurrKatEngine.h"
-#include "PurrKatEngine/Scene/Scene.h"
+#include "EditorPanels/SceneHierarchyPanel.h"
 
 namespace PurrKatEngine
 {
@@ -38,5 +38,7 @@ namespace PurrKatEngine
         Entity m_SquareEntity;
         Entity m_CameraEntity;
         Entity m_CameraEntity2;
+        
+        SceneHierarchyPanel m_SceneHierarchyPanel;
     };
 }

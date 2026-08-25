@@ -75,6 +75,7 @@ namespace PurrKatEngine
         m_CameraEntity2.AddComponent<CameraComponent>();
         m_CameraEntity2.AddComponent<ScriptComponent>().Bind<CameraController>();
         
+        m_SceneHierarchyPanel.SetContext(Ref<Scene>(&m_ActiveScene));
     }
 
     void EditorViewLayer::OnAttach()
@@ -138,13 +139,13 @@ namespace PurrKatEngine
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 
         ImGui::Begin("Window with a DockSpace", &dockSpaceOpened, window_flags);
-
+        
         if (!keepWindowPadding)
             ImGui::PopStyleVar();
 
         if (fullscreen)
             ImGui::PopStyleVar(2);
-
+        
         // Submit the DockSpace widget inside our window
         // - Note that the id here is different from the one used by DockSpaceOverViewport(), so docking state won't get transfered between "Basic" and "Advanced" demos.
         // - If we made the ShowExampleAppDockSpaceBasic() calculate its own ID and pass it to DockSpaceOverViewport() the ID could easily match.
@@ -162,6 +163,8 @@ namespace PurrKatEngine
             }
             ImGui::EndMenuBar();
         }
+
+        m_SceneHierarchyPanel.OnImGuiRender();
 
         static ImVec2 contentSize = {};
         static glm::vec2 viewportSize = {};

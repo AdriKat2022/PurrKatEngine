@@ -10,12 +10,13 @@ namespace PurrKatEngine
     class Scene
     {
         friend class Entity;
+        friend class SceneHierarchyPanel;
         
     public:
         Scene();
         ~Scene();
 
-        Entity CreateEntity(const std::string& entityName = {});
+        Entity CreateEntity(const std::string& entityName = "Game Entity");
         
         void SetMainCamera(const Entity& camEntity);
         void OnUpdate();

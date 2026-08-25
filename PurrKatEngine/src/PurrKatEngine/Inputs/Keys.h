@@ -31,7 +31,7 @@ namespace PurrKatEngine {
         GamepadRStickRight, GamepadRStickUp, GamepadRStickDown,
     };
 
-    enum class MouseButtonCode : byte
+    enum class MouseButtonCode : unsigned char
     {
         MouseLeft         = 0,
         MouseRight        = 1,
