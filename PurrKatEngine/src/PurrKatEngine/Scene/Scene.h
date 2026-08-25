@@ -1,10 +1,12 @@
 ﻿#pragma once
 
 #include <entt.h>
-#include "Components.h"
 
 namespace PurrKatEngine
 {
+    struct TransformComponent;
+    struct CameraComponent;
+
     class Scene
     {
         friend class Entity;
