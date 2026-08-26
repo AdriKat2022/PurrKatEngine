@@ -31,14 +31,18 @@ namespace PurrKatEngine
             void OnStart() override
             {
                 PKE_CORE_DEBUG("ON START!");
-                TransformComponent& transform = *m_Entity.Transform;
+                TransformComponent& transform = m_Entity.GetComponent<TransformComponent>();
                 SceneCamera& cam = GetComponent<CameraComponent>();
                 cam.SetOrthographicSize(Random::Float(0.5f, 15.0f));
             }
             
             void OnUpdate() override
             {
-                TransformComponent& transform = *m_Entity.Transform;
+                TransformComponent& transform = m_Entity.GetComponent<TransformComponent>();
+                
+                if (!HasComponent<CameraComponent>())
+                    return;
+                
                 SceneCamera& cam = GetComponent<CameraComponent>();
                 
                 float camRotation = 0;

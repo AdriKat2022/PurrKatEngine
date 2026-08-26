@@ -63,6 +63,7 @@ namespace PurrKatEngine
         
         if (m_MainCameraEntityRef == entt::null || !m_Registry.all_of<TransformComponent, CameraComponent>(m_MainCameraEntityRef))
         {
+            m_MainCameraEntityRef = entt::null;
             PKE_CORE_WARN("There are no valid camera in the scene!");
             return;
         }

@@ -19,6 +19,9 @@ namespace PurrKatEngine
         template<typename T>
         T& GetComponent() { return m_Entity.GetComponent<T>(); }
         
+        template<typename T>
+        bool HasComponent() const { return m_Entity.HasComponent<T>(); }
+        
     protected:
         Entity m_Entity;
     };

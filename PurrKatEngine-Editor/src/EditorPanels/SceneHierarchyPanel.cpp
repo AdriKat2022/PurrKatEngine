@@ -231,6 +231,12 @@ namespace PurrKatEngine
             },
             true
             );
+        
+        DrawComponent<ScriptComponent>("Custom Script", entityToInspect,
+            [](const Entity& e) {},
+            [](const Entity& e){},
+            true
+            );
     }
 
     template<typename Component>

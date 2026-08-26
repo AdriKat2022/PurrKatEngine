@@ -10,11 +10,8 @@ namespace PurrKatEngine
     class Entity
     {
     public:
-        TransformComponent* Transform = nullptr;
-        
-    public:
         Entity() = default;
-        Entity(entt::entity handle, Scene* scene) : m_EntityId(handle), m_Scene(scene) { if (HasComponent<TransformComponent>()) Transform = &GetComponent<TransformComponent>(); }
+        Entity(entt::entity handle, Scene* scene) : m_EntityId(handle), m_Scene(scene) { }
         
         const std::string& GetName() const { return GetComponent<TagComponent>(); }
         
@@ -30,9 +27,6 @@ namespace PurrKatEngine
         T& AddComponent(Args&&... args)
         {
             auto& component = m_Scene->m_Registry.emplace<T>(m_EntityId, std::forward<Args>(args)...);
-            if constexpr (std::is_same_v<T, TransformComponent>)
-                Transform = &component;
-            
             return component;
         }
         
