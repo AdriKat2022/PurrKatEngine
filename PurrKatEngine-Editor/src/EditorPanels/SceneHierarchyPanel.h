@@ -24,6 +24,8 @@ namespace PurrKatEngine
         
         template <class Component>
         static void DrawComponent(const std::string& componentName, const Entity& entityToInspect, void (*imguiCode)(const Entity&), void (*onReset)(const Entity&), bool allowRemove);
+        template <class Component>
+        void DrawAddComponentItem(const std::string& componentName, Entity& entity, void (*onAdd)(const Entity&, Component& component) = nullptr, bool allowMultiple = false) const;
 
     private:
         Scene* m_Scene;

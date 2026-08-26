@@ -35,6 +35,9 @@ namespace PurrKatEngine
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
         io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
         
+        io.Fonts->AddFontFromFileTTF("assets/fonts/CascadiaCode/CascadiaCode-Regular.ttf", 18.0f);
+        io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/NotoSansJP/NotoSansJP-Regular.ttf", 18.0f);
+        
         // Setup Dear ImGui style
         ImGui::StyleColorsDark();
         //ImGui::StyleColorsLight();
