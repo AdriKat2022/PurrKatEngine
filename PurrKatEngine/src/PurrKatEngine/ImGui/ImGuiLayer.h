@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include "PurrKatEngine/Events/ApplicationEvents.h"
 #include "PurrKatEngine/Layers/Layer.h"
 
 namespace PurrKatEngine
@@ -17,6 +16,9 @@ namespace PurrKatEngine
         void End();
         
         void SetBlockEvents(bool blockEvents) { m_BlockEvents = blockEvents; }
+        
+    private:
+        static void SetUpImGuiStyle();
         
     private:
         bool m_BlockEvents = false;

@@ -35,22 +35,8 @@ namespace PurrKatEngine
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
         io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
         
-        io.Fonts->AddFontFromFileTTF("assets/fonts/CascadiaCode/CascadiaCode-Regular.ttf", 18.0f);
-        io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/NotoSansJP/NotoSansJP-Regular.ttf", 18.0f);
-        
         // Setup Dear ImGui style
-        ImGui::StyleColorsDark();
-        //ImGui::StyleColorsLight();
-
-        // Setup scaling
-        ImGuiStyle& style = ImGui::GetStyle();
-        // style.ScaleAllSizes(main_scale);        // Bake a fixed style scale. (until we have a solution for dynamic style scaling, changing this requires resetting Style + calling this again)
-        // style.FontScaleDpi = main_scale;        // Set initial font scale. (in docking branch: using io.ConfigDpiScaleFonts=true automatically overrides this for every window depending on the current monitor)
-        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-        {
-            style.WindowRounding = 0.0f;
-            style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-        }
+        SetUpImGuiStyle();
         
         Application& app = Application::Get();
         GLFWwindow* window = static_cast<GLFWwindow*>(app.GetWindow().GetNativeWindow());
@@ -61,7 +47,7 @@ namespace PurrKatEngine
 
         s_IsImGuiInitialized = true;
     }
-    
+
     void ImGuiLayer::OnDetach()
     {
         Layer::OnDetach();
@@ -71,7 +57,7 @@ namespace PurrKatEngine
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
     }
-
+    
     void ImGuiLayer::OnEvent(Event& event)
     {
         if (m_BlockEvents)
@@ -105,5 +91,56 @@ namespace PurrKatEngine
             ImGui::RenderPlatformWindowsDefault();
             glfwMakeContextCurrent(backup_current_context);
         }
+    }
+
+    void ImGuiLayer::SetUpImGuiStyle()
+    {
+        auto& io = ImGui::GetIO();
+        
+        // ------------------- Setup Fonts -------------------
+        
+        io.Fonts->AddFontFromFileTTF("assets/fonts/CascadiaCode/CascadiaCode-Regular.ttf", 18.0f);
+        io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/NotoSansJP/NotoSansJP-Regular.ttf", 18.0f);
+        
+        // Setup scaling
+        ImGuiStyle& style = ImGui::GetStyle();
+        // style.ScaleAllSizes(main_scale);        // Bake a fixed style scale. (until we have a solution for dynamic style scaling, changing this requires resetting Style + calling this again)
+        // style.FontScaleDpi = main_scale;        // Set initial font scale. (in docking branch: using io.ConfigDpiScaleFonts=true automatically overrides this for every window depending on the current monitor)
+        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+        {
+            style.WindowRounding = 0.0f;
+            style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+        }
+        
+        
+        // ------------------- Setup Colors -------------------
+        
+        ImGui::StyleColorsDark();
+        //ImGui::StyleColorsLight();
+
+        auto& imguiColors = ImGui::GetStyle().Colors;
+        imguiColors[ImGuiCol_WindowBg] = ImVec4{0.1f, 0.105f, 0.11f, 1.0f};
+        
+        imguiColors[ImGuiCol_Header] = ImVec4{0.2f, 0.205f, 0.21f, 1.0f};
+        imguiColors[ImGuiCol_HeaderHovered] = ImVec4{0.3f, 0.305f, 0.31f, 1.0f};
+        imguiColors[ImGuiCol_HeaderActive] = ImVec4{0.15f, 0.1505f, 0.151f, 1.0f};
+        
+        imguiColors[ImGuiCol_Button] = ImVec4{0.2f, 0.205f, 0.21f, 1.0f};
+        imguiColors[ImGuiCol_ButtonHovered] = ImVec4{0.3f, 0.305f, 0.31f, 1.0f};
+        imguiColors[ImGuiCol_ButtonActive] = ImVec4{0.15f, 0.1505f, 0.151f, 1.0f};
+        
+        imguiColors[ImGuiCol_FrameBg] = ImVec4{0.2f, 0.205f, 0.21f, 1.0f};
+        imguiColors[ImGuiCol_FrameBgHovered] = ImVec4{0.3f, 0.305f, 0.31f, 1.0f};
+        imguiColors[ImGuiCol_FrameBgActive] = ImVec4{0.15f, 0.1505f, 0.151f, 1.0};
+        
+        imguiColors[ImGuiCol_Tab] = ImVec4{0.2f, 0.205f, 0.21f, 1.0f};
+        imguiColors[ImGuiCol_TabHovered] = ImVec4{0.3f, 0.305f, 0.31f, 1.0f};
+        imguiColors[ImGuiCol_TabActive] = ImVec4{0.15f, 0.1505f, 0.151f, 1.0f};
+        imguiColors[ImGuiCol_TabUnfocused] = ImVec4{0.2f, 0.205f, 0.21f, 1.0f};
+        imguiColors[ImGuiCol_TabUnfocusedActive] = ImVec4{0.15f, 0.1505f, 0.151f, 1.0f};
+        
+        imguiColors[ImGuiCol_TitleBg] = ImVec4{0.15f, 0.1505f, 0.151f, 1.0f};
+        imguiColors[ImGuiCol_TitleBgActive] = ImVec4{0.15f, 0.1505f, 0.151f, 1.0f};
+        imguiColors[ImGuiCol_TitleBgCollapsed] = ImVec4{0.15f, 0.1505f, 0.151f, 1.0f};
     }
 }
