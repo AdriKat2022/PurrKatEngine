@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+// DEPRECATED, WILL BE REMOVED SOON
+
 namespace PurrKatEngine
 {
     class OrthographicCamera

@@ -62,7 +62,7 @@ namespace PurrKatEngine
         ProjectionType m_ProjectionType = ProjectionType::Orthographic;
         AspectRatioAdjustmentMode m_AspectRatioAdjustementMode = AspectRatioAdjustmentMode::MatchHeight;
         
-        uint32_t m_ViewportWidth = 0;
-        uint32_t m_ViewportHeight = 0;
+        uint32_t m_ViewportWidth = 1;
+        uint32_t m_ViewportHeight = 1;
     };
 }

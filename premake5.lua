@@ -25,7 +25,7 @@ project "PurrKatEngine"
     language "C++"
     cppdialect "C++20"
 
-    buildoptions { "/utf-8" }
+    buildoptions { "/utf-8", "/MP" }
 
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -179,23 +179,23 @@ project "Sandbox"
     }
 
     filter "system:windows"
-    systemversion "latest"
-    
-    defines {
-        "PKE_PLATFORM_WINDOWS"
-    }
+        systemversion "latest"
+        
+        defines {
+            "PKE_PLATFORM_WINDOWS"
+        }
     
     filter { "configurations:Debug" }
-    defines { "PKE_DEBUG" }
-    runtime "Debug"
-    symbols "On"
+        defines { "PKE_DEBUG" }
+        runtime "Debug"
+        symbols "On"
     
     filter { "configurations:Release" }
-    defines { "PKE_RELEASE" }
-    runtime "Release"
-    optimize "on"
+        defines { "PKE_RELEASE" }
+        runtime "Release"
+        optimize "on"
     
     filter { "configurations:Dist" }
-    defines { "PKE_DIST" }
-    runtime "Release"
-    optimize "on"
+        defines { "PKE_DIST" }
+        runtime "Release"
+        optimize "on"

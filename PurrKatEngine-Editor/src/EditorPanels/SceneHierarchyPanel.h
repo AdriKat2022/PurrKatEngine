@@ -15,11 +15,18 @@ namespace PurrKatEngine
         void OnImGuiRender();
         
     private:
-        void DrawEntityNode(Entity entity);
-        void DrawComponents(Entity entity);
+        void DrawImGuiSceneHierarchy();
+        void DrawEntityNode(Entity& entity);
+        
+        void DrawImGuiInspectorOfEntity(Entity& entityToInspect) const;
+        
+        static void DrawImGuiComponentsControllers(const Entity& entityToInspect);
+        
+        template <class Component>
+        static void DrawComponent(const std::string& componentName, const Entity& entityToInspect, void (*imguiCode)(const Entity&), void (*onReset)(const Entity&), bool allowRemove);
 
     private:
         Scene* m_Scene;
-        Entity m_ActiveSelection;
+        Entity m_ActiveSelection = {};
     };
 }

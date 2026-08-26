@@ -6,6 +6,7 @@
 #include "ScriptableEntity.h"
 #include "PurrKatEngine/Logs/InternalLog.h"
 #include "PurrKatEngine/Renderer/Renderer2D/Renderer2D.h"
+#include "PurrKatEngine/Utility/ImGuiUtility.h"
 
 namespace PurrKatEngine
 {
@@ -13,26 +14,33 @@ namespace PurrKatEngine
 
     Scene::~Scene() {}
 
-    Entity Scene::CreateEntity(const std::string& entityName)
+    Entity Scene::CreateEntity(const std::string& entityName, const glm::vec3& position)
     {
         Entity newEntity = {m_Registry.create(), this};
-        newEntity.AddComponent<TransformComponent>();
+        newEntity.AddComponent<TransformComponent>(position);
         newEntity.AddComponent<TagComponent>(entityName);
         return newEntity;
+    }
+
+    void Scene::DestroyEntity(Entity& entity)
+    {
+        m_Registry.destroy(entity);
+        entity.Invalidate();
     }
 
     void Scene::SetMainCamera(const Entity& camEntity)
     {
         if (camEntity.HasComponent<CameraComponent>() && camEntity.HasComponent<TransformComponent>())
         {
-            m_MainCameraComponent = &camEntity.GetComponent<CameraComponent>();
-            m_TransformCameraComponent = &camEntity.GetComponent<TransformComponent>();
+            m_MainCameraEntityRef = camEntity;
         }
         else
         {
             PKE_CORE_ERROR("Scene::SetMainCamera: The provided entity does not have a CameraComponent or TransformComponent.");
         }
     }
+
+    Entity Scene::GetMainCamera() { return {m_MainCameraEntityRef, this}; }
 
     void Scene::OnUpdate()
     {
@@ -50,20 +58,25 @@ namespace PurrKatEngine
         });
         
         // Find a camera if we don't have one.
-        if (m_MainCameraComponent == nullptr)
+        if (m_MainCameraEntityRef == entt::null || !m_Registry.all_of<TransformComponent, CameraComponent>(m_MainCameraEntityRef))
             FindFirstCameraInScene();
         
-        if (m_MainCameraComponent == nullptr)
+        if (m_MainCameraEntityRef == entt::null || !m_Registry.all_of<TransformComponent, CameraComponent>(m_MainCameraEntityRef))
+        {
+            PKE_CORE_WARN("There are no valid camera in the scene!");
             return;
+        }
         
-        Renderer2D::BeginScene(*m_MainCameraComponent, *m_TransformCameraComponent);
+        auto& camera = m_Registry.get<CameraComponent>(m_MainCameraEntityRef);
+        auto& transformComponent = m_Registry.get<TransformComponent>(m_MainCameraEntityRef);
+        
+        Renderer2D::BeginScene(camera, transformComponent);
         
         auto group = m_Registry.group<TransformComponent>(entt::get<SpriteComponent>);
         for (const auto& entity : group)
         {
             auto [transform, sprite] = group.get<TransformComponent, SpriteComponent>(entity);
             Renderer2D::DrawQuad(transform, nullptr, {1, 1}, sprite.Color);
-            // PKE_CORE_DEBUG("Rendering entity {} with transform:\n{}", (uint32_t)entity, to_string(transform.Transform));
         }
         
         Renderer2D::EndScene();
@@ -87,10 +100,12 @@ namespace PurrKatEngine
         auto cameras = m_Registry.view<CameraComponent>();
         for (entt::entity entity : cameras)
         {
-            CameraComponent& cam = cameras.get<CameraComponent>(entity);
-            m_MainCameraComponent = &cam;
-            m_TransformCameraComponent = &m_Registry.get<TransformComponent>(entity);
-            break;
+            Entity camEntity = {entity, this};
+            if (camEntity.HasComponent<CameraComponent>() && camEntity.HasComponent<TransformComponent>())
+            {
+                m_MainCameraEntityRef = camEntity;
+                break;
+            }
         }
     }
 }

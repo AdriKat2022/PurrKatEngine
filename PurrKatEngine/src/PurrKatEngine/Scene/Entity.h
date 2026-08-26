@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <entt.h>
+#include "Components.h"
 #include "Scene.h"
 
 #define ENTITY_GET_NAME(entity) entity.GetComponent<TagComponent>().Tag
@@ -9,8 +10,15 @@ namespace PurrKatEngine
     class Entity
     {
     public:
+        TransformComponent* Transform = nullptr;
+        
+    public:
         Entity() = default;
-        Entity(entt::entity handle, Scene* scene) : m_EntityId(handle), m_Scene(scene) {}
+        Entity(entt::entity handle, Scene* scene) : m_EntityId(handle), m_Scene(scene) { if (HasComponent<TransformComponent>()) Transform = &GetComponent<TransformComponent>(); }
+        
+        const std::string& GetName() const { return GetComponent<TagComponent>(); }
+        
+        void Destroy() { m_Scene->DestroyEntity(*this); }
         
         template<typename T>
         bool HasComponent() const
@@ -21,7 +29,11 @@ namespace PurrKatEngine
         template<typename T, typename... Args>
         T& AddComponent(Args&&... args)
         {
-            return m_Scene->m_Registry.emplace<T>(m_EntityId, std::forward<Args>(args)...);
+            auto& component = m_Scene->m_Registry.emplace<T>(m_EntityId, std::forward<Args>(args)...);
+            if constexpr (std::is_same_v<T, TransformComponent>)
+                Transform = &component;
+            
+            return component;
         }
         
         template<typename T>
@@ -49,15 +61,23 @@ namespace PurrKatEngine
             m_Scene->m_Registry.remove<T>(m_EntityId);
         }
         
-        operator bool() const { return m_EntityId != entt::null; }
+        bool IsValid() const { return m_EntityId != entt::null && m_Scene->m_Registry.all_of<TransformComponent>(m_EntityId); }
+        
+        operator bool() const { return IsValid(); }
         operator uint32_t() const { return (uint32_t)m_EntityId; }
         operator uint64_t() const { return (uint64_t)m_EntityId; }
+        operator entt::entity() const { return m_EntityId; }
         
         bool operator==(const Entity& other) const { return m_EntityId == other.m_EntityId && m_Scene == other.m_Scene; }
         bool operator!=(const Entity& other) const { return m_EntityId != other.m_EntityId || m_Scene != other.m_Scene; }
+
+    private:
+        void Invalidate() { m_EntityId = { entt::null }; }
         
     private:
-        entt::entity m_EntityId = {entt::null};
-        Scene* m_Scene;
+        entt::entity m_EntityId = {entt::null };
+        Scene* m_Scene = nullptr;
+        
+        friend class Scene;
     };
 }

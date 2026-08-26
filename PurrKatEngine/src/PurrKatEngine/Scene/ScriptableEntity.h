@@ -19,7 +19,7 @@ namespace PurrKatEngine
         template<typename T>
         T& GetComponent() { return m_Entity.GetComponent<T>(); }
         
-    private:
+    protected:
         Entity m_Entity;
     };
 }

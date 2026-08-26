@@ -39,20 +39,17 @@ namespace PurrKatEngine
         };
         
     public:
+        
+        static bool DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float labelWidth = 100.0f);
+                
         static void ShowApplicationInfoWindow();
-
         static void ShowDisplayMouseAndWorldPosition(const OrthographicCamera* cam = nullptr);
-
         static void ShowTransform(const std::string& name, const Transform& transform);
-
         static void ShowVector3Row(const char* label, const glm::vec3& value);
-
         static void ShowRendererStatistics(bool showInNewWindow = true, bool showHeader = false);
-
         static void ShowOrthographicCameraInfos(OrthographicCameraController& cameraController);
 
         static bool SliderIntControl(const char* label, int& value, int min, int max, int btnStep = 1);
-
         static bool DragIntControl(const char* label, int& value, int min, int max, int btnStep = 1, float dragSpeed = 1);
 
         template <typename T, size_t N>

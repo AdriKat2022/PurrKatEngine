@@ -1,5 +1,7 @@
 ﻿#include "EditorViewLayer.h"
 
+#include "PurrKatEngine/Utility/ArrayUtility.h"
+
 namespace PurrKatEngine
 {
     EditorViewLayer::EditorViewLayer()
@@ -13,13 +15,12 @@ namespace PurrKatEngine
         m_FrameBuffer = FrameBuffer::CreateRef({.Width = 1920, .Height = 1080, .UpscalingFilterType = FilterType::Nearest});
         m_Cpp = Texture2D::CreateRef("assets/textures/cpp.png", { .Filter = Texture2D::FilterType::Nearest});
 
-
         Entity square;
         
         square = m_ActiveScene.CreateEntity("Square");
         square.AddComponent<SpriteComponent>(glm::vec4{1.0f, 0, 0, 1.0f});
-        square = m_ActiveScene.CreateEntity("Square");
-        square.AddComponent<SpriteComponent>(glm::vec4{1.0f, 0, 0, 1.0f});
+        square = m_ActiveScene.CreateEntity("Square Behind", {-1.0f, 1.0f, -5.0f});
+        square.AddComponent<SpriteComponent>(glm::vec4{0.2f, 0.8f, 0, 1.0f});
         
         class CameraController : public ScriptableEntity
         {
@@ -30,21 +31,21 @@ namespace PurrKatEngine
             void OnStart() override
             {
                 PKE_CORE_DEBUG("ON START!");
-                glm::mat4& transform = GetComponent<TransformComponent>();
+                TransformComponent& transform = *m_Entity.Transform;
                 SceneCamera& cam = GetComponent<CameraComponent>();
                 cam.SetOrthographicSize(Random::Float(0.5f, 15.0f));
             }
             
             void OnUpdate() override
             {
-                glm::mat4& transform = GetComponent<TransformComponent>();
+                TransformComponent& transform = *m_Entity.Transform;
                 SceneCamera& cam = GetComponent<CameraComponent>();
                 
                 float camRotation = 0;
                 
                 if (EnableMovement)
                 {
-                    glm::vec2 camPos = { transform[3][0], transform[3][1] };
+                    glm::vec3 camPos = transform.Position;
                     
                     auto input = Input::GetAxis2D(KeyCode::W, KeyCode::A, KeyCode::S, KeyCode::D);
         
@@ -58,28 +59,26 @@ namespace PurrKatEngine
                         sin(camRotation) * input.x
                     ) * (float)Time::deltaTime * cam.GetOrthographicSize();
                     
-                    transform[3][0] = camPos.x;
-                    transform[3][1] = camPos.y;
+                    transform.Position = camPos;
                 }
 
                 if (EnableRotation)
                 {
                     auto input = Input::GetAxis(KeyCode::Q, KeyCode::E);
                     camRotation += input * (float)Time::deltaTime;
-                    // transform[3][3] = camRotation;
                 }
                 
             }
         };
         
         Entity camera;
-        camera = m_ActiveScene.CreateEntity("Camera");
-        camera.AddComponent<CameraComponent>();
-        camera.AddComponent<ScriptComponent>().Bind<CameraController>();
-        m_CameraList.push_back(camera);
+        // camera = m_ActiveScene.CreateEntity("Camera2");
+        // camera.AddComponent<CameraComponent>();
+        // camera.AddComponent<ScriptComponent>().Bind<CameraController>();
+        // m_CameraList.push_back(camera);
         
-        camera = m_ActiveScene.CreateEntity("Camera2");
-        camera.AddComponent<CameraComponent>();
+        camera = m_ActiveScene.CreateEntity("Camera", {0, 0, 5});
+        camera.AddComponent<CameraComponent>().Camera.SetProjectionType(SceneCamera::ProjectionType::Perspective);
         camera.AddComponent<ScriptComponent>().Bind<CameraController>();
         m_CameraList.push_back(camera);
         
@@ -196,15 +195,16 @@ namespace PurrKatEngine
         static bool inspector = true;
         if (ImGui::Begin("Camera Switcher", &inspector, ImGuiWindowFlags_AlwaysAutoResize))
         {
-            static int activeCamera = 0;
+            Entity activeCamEntity = m_ActiveScene.GetMainCamera();
             
-            auto& activeCamEntity = m_CameraList[activeCamera%m_CameraList.size()];
+            static int activeCamera = ArrayUtility::IndexOf(activeCamEntity, m_CameraList);
             
-            ImGui::TextColored({0.2f, 0.8f, 0.2f, 1.0f}, "Active Camera: %s", ENTITY_GET_NAME(activeCamEntity).c_str());
+            if (activeCamEntity.IsValid())
+                ImGui::TextColored({0.2f, 0.8f, 0.2f, 1.0f}, "Active Camera: %s", ENTITY_GET_NAME(activeCamEntity).c_str());
             
             if (ImGui::Button("Switch Camera"))
             {
-                activeCamera = (activeCamera+1)%m_CameraList.size();
+                activeCamera = (activeCamera + 1)%m_CameraList.size();
                 auto& newActiveCamEntity = m_CameraList[activeCamera%m_CameraList.size()];
                 m_ActiveScene.SetMainCamera(newActiveCamEntity);
             }
