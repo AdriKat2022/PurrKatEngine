@@ -1,6 +1,8 @@
 ﻿#include "EditorViewLayer.h"
 
+#include "PurrKatEngine/Serialization/SceneSerializer.h"
 #include "PurrKatEngine/Utility/ArrayUtility.h"
+#include "PurrKatEngine/Scene/Scene.h"
 
 namespace PurrKatEngine
 {
@@ -15,12 +17,14 @@ namespace PurrKatEngine
         m_FrameBuffer = FrameBuffer::CreateRef({.Width = 1920, .Height = 1080, .UpscalingFilterType = FilterType::Nearest});
         m_Cpp = Texture2D::CreateRef("assets/textures/cpp.png", { .Filter = Texture2D::FilterType::Nearest});
 
+        m_ActiveScene = MakeRef<Scene>();
+        
         Entity square;
         
-        square = m_ActiveScene.CreateEntity("Square");
-        square.AddComponent<SpriteComponent>(glm::vec4{1.0f, 0, 0, 1.0f});
-        square = m_ActiveScene.CreateEntity("Square Behind", {-1.0f, 1.0f, -5.0f});
-        square.AddComponent<SpriteComponent>(glm::vec4{0.2f, 0.8f, 0, 1.0f});
+        // square = m_ActiveScene->CreateEntity("Square");
+        // square.AddComponent<SpriteComponent>(glm::vec4{1.0f, 0, 0, 1.0f});
+        // square = m_ActiveScene->CreateEntity("Square Behind", {-1.0f, 1.0f, -5.0f});
+        // square.AddComponent<SpriteComponent>(glm::vec4{0.2f, 0.8f, 0, 1.0f});
         
         class CameraController : public ScriptableEntity
         {
@@ -76,17 +80,21 @@ namespace PurrKatEngine
         };
         
         Entity camera;
-        // camera = m_ActiveScene.CreateEntity("Camera2");
+        // camera = m_ActiveScene->CreateEntity("Camera2");
         // camera.AddComponent<CameraComponent>();
         // camera.AddComponent<ScriptComponent>().Bind<CameraController>();
         // m_CameraList.push_back(camera);
         
-        camera = m_ActiveScene.CreateEntity("Camera", {0, 0, 5});
-        camera.AddComponent<CameraComponent>().Camera.SetProjectionType(SceneCamera::ProjectionType::Perspective);
-        camera.AddComponent<ScriptComponent>().Bind<CameraController>();
-        m_CameraList.push_back(camera);
+        // camera = m_ActiveScene->CreateEntity("Camera", {0, 0, 5});
+        // camera.AddComponent<CameraComponent>().Camera.SetProjectionType(SceneCamera::ProjectionType::Perspective);
+        // camera.AddComponent<ScriptComponent>().Bind<CameraController>();
+        // m_CameraList.push_back(camera);
         
-        m_SceneHierarchyPanel.SetScene(&m_ActiveScene);
+        m_SceneHierarchyPanel.SetScene(m_ActiveScene.get());
+        
+        SceneSerializer serializer(m_ActiveScene);
+        // serializer.Serialize("assets/scenes/testScene.pkscene");
+        serializer.Deserialize("assets/scenes/testScene.pkscene");
     }
 
     void EditorViewLayer::OnAttach()
@@ -199,7 +207,7 @@ namespace PurrKatEngine
         static bool inspector = true;
         if (ImGui::Begin("Camera Switcher", &inspector, ImGuiWindowFlags_AlwaysAutoResize))
         {
-            Entity activeCamEntity = m_ActiveScene.GetMainCamera();
+            Entity activeCamEntity = m_ActiveScene->GetMainCamera();
             
             static int activeCamera = ArrayUtility::IndexOf(activeCamEntity, m_CameraList);
             
@@ -210,7 +218,7 @@ namespace PurrKatEngine
             {
                 activeCamera = (activeCamera + 1)%m_CameraList.size();
                 auto& newActiveCamEntity = m_CameraList[activeCamera%m_CameraList.size()];
-                m_ActiveScene.SetMainCamera(newActiveCamEntity);
+                m_ActiveScene->SetMainCamera(newActiveCamEntity);
             }
         }
         ImGui::End();
@@ -231,7 +239,7 @@ namespace PurrKatEngine
                 m_UpScaledFrameBuffer->Resize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
                 // m_FrameBuffer->Resize((uint32_t)(viewportSize.x/(float)m_UpScaleFactor), (uint32_t)(viewportSize.y/(float)m_UpScaleFactor));
                 m_CameraController.SetAspectRatio(viewportSize.x/viewportSize.y);
-                m_ActiveScene.OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+                m_ActiveScene->OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
             }
             else
             {
@@ -255,7 +263,7 @@ namespace PurrKatEngine
             m_CameraController.OnEvent(event);
     }
 
-    void EditorViewLayer::RenderEditorViewport()
+    void EditorViewLayer::RenderEditorViewport() const
     {
         // Render in Frame Buffer
         m_FrameBuffer->Bind();
@@ -263,7 +271,7 @@ namespace PurrKatEngine
         RenderCommand::SetClearColor(m_BackgroundColor);
         RenderCommand::Clear();
 
-        m_ActiveScene.OnUpdate();
+        m_ActiveScene->OnUpdate();
 
         // Renderer2D::BeginScene(m_CameraController.GetCamera(), false);
         // Renderer2D::DrawQuad({0.0f, 0.0f}, {1.0f, 1.0f});

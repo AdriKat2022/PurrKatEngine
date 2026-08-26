@@ -11,6 +11,7 @@ namespace PurrKatEngine
     {
         friend class Entity;
         friend class SceneHierarchyPanel;
+        friend class SceneSerializer;
         
     public:
         Scene();

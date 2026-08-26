@@ -16,7 +16,7 @@ namespace PurrKatEngine
         void OnEvent(Event& event) override;
 
     private:
-        void RenderEditorViewport();
+        void RenderEditorViewport() const;
         
     private:
         glm::vec4 m_BackgroundColor{0.1f, 0.1f, 0.1f, 1.0f};
@@ -34,7 +34,7 @@ namespace PurrKatEngine
         SpriteSheet m_GrassSpriteSheet;
         Ref<const Texture2D> m_Cpp;
         
-        Scene m_ActiveScene;
+        Ref<Scene> m_ActiveScene;
         std::vector<Entity> m_CameraList;
         
         SceneHierarchyPanel m_SceneHierarchyPanel;

@@ -2,6 +2,7 @@
 #include "SceneCamera.h"
 
 #include <glm/ext/matrix_clip_space.hpp>
+#include "PurrKatEngine/Logs/InternalLog.h"
 
 namespace PurrKatEngine
 {
@@ -58,7 +59,13 @@ namespace PurrKatEngine
         
         if (m_ProjectionType == ProjectionType::Perspective)
         {
-            m_ProjectionMatrix = glm::perspective(m_PerspectivePov, aspectRatio, m_PerspectiveNear, m_PerspectiveFar);
+            float adjustedFov = m_PerspectivePov; // Default FOV (vertical)
+
+            // Scale FOV horizontally to match width (wider FOV)
+            if (m_AspectRatioAdjustementMode == AspectRatioAdjustmentMode::MatchWidth)
+                adjustedFov = 2.0f * std::atan(std::tan(m_PerspectivePov * 0.5f) / aspectRatio);
+
+            m_ProjectionMatrix = glm::perspective(adjustedFov, aspectRatio, m_PerspectiveNear, m_PerspectiveFar);
         }
         else // ORTHOGRAPHIC
         {

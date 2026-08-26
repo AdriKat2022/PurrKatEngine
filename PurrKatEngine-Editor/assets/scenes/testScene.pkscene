@@ -1,0 +1,32 @@
+Scene: Untitled
+Entities:
+  - Entity: 2
+    Tag: Camera
+    Transform:
+      Position: [0, 0, 5]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Camera:
+      ProjectionType: 0
+      PerspectiveFOV: 0.7853982
+      PerspectiveNear: 0.01
+      PerspectiveFar: 1000
+      OrthographicSize: 10
+      OrthographicNear: -1
+      OrthographicFar: 1
+  - Entity: 1
+    Tag: Square Behind
+    Transform:
+      Position: [-1, 1, -5]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Sprite:
+      Color: [0.2, 0.8, 0, 1]
+  - Entity: 0
+    Tag: Square
+    Transform:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Sprite:
+      Color: [1, 0, 0, 1]

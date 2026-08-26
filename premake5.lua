@@ -14,7 +14,7 @@ IncludeDirs["ImGui"] = "PurrKatEngine/vendor/imgui"
 IncludeDirs["Glm"] = "PurrKatEngine/vendor/glm"
 IncludeDirs["stb_image"] = "PurrKatEngine/vendor/stb_image"
 IncludeDirs["entt"] = "PurrKatEngine/vendor/entt/include"
-IncludeDirs["yaml"] = "PurrKatEngine/vendor/yaml-cpp/include/yaml-cpp"
+IncludeDirs["yaml"] = "PurrKatEngine/vendor/yaml-cpp/include"
 
 group "Dependencies"
     include "PurrKatEngine/vendor"
