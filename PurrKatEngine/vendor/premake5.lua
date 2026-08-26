@@ -190,3 +190,50 @@ project "Glad"
     filter "configurations:Dist"
 		runtime "Release"
 		optimize "on"
+
+project "YAML-CPP"
+    location "yaml-cpp"
+    kind "StaticLib"
+    language "C"
+    warnings "off"
+    
+    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+    objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+    
+    projectFolder = "yaml-cpp"
+    
+    files
+    {
+        projectFolder.."/include/yaml-cpp/**.h",
+        projectFolder.."/src/**.cpp",
+    }
+    
+    includedirs
+    {
+        projectFolder.."/include",
+        projectFolder.."/src",
+    }
+
+    defines { "YAML_CPP_STATIC_DEFINE" }
+
+    filter "system:linux"
+        pic "On"
+        systemversion "latest"
+    
+        filter "system:macosx"
+        pic "On"
+    
+    filter "system:windows"
+        systemversion "latest"
+    
+    filter "configurations:Debug"
+        runtime "Debug"
+        symbols "on"
+    
+    filter "configurations:Release"
+        runtime "Release"
+        optimize "on"
+    
+    filter "configurations:Dist"
+        runtime "Release"
+        optimize "on"

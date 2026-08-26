@@ -14,6 +14,7 @@ IncludeDirs["ImGui"] = "PurrKatEngine/vendor/imgui"
 IncludeDirs["Glm"] = "PurrKatEngine/vendor/glm"
 IncludeDirs["stb_image"] = "PurrKatEngine/vendor/stb_image"
 IncludeDirs["entt"] = "PurrKatEngine/vendor/entt/include"
+IncludeDirs["yaml"] = "PurrKatEngine/vendor/yaml-cpp/include/yaml-cpp"
 
 group "Dependencies"
     include "PurrKatEngine/vendor"
@@ -33,7 +34,7 @@ project "PurrKatEngine"
     pchheader "pkepch.h"
     pchsource "PurrKatEngine/src/pkepch.cpp"
 
-    defines { "_CRT_SECURE_NO_WARNINGS" }
+    defines { "_CRT_SECURE_NO_WARNINGS", "YAML_CPP_STATIC_DEFINE" }
 
     files
     {
@@ -52,7 +53,8 @@ project "PurrKatEngine"
         "%{IncludeDirs.ImGui}",
         "%{IncludeDirs.Glm}",
         "%{IncludeDirs.stb_image}",
-        "%{IncludeDirs.entt}"
+        "%{IncludeDirs.entt}",
+        "%{IncludeDirs.yaml}"
     }
 
     links
@@ -60,7 +62,8 @@ project "PurrKatEngine"
         "GLFW",
         "Glad",
         "ImGui",
-        "opengl32.lib"
+        "opengl32.lib",
+        "YAML-CPP"
     }
 
     filter "system:windows"
@@ -105,7 +108,8 @@ project "PurrKatEngine-Editor"
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
-    files {
+    files
+    {
         "%{prj.name}/src/**.h",
         "%{prj.name}/src/**.cpp"
     }
@@ -117,7 +121,8 @@ project "PurrKatEngine-Editor"
         "%{wks.location}/PurrKatEngine/src",
         "%{IncludeDirs.Glm}",
         "%{IncludeDirs.ImGui}",
-        "%{IncludeDirs.entt}"
+        "%{IncludeDirs.entt}",
+        "%{IncludeDirs.yaml}"
     }
 
     links
@@ -158,7 +163,8 @@ project "Sandbox"
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
-    files {
+    files
+    {
         "%{prj.name}/src/**.h",
         "%{prj.name}/src/**.cpp"
     }
@@ -170,7 +176,8 @@ project "Sandbox"
         "%{wks.location}/PurrKatEngine/src",
         "%{IncludeDirs.Glm}",
         "%{IncludeDirs.ImGui}",
-        "%{IncludeDirs.entt}"
+        "%{IncludeDirs.entt}",
+        "%{IncludeDirs.yaml}"
     }
 
     links
