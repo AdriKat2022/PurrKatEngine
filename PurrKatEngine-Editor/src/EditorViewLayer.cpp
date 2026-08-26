@@ -19,13 +19,6 @@ namespace PurrKatEngine
 
         m_ActiveScene = MakeRef<Scene>();
         
-        Entity square;
-        
-        // square = m_ActiveScene->CreateEntity("Square");
-        // square.AddComponent<SpriteComponent>(glm::vec4{1.0f, 0, 0, 1.0f});
-        // square = m_ActiveScene->CreateEntity("Square Behind", {-1.0f, 1.0f, -5.0f});
-        // square.AddComponent<SpriteComponent>(glm::vec4{0.2f, 0.8f, 0, 1.0f});
-        
         class CameraController : public ScriptableEntity
         {
         public:
@@ -79,21 +72,9 @@ namespace PurrKatEngine
             }
         };
         
-        Entity camera;
-        // camera = m_ActiveScene->CreateEntity("Camera2");
-        // camera.AddComponent<CameraComponent>();
-        // camera.AddComponent<ScriptComponent>().Bind<CameraController>();
-        // m_CameraList.push_back(camera);
-        
-        // camera = m_ActiveScene->CreateEntity("Camera", {0, 0, 5});
-        // camera.AddComponent<CameraComponent>().Camera.SetProjectionType(SceneCamera::ProjectionType::Perspective);
-        // camera.AddComponent<ScriptComponent>().Bind<CameraController>();
-        // m_CameraList.push_back(camera);
-        
         m_SceneHierarchyPanel.SetScene(m_ActiveScene.get());
         
         SceneSerializer serializer(m_ActiveScene);
-        // serializer.Serialize("assets/scenes/testScene.pkscene");
         serializer.Deserialize("assets/scenes/testScene.pkscene");
     }
 
@@ -175,6 +156,16 @@ namespace PurrKatEngine
         {
             if (ImGui::BeginMenu("File"))
             {
+                if (ImGui::MenuItem("Load Scene"))
+                {
+                    m_ActiveScene->EmptyScene();
+                    SceneSerializer(m_ActiveScene).Deserialize("assets/scenes/testScene.pkscene");
+                    m_ActiveScene->OnViewportResize((uint32_t)m_LastEditorViewportSize.x, (uint32_t)m_LastEditorViewportSize.y);
+                }
+                
+                if (ImGui::MenuItem("Save Scene"))
+                    SceneSerializer(m_ActiveScene).Serialize("assets/scenes/testScene.pkscene");
+                    
                 if (ImGui::MenuItem("Exit"))
                     Application::Get().QuitApplication();
 

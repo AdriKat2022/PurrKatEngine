@@ -28,6 +28,8 @@ namespace PurrKatEngine
         
         uint32_t GetViewportWidth() const { return m_ViewportWidth; }
         uint32_t GetViewportHeight() const { return m_ViewportHeight; }
+        
+        void EmptyScene();
 
     private:
         void FindFirstCameraInScene();

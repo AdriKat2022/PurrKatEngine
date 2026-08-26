@@ -96,6 +96,12 @@ namespace PurrKatEngine
         }
     }
 
+    void Scene::EmptyScene()
+    {
+        m_Registry.clear();
+        m_MainCameraEntityRef = entt::null;
+    }
+
     void Scene::FindFirstCameraInScene()
     {
         auto cameras = m_Registry.view<CameraComponent>();
