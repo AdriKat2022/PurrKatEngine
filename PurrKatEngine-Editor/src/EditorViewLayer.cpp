@@ -312,11 +312,14 @@ namespace PurrKatEngine
         dispatcher.Dispatch<KeyPressedEvent>([this](KeyPressedEvent& e)
         {
             if (e.IsRepeat()) return false;
+
+            bool control = Input::IsKeyPressed(KeyCode::LeftCtrl) || Input::IsKeyPressed(KeyCode::RightCtrl);
+            bool shift = Input::IsKeyPressed(KeyCode::LeftShift) || Input::IsKeyPressed(KeyCode::RightShift);
             
             switch (e.GetKeyCode())
             {
                 case KeyCode::N:
-                    if (Input::IsKeyPressed(KeyCode::LeftCtrl))
+                    if (control)
                     {
                         m_EditorContext.NewScene();
                         return true;
@@ -324,7 +327,7 @@ namespace PurrKatEngine
                     break;
                     
                 case KeyCode::O:
-                    if (Input::IsKeyPressed(KeyCode::LeftCtrl))
+                    if (control)
                     {
                         m_EditorContext.OpenScene();
                         return true;
@@ -332,9 +335,9 @@ namespace PurrKatEngine
                     break;
                     
                 case KeyCode::S:
-                    if (Input::IsKeyPressed(KeyCode::LeftCtrl))
+                    if (control)
                     {
-                        if (Input::IsKeyPressed(KeyCode::LeftShift))
+                        if (shift)
                             m_EditorContext.SaveSceneAs();
                         else
                             m_EditorContext.SaveScene();
@@ -342,6 +345,20 @@ namespace PurrKatEngine
                         return true;
                     }
                     break;
+                    
+                // ------- GIZMOS --------
+                // case KeyCode::Q:
+                //     m_GizmoOperation = -1;
+                //     return true;
+                case KeyCode::W:
+                    m_GizmoOperation = ImGuizmo::OPERATION::TRANSLATE;
+                    return true;
+                case KeyCode::E:
+                    m_GizmoOperation = ImGuizmo::OPERATION::ROTATE;
+                    return true;
+                case KeyCode::R:
+                    m_GizmoOperation = ImGuizmo::OPERATION::SCALE;
+                    return true;
             }
             
             return false;
