@@ -17,7 +17,7 @@ namespace PurrKatEngine
             if (it == std::end(container))
                 return -1; // Not found
                 
-            return std::distance(std::begin(container), it);
+            return (int)std::distance(std::begin(container), it);
         }
         
     };

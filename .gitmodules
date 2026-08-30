@@ -13,3 +13,6 @@
 [submodule "PurrKatEngine/vendor/yaml-cpp"]
 	path = PurrKatEngine/vendor/yaml-cpp
 	url = git@github.com:jbeder/yaml-cpp.git
+[submodule "PurrKatEngine/vendor/ImGuizmo"]
+	path = PurrKatEngine/vendor/ImGuizmo
+	url = https://github.com/CedricGuillemet/ImGuizmo.git

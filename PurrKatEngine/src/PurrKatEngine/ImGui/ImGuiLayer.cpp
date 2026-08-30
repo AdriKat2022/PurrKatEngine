@@ -3,9 +3,11 @@
 
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
+#include "ImGuizmo.h"
 #include "GLFW/glfw3.h"
 #include "PurrKatEngine/Application.h"
 #include "PurrKatEngine/Logs/InternalLog.h"
+#include "ImGuizmo.h"
 
 namespace PurrKatEngine
 {
@@ -73,6 +75,7 @@ namespace PurrKatEngine
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+        ImGuizmo::BeginFrame();
     }
 
     void ImGuiLayer::End()

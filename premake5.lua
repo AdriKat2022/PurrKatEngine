@@ -15,6 +15,7 @@ IncludeDirs["Glm"] = "PurrKatEngine/vendor/glm"
 IncludeDirs["stb_image"] = "PurrKatEngine/vendor/stb_image"
 IncludeDirs["entt"] = "PurrKatEngine/vendor/entt/include"
 IncludeDirs["yaml"] = "PurrKatEngine/vendor/yaml-cpp/include"
+IncludeDirs["ImGuizmo"] = "PurrKatEngine/vendor/ImGuizmo/src"
 
 group "Dependencies"
     include "PurrKatEngine/vendor"
@@ -40,21 +41,24 @@ project "PurrKatEngine"
     {
         "%{prj.name}/src/**.h",
         "%{prj.name}/src/**.cpp",
-        "%{prj.name}/vendor/stb_image/**.h",
-        "%{prj.name}/vendor/stb_image/**.cpp",
+        "PurrKatEngine/vendor/stb_image/**.h",
+        "PurrKatEngine/vendor/stb_image/**.cpp",
+        "PurrKatEngine/vendor/ImGuizmo/src/ImGuizmo.h",
+        "PurrKatEngine/vendor/ImGuizmo/src/ImGuizmo.cpp",
     }
 
     includedirs
     {
-        "%{prj.location}/vendor/spdlog/include",
-        "%{prj.location}/src",
+        "PurrKatEngine/vendor/spdlog/include",
+        "PurrKatEngine/src",
         "%{IncludeDirs.GLFW}",
         "%{IncludeDirs.Glad}",
         "%{IncludeDirs.ImGui}",
         "%{IncludeDirs.Glm}",
         "%{IncludeDirs.stb_image}",
         "%{IncludeDirs.entt}",
-        "%{IncludeDirs.yaml}"
+        "%{IncludeDirs.yaml}",
+        "%{IncludeDirs.ImGuizmo}",
     }
 
     links
@@ -65,6 +69,9 @@ project "PurrKatEngine"
         "opengl32.lib",
         "YAML-CPP"
     }
+
+    filter "files:PurrKatEngine/vendor/ImGuizmo/**.cpp"
+        flags { "NoPCH" }
 
     filter "system:windows"
         systemversion "latest"
@@ -113,18 +120,21 @@ project "PurrKatEngine-Editor"
     files
     {
         "%{prj.name}/src/**.h",
-        "%{prj.name}/src/**.cpp"
+        "%{prj.name}/src/**.cpp",
+        "PurrKatEngine/vendor/ImGuizmo/src/ImGuizmo.h",
+        "PurrKatEngine/vendor/ImGuizmo/src/ImGuizmo.cpp",
     }
 
     includedirs
     {
-        "%{wks.location}/PurrKatEngine/vendor/spdlog/include",
-        "%{wks.location}/PurrKatEngine/vendor",
-        "%{wks.location}/PurrKatEngine/src",
+        "PurrKatEngine/vendor/spdlog/include",
+        "PurrKatEngine/vendor",
+        "PurrKatEngine/src",
         "%{IncludeDirs.Glm}",
         "%{IncludeDirs.ImGui}",
         "%{IncludeDirs.entt}",
-        "%{IncludeDirs.yaml}"
+        "%{IncludeDirs.yaml}",
+        "%{IncludeDirs.ImGuizmo}",
     }
 
     links
@@ -171,9 +181,9 @@ project "Sandbox"
 
     includedirs
     {
-        "%{wks.location}/PurrKatEngine/vendor/spdlog/include",
-        "%{wks.location}/PurrKatEngine/vendor",
-        "%{wks.location}/PurrKatEngine/src",
+        "PurrKatEngine/vendor/spdlog/include",
+        "PurrKatEngine/vendor",
+        "PurrKatEngine/src",
         "%{IncludeDirs.Glm}",
         "%{IncludeDirs.ImGui}",
         "%{IncludeDirs.entt}",
@@ -188,9 +198,7 @@ project "Sandbox"
     filter "system:windows"
         systemversion "latest"
         
-        defines {
-            "PKE_PLATFORM_WINDOWS"
-        }
+        defines { "PKE_PLATFORM_WINDOWS" }
     
     filter { "configurations:Debug" }
         defines { "PKE_DEBUG" }

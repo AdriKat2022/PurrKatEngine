@@ -66,6 +66,8 @@ namespace PurrKatEngine
         
         if (opened)
         {
+            // TODO: Draw children entities here.
+            
             opened = ImGui::TreeNodeEx((void*)(uint64_t)entity, flags, entityName.c_str());
             
             if (opened)

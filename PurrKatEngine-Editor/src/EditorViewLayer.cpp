@@ -244,6 +244,54 @@ namespace PurrKatEngine
                 // m_UpScaledFrameBuffer->ScaleFrom(*m_FrameBuffer);
             }
             ImGui::Image(m_FrameBuffer->GetColorAttachmentRendererID(), *(ImVec2*)&m_LastEditorViewportSize, {0, 1}, {1, 0});
+            
+            // ---------- GIZMOS ------------
+            Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
+            if (selectedEntity.IsValid() && selectedEntity.HasComponent<TransformComponent>())
+            {
+                // Init
+                ImGuizmo::SetOrthographic(true);
+                ImGuizmo::SetDrawlist();
+                float windowWidth = ImGui::GetWindowWidth();
+                float windowHeight = ImGui::GetWindowHeight();
+                ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+
+                // Camera
+                Entity cameraEntity = m_ActiveScene->GetMainCamera();
+                CameraComponent& mainCamera = cameraEntity.GetComponent<CameraComponent>();
+                glm::mat4 cameraProjection = mainCamera.Camera.GetProjectionMatrix();
+                glm::mat4 cameraView = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransformMatrix());
+
+                // Entity transform
+                TransformComponent& transform = selectedEntity.GetComponent<TransformComponent>();
+                glm::mat4 transformMatrix = transform;
+
+                // Snapping
+                // bool snap = Input::IsKeyPressed(KeyCode::LeftControl);
+                // float snapValue = 0.5f; // Snap to 0.5m for translation/scale
+                // if (m_CurrentGizmoOperation == ImGuizmo::OPERATION::ROTATE)
+                //     snapValue = 45.0f; // Snap to 45 degrees for rotation
+                // float snapValues[3] = {snapValue, snapValue, snapValue};
+
+                ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
+                                     m_GizmoOperation, ImGuizmo::LOCAL,
+                                     glm::value_ptr(transformMatrix));
+                
+                if (ImGuizmo::IsUsing())
+                {
+                    glm::vec3 translation, rotation, scale;
+                    
+                    if (Math::DecomposeTransform(transformMatrix, translation, rotation, scale))
+                    {
+                        glm::vec3 originalRotation = transform.Rotation;
+                        glm::vec3 deltaRotation = rotation - originalRotation;
+                        
+                        transform.Position = translation;
+                        transform.Rotation += deltaRotation;
+                        transform.Scale = scale;
+                    }
+                }
+            }
         }
         ImGui::End();
         ImGui::PopStyleVar();

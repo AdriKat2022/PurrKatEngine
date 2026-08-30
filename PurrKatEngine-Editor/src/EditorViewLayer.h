@@ -2,6 +2,7 @@
 #include "EditorContext.h"
 #include "PurrKatEngine.h"
 #include "EditorPanels/SceneHierarchyPanel.h"
+#include "ImGuizmo.h"
 
 namespace PurrKatEngine
 {
@@ -21,6 +22,9 @@ namespace PurrKatEngine
         
     private:
         EditorContext m_EditorContext;
+        
+        // GIZMO
+        ImGuizmo::OPERATION m_GizmoOperation = ImGuizmo::OPERATION::TRANSLATE;
         
         glm::vec4 m_BackgroundColor{0.1f, 0.1f, 0.1f, 1.0f};
         glm::vec2 m_LastEditorViewportSize;

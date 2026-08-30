@@ -13,7 +13,8 @@ namespace PurrKatEngine
 
         void SetScene(Scene* scene);
         void OnImGuiRender();
-        
+        Entity GetSelectedEntity() const { return m_ActiveSelection; }
+
     private:
         void DrawImGuiSceneHierarchy();
         void DrawEntityNode(Entity& entity);

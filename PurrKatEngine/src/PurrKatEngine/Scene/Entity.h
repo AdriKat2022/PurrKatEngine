@@ -39,7 +39,7 @@ namespace PurrKatEngine
         }
         
         template<typename T>
-        bool TryGetComponent(const T*& outComponent) const
+        bool TryGetComponent(T*& outComponent) const
         {
             if (m_Scene->m_Registry.any_of<T>(m_EntityId))
             {
