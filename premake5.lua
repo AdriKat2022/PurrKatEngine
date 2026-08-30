@@ -78,7 +78,7 @@ project "PurrKatEngine"
 
         defines {
             "PKE_PLATFORM_WINDOWS",
-            "PKE_BUILD_DLL",
+            --"PKE_BUILD_DLL",
             "GLFW_INCLUDE_NONE"
         }
 
@@ -121,8 +121,6 @@ project "PurrKatEngine-Editor"
     {
         "%{prj.name}/src/**.h",
         "%{prj.name}/src/**.cpp",
-        "PurrKatEngine/vendor/ImGuizmo/src/ImGuizmo.h",
-        "PurrKatEngine/vendor/ImGuizmo/src/ImGuizmo.cpp",
     }
 
     includedirs

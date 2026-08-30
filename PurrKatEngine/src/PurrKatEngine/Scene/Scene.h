@@ -5,6 +5,7 @@
 
 namespace PurrKatEngine
 {
+    class EditorCamera;
     struct TransformComponent;
     struct CameraComponent;
 
@@ -21,7 +22,9 @@ namespace PurrKatEngine
         Entity CreateEntity(const std::string& entityName = "Game Entity", const glm::vec3& position = glm::vec3(0.0f, 0.0f, 0.0f));
         void DestroyEntity(Entity& entity);
         
-        void OnUpdate();
+        void OnRuntimeUpdate();
+        void OnEditorUpdate(const EditorCamera& camera);
+        
         void OnViewportResize(uint32_t width, uint32_t height);
         
         void SetMainCamera(const Entity& camEntity);

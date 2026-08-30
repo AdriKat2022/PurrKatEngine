@@ -3,12 +3,14 @@
 
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.inl>
+#include "PurrKatEngine/Editor/EditorCamera.h"
 #include "PurrKatEngine/Profiling/Profiler.h"
 #include "PurrKatEngine/Renderer/Buffer.h"
 #include "PurrKatEngine/Renderer/Camera.h"
 #include "PurrKatEngine/Renderer/RenderCommand.h"
 #include "PurrKatEngine/Renderer/Shader.h"
 #include "PurrKatEngine/Renderer/Tex2D.h"
+#include "PurrKatEngine/Renderer/Texture.h"
 #include "PurrKatEngine/Renderer/VertexArray.h"
 #include "PurrKatEngine/Utility/ImGuiUtility.h"
 
@@ -173,7 +175,23 @@ namespace PurrKatEngine
             s_RendererData.SpriteColorShader->SetUniformMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
         }
     }
-    
+
+    void Renderer2D::BeginScene(const EditorCamera& camera, bool litScene)
+    {
+        s_RendererData.IsLitScene = litScene;
+        
+        if (litScene)
+        {
+            s_RendererData.SpriteColorShaderLit->Bind();
+            s_RendererData.SpriteColorShaderLit->SetUniformMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
+        }
+        else
+        {
+            s_RendererData.SpriteColorShader->Bind();
+            s_RendererData.SpriteColorShader->SetUniformMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
+        }
+    }
+
     void Renderer2D::EndScene()
     {
         FlushScene();

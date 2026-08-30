@@ -42,7 +42,7 @@ namespace PurrKatEngine
 
     Entity Scene::GetMainCamera() { return {m_MainCameraEntityRef, this}; }
 
-    void Scene::OnUpdate()
+    void Scene::OnRuntimeUpdate()
     {
         // Update all Scriptable Entities.
         m_Registry.view<ScriptComponent>().each([this](auto entity, ScriptComponent& scriptComp)
@@ -72,6 +72,20 @@ namespace PurrKatEngine
         auto& transformComponent = m_Registry.get<TransformComponent>(m_MainCameraEntityRef);
         
         Renderer2D::BeginScene(camera, transformComponent);
+        
+        auto group = m_Registry.group<TransformComponent>(entt::get<SpriteComponent>);
+        for (const auto& entity : group)
+        {
+            auto [transform, sprite] = group.get<TransformComponent, SpriteComponent>(entity);
+            Renderer2D::DrawQuad(transform, nullptr, {1, 1}, sprite.Color);
+        }
+        
+        Renderer2D::EndScene();
+    }
+
+    void Scene::OnEditorUpdate(const EditorCamera& camera)
+    {
+        Renderer2D::BeginScene(camera);
         
         auto group = m_Registry.group<TransformComponent>(entt::get<SpriteComponent>);
         for (const auto& entity : group)

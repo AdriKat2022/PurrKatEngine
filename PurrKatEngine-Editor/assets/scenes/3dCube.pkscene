@@ -1,0 +1,66 @@
+Scene: Untitled
+Entities:
+  - Entity: 7
+    Tag: Game Entity
+    Transform:
+      Position: [-1, 0.5, 1.5]
+      Rotation: [-1.5707964, 0, 0]
+      Scale: [1, 0.99991524, 0.99991524]
+    Sprite:
+      Color: [0.08049543, 0.14779338, 0.8078292, 1]
+  - Entity: 6
+    Tag: Game Entity
+    Transform:
+      Position: [0, 0.5, 1.5]
+      Rotation: [-1.5707964, 0, 0]
+      Scale: [1, 0.99999577, 0.99999577]
+    Sprite:
+      Color: [1, 1, 1, 1]
+  - Entity: 5
+    Tag: Game Entity
+    Transform:
+      Position: [0.5, 0, 1.5]
+      Rotation: [0, 1.5707964, 0]
+      Scale: [0.99999005, 1, 0.99999005]
+    Sprite:
+      Color: [1, 1, 1, 1]
+  - Entity: 4
+    Tag: Game Entity
+    Transform:
+      Position: [-1, 0.5, 0.5]
+      Rotation: [-1.5707964, 0, 0]
+      Scale: [1, 0.9999951, 0.9999951]
+    Sprite:
+      Color: [1, 1, 1, 1]
+  - Entity: 3
+    Tag: Game Entity
+    Transform:
+      Position: [-1, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Sprite:
+      Color: [1, 1, 1, 1]
+  - Entity: 2
+    Tag: Game Entity
+    Transform:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Sprite:
+      Color: [0.060821235, 0.37010676, 0.042147398, 1]
+  - Entity: 1
+    Tag: Game Entity
+    Transform:
+      Position: [0.5, 0, 0.5]
+      Rotation: [0, 1.5707964, 0]
+      Scale: [0.9999965, 1, 0.9999965]
+    Sprite:
+      Color: [0, 0.6797153, 0.13545918, 1]
+  - Entity: 0
+    Tag: Game Entity
+    Transform:
+      Position: [0, 0.5, 0.5]
+      Rotation: [-1.570451, 0, 0]
+      Scale: [1, 0.9999999, 0.9999999]
+    Sprite:
+      Color: [0.33096087, 1, 0.33572263, 1]

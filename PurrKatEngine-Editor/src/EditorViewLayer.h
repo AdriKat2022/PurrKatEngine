@@ -3,6 +3,7 @@
 #include "PurrKatEngine.h"
 #include "EditorPanels/SceneHierarchyPanel.h"
 #include "ImGuizmo.h"
+#include "PurrKatEngine/Editor/EditorCamera.h"
 
 namespace PurrKatEngine
 {
@@ -23,6 +24,8 @@ namespace PurrKatEngine
     private:
         EditorContext m_EditorContext;
         
+        EditorCamera m_EditorCamera;
+        
         // GIZMO
         ImGuizmo::OPERATION m_GizmoOperation = ImGuizmo::OPERATION::TRANSLATE;
         
@@ -36,7 +39,6 @@ namespace PurrKatEngine
         Ref<FrameBuffer> m_FrameBuffer;
         Ref<FrameBuffer> m_UpScaledFrameBuffer;
 
-        OrthographicCameraController m_CameraController;
         SpriteSheet m_DirtSpriteSheet;
         SpriteSheet m_GrassSpriteSheet;
         Ref<const Texture2D> m_Cpp;

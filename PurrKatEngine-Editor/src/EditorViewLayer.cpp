@@ -8,8 +8,6 @@ namespace PurrKatEngine
 {
     EditorViewLayer::EditorViewLayer()
     {
-        m_CameraController.EnableZoom = true;
-
         m_GrassSpriteSheet.SetTexture(Texture2D::CreateRef("assets/textures/TileSets/Grass.png", {.Filter = Texture2D::FilterType::Nearest}));
         m_GrassSpriteSheet.SetSpriteSheetOptions({.CellCount = {11, 7}});
 
@@ -18,59 +16,6 @@ namespace PurrKatEngine
         m_Cpp = Texture2D::CreateRef("assets/textures/cpp.png", { .Filter = Texture2D::FilterType::Nearest});
 
         m_ActiveScene = m_EditorContext.GetScene();
-        
-        class CameraController : public ScriptableEntity
-        {
-        public:
-            bool EnableMovement = true;
-            bool EnableRotation = true;
-            
-            void OnStart() override
-            {
-                PKE_CORE_DEBUG("ON START!");
-                TransformComponent& transform = m_Entity.GetComponent<TransformComponent>();
-                SceneCamera& cam = GetComponent<CameraComponent>();
-                cam.SetOrthographicSize(Random::Float(0.5f, 15.0f));
-            }
-            
-            void OnUpdate() override
-            {
-                TransformComponent& transform = m_Entity.GetComponent<TransformComponent>();
-                
-                if (!HasComponent<CameraComponent>())
-                    return;
-                
-                SceneCamera& cam = GetComponent<CameraComponent>();
-                
-                float camRotation = 0;
-                
-                if (EnableMovement)
-                {
-                    glm::vec3 camPos = transform.Position;
-                    
-                    auto input = Input::GetAxis2D(KeyCode::W, KeyCode::A, KeyCode::S, KeyCode::D);
-        
-                    camPos.x += (
-                        cos(camRotation) * input.x
-                        -sin(camRotation) * input.y
-                    ) * (float)Time::deltaTime * cam.GetOrthographicSize();
-        
-                    camPos.y += (
-                        cos(camRotation) * input.y +
-                        sin(camRotation) * input.x
-                    ) * (float)Time::deltaTime * cam.GetOrthographicSize();
-                    
-                    transform.Position = camPos;
-                }
-
-                if (EnableRotation)
-                {
-                    auto input = Input::GetAxis(KeyCode::Q, KeyCode::E);
-                    camRotation += input * (float)Time::deltaTime;
-                }
-                
-            }
-        };
         
         m_SceneHierarchyPanel.SetScene(m_ActiveScene.get());
     }
@@ -89,9 +34,11 @@ namespace PurrKatEngine
     {
         Layer::OnUpdate();
         
-        if (m_IsEditorViewportFocused)
-            m_CameraController.OnUpdate();
-
+        if (m_IsEditorViewportFocused || m_IsEditorViewportHovered)
+        {
+            m_EditorCamera.OnUpdate();
+        }
+        
         RenderEditorViewport();
     }
 
@@ -198,7 +145,6 @@ namespace PurrKatEngine
         ImGui::End();
 
         ImGuiUtility::ShowApplicationInfoWindow();
-        ImGuiUtility::ShowOrthographicCameraInfos(m_CameraController);
         ImGuiUtility::ShowRendererStatistics(true);
         
         static bool inspector = true;
@@ -234,16 +180,16 @@ namespace PurrKatEngine
                 m_LastEditorViewportSize = viewportSize;
                 
                 m_UpScaledFrameBuffer->Resize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
-                // m_FrameBuffer->Resize((uint32_t)(viewportSize.x/(float)m_UpScaleFactor), (uint32_t)(viewportSize.y/(float)m_UpScaleFactor));
-                m_CameraController.SetAspectRatio(viewportSize.x/viewportSize.y);
+                m_FrameBuffer->Resize((uint32_t)(viewportSize.x/(float)m_UpScaleFactor), (uint32_t)(viewportSize.y/(float)m_UpScaleFactor));
                 m_ActiveScene->OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+                m_EditorCamera.SetViewportSize(viewportSize.x, viewportSize.y);
             }
             else
             {
                 // Rendering in the else branch helps decrease the flickering while resizing the viewport.
-                // m_UpScaledFrameBuffer->ScaleFrom(*m_FrameBuffer);
+                m_UpScaledFrameBuffer->ScaleFrom(*m_FrameBuffer);
             }
-            ImGui::Image(m_FrameBuffer->GetColorAttachmentRendererID(), *(ImVec2*)&m_LastEditorViewportSize, {0, 1}, {1, 0});
+            ImGui::Image(m_UpScaledFrameBuffer->GetColorAttachmentRendererID(), *(ImVec2*)&m_LastEditorViewportSize, {0, 1}, {1, 0});
             
             // ---------- GIZMOS ------------
             Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
@@ -257,11 +203,14 @@ namespace PurrKatEngine
                 ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
 
                 // Camera
-                Entity cameraEntity = m_ActiveScene->GetMainCamera();
-                CameraComponent& mainCamera = cameraEntity.GetComponent<CameraComponent>();
-                glm::mat4 cameraProjection = mainCamera.Camera.GetProjectionMatrix();
-                glm::mat4 cameraView = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransformMatrix());
-
+                // Entity cameraEntity = m_ActiveScene->GetMainCamera();
+                // CameraComponent& mainCamera = cameraEntity.GetComponent<CameraComponent>();
+                // glm::mat4 cameraProjection = mainCamera.Camera.GetProjectionMatrix();
+                // glm::mat4 cameraView = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransformMatrix());
+                glm::mat4 cameraProjection = m_EditorCamera.GetProjectionMatrix();
+                glm::mat4 cameraView = m_EditorCamera.GetViewMatrix();
+                
+                
                 // Entity transform
                 TransformComponent& transform = selectedEntity.GetComponent<TransformComponent>();
                 glm::mat4 transformMatrix = transform;
@@ -303,9 +252,7 @@ namespace PurrKatEngine
     {
         Layer::OnEvent(event);
         
-        // Block window events because we already handle the viewport manually via ImGui.
-        if (!event.IsInCategory(EventCategoryApplication) && m_IsEditorViewportHovered)
-            m_CameraController.OnEvent(event);
+        m_EditorCamera.OnEvent(event);
         
         // Shortcuts
         EventDispatcher dispatcher(event);
@@ -359,6 +306,21 @@ namespace PurrKatEngine
                 case KeyCode::R:
                     m_GizmoOperation = ImGuizmo::OPERATION::SCALE;
                     return true;
+                    
+                // ------- CAMERA FOCUS --------
+                case KeyCode::F:
+                {
+                    // TODO: The selected entity should belong to the EditorContext instead of the SceneHierarchyPanel.
+                    // TODO: Create event for when the selected entity changes.
+                    Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
+                    if (selectedEntity.IsValid())
+                    {
+                        TransformComponent& transform = selectedEntity.GetComponent<TransformComponent>();
+                        m_EditorCamera.SetFocusPoint(transform.Position);
+                        m_EditorCamera.SetDistance(10.0f);
+                        return true;
+                    }
+                }
             }
             
             return false;
@@ -373,13 +335,7 @@ namespace PurrKatEngine
         RenderCommand::SetClearColor(m_BackgroundColor);
         RenderCommand::Clear();
 
-        m_ActiveScene->OnUpdate();
-
-        // Renderer2D::BeginScene(m_CameraController.GetCamera(), false);
-        // Renderer2D::DrawQuad({0.0f, 0.0f}, {1.0f, 1.0f});
-        // Renderer2D::DrawQuad({1.0f, 1.0f}, {1.0f, 1.0f}, m_GrassSpriteSheet.GetSprite({0, 0}));
-        // Renderer2D::DrawQuad({1.0f, 1.0f}, SET_WIDTH(m_Cpp, 1), m_Cpp);
-        // Renderer2D::EndScene();
+        m_ActiveScene->OnEditorUpdate(m_EditorCamera);
 
         m_FrameBuffer->Unbind();
     }

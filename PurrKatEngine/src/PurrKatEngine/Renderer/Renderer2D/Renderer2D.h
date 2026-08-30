@@ -2,10 +2,10 @@
 #include "PurrKatEngine/Components/Transform.h"
 #include "PurrKatEngine/Renderer/OrthographicCamera.h"
 #include "PurrKatEngine/Renderer/Tex2D.h"
-#include "PurrKatEngine/Renderer/Texture.h"
 
 namespace PurrKatEngine
 {
+    class EditorCamera;
     class Camera;
 
     struct LightSource2D
@@ -24,6 +24,7 @@ namespace PurrKatEngine
         
         static void BeginScene(const Camera& camera, const glm::mat4& transform, bool litScene = false);
         static void BeginScene(const OrthographicCamera& camera, bool litScene = false);
+        static void BeginScene(const EditorCamera& camera, bool litScene = false);
         static void EndScene();
         static void FlushScene();
         
