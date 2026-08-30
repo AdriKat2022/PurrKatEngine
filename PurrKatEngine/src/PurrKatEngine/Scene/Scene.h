@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <entt.h>
+#include <glm/vec3.hpp>
 
 namespace PurrKatEngine
 {

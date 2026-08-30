@@ -13,11 +13,11 @@ namespace PurrKatEngine
         m_GrassSpriteSheet.SetTexture(Texture2D::CreateRef("assets/textures/TileSets/Grass.png", {.Filter = Texture2D::FilterType::Nearest}));
         m_GrassSpriteSheet.SetSpriteSheetOptions({.CellCount = {11, 7}});
 
-        m_UpScaledFrameBuffer = FrameBuffer::CreateRef({.Width = 1280, .Height = 720, .UpscalingFilterType = FilterType::Nearest});
-        m_FrameBuffer = FrameBuffer::CreateRef({.Width = 1920, .Height = 1080, .UpscalingFilterType = FilterType::Nearest});
+        m_UpScaledFrameBuffer = FrameBuffer::CreateRef({.Width = 1280, .Height = 720, .UpscalingFilterType = ImageFilterType::Nearest});
+        m_FrameBuffer = FrameBuffer::CreateRef({.Width = 1920, .Height = 1080, .UpscalingFilterType = ImageFilterType::Nearest});
         m_Cpp = Texture2D::CreateRef("assets/textures/cpp.png", { .Filter = Texture2D::FilterType::Nearest});
 
-        m_ActiveScene = MakeRef<Scene>();
+        m_ActiveScene = m_EditorContext.GetScene();
         
         class CameraController : public ScriptableEntity
         {
@@ -73,9 +73,6 @@ namespace PurrKatEngine
         };
         
         m_SceneHierarchyPanel.SetScene(m_ActiveScene.get());
-        
-        SceneSerializer serializer(m_ActiveScene);
-        serializer.Deserialize("assets/scenes/testScene.pkscene");
     }
 
     void EditorViewLayer::OnAttach()
@@ -156,17 +153,26 @@ namespace PurrKatEngine
         {
             if (ImGui::BeginMenu("File"))
             {
-                if (ImGui::MenuItem("Load Scene"))
-                {
-                    m_ActiveScene->EmptyScene();
-                    SceneSerializer(m_ActiveScene).Deserialize("assets/scenes/testScene.pkscene");
-                    m_ActiveScene->OnViewportResize((uint32_t)m_LastEditorViewportSize.x, (uint32_t)m_LastEditorViewportSize.y);
-                }
+                ImGui::BeginDisabled(true);
+                if (m_EditorContext.GetActiveSceneFilePath().empty())
+                    ImGui::MenuItem("Current Scene: Untitled*");
+                else
+                    ImGui::MenuItem((std::format("Current Scene: {}", m_EditorContext.GetActiveSceneName()).c_str()));
+                ImGui::EndDisabled();
                 
-                if (ImGui::MenuItem("Save Scene"))
-                    SceneSerializer(m_ActiveScene).Serialize("assets/scenes/testScene.pkscene");
-                    
-                if (ImGui::MenuItem("Exit"))
+                if (ImGui::MenuItem("New Scene", "Ctrl + N"))
+                    m_EditorContext.NewScene();
+
+                if (ImGui::MenuItem("Open Scene...", "Ctrl + O"))
+                    m_EditorContext.OpenScene();
+
+                if (ImGui::MenuItem("Save Scene", "Ctrl + S"))
+                    m_EditorContext.SaveScene();
+
+                if (ImGui::MenuItem("Save Scene As...", "Ctrl + Shift + S"))
+                    m_EditorContext.SaveSceneAs();
+
+                if (ImGui::MenuItem("Exit without saving", "Alt + F4"))
                     Application::Get().QuitApplication();
 
                 ImGui::EndMenu();
@@ -252,6 +258,46 @@ namespace PurrKatEngine
         // Block window events because we already handle the viewport manually via ImGui.
         if (!event.IsInCategory(EventCategoryApplication) && m_IsEditorViewportHovered)
             m_CameraController.OnEvent(event);
+        
+        // Shortcuts
+        EventDispatcher dispatcher(event);
+        dispatcher.Dispatch<KeyPressedEvent>([this](KeyPressedEvent& e)
+        {
+            if (e.IsRepeat()) return false;
+            
+            switch (e.GetKeyCode())
+            {
+                case KeyCode::N:
+                    if (Input::IsKeyPressed(KeyCode::LeftCtrl))
+                    {
+                        m_EditorContext.NewScene();
+                        return true;
+                    }
+                    break;
+                    
+                case KeyCode::O:
+                    if (Input::IsKeyPressed(KeyCode::LeftCtrl))
+                    {
+                        m_EditorContext.OpenScene();
+                        return true;
+                    }
+                    break;
+                    
+                case KeyCode::S:
+                    if (Input::IsKeyPressed(KeyCode::LeftCtrl))
+                    {
+                        if (Input::IsKeyPressed(KeyCode::LeftShift))
+                            m_EditorContext.SaveSceneAs();
+                        else
+                            m_EditorContext.SaveScene();
+
+                        return true;
+                    }
+                    break;
+            }
+            
+            return false;
+        });
     }
 
     void EditorViewLayer::RenderEditorViewport() const

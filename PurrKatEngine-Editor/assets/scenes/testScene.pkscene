@@ -35,7 +35,7 @@ Entities:
   - Entity: 0
     Tag: Camera
     Transform:
-      Position: [0, 0, 5]
+      Position: [1.1, 1.5, 6.4]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     Camera:
@@ -44,5 +44,5 @@ Entities:
       PerspectiveNear: 0.01
       PerspectiveFar: 1000
       OrthographicSize: 10
-      OrthographicNear: -1
-      OrthographicFar: 1
+      OrthographicNear: -18.05
+      OrthographicFar: 22.1

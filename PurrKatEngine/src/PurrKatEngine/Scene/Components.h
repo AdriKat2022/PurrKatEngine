@@ -1,9 +1,11 @@
 ﻿#pragma once
+#include <string>
 #include <glm/ext/matrix_transform.hpp>
 #include "PurrKatEngine/Renderer/SceneCamera.h"
 
 namespace PurrKatEngine
 {
+    class Entity;
     class ScriptableEntity;
 
     struct TransformComponent
@@ -59,6 +61,8 @@ namespace PurrKatEngine
         
         CameraComponent() = default;
         CameraComponent(SceneCamera camera) : Camera(std::move(camera)) {}
+        
+        void OnMount(Entity& entity);
         
         operator PurrKatEngine::SceneCamera& () { return Camera; }
         operator const PurrKatEngine::SceneCamera& () const { return Camera; }

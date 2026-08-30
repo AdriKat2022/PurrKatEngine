@@ -102,7 +102,7 @@ namespace PurrKatEngine
             (GLsizei)m_FrameBufferSpecifications.Height
         );
 
-        auto filter = m_FrameBufferSpecifications.UpscalingFilterType == FilterType::Linear ? GL_LINEAR : GL_NEAREST;
+        auto filter = m_FrameBufferSpecifications.UpscalingFilterType == ImageFilterType::Linear ? GL_LINEAR : GL_NEAREST;
         glTextureParameteri(m_ColorAttachment, GL_TEXTURE_MIN_FILTER, filter);
         glTextureParameteri(m_ColorAttachment, GL_TEXTURE_MAG_FILTER, filter);
 
@@ -194,7 +194,7 @@ namespace PurrKatEngine
         glBlitFramebuffer(
             0, 0, srcWidth, srcHeight,
             0, 0, dstWidth, dstHeight,
-            GL_COLOR_BUFFER_BIT, m_FrameBufferSpecifications.UpscalingFilterType == FilterType::Linear ? GL_LINEAR : GL_NEAREST
+            GL_COLOR_BUFFER_BIT, m_FrameBufferSpecifications.UpscalingFilterType == ImageFilterType::Linear ? GL_LINEAR : GL_NEAREST
         );
 
         glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);

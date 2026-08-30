@@ -108,6 +108,8 @@ project "PurrKatEngine-Editor"
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
+    defines { "YAML_CPP_STATIC_DEFINE" }
+
     files
     {
         "%{prj.name}/src/**.h",
@@ -133,9 +135,7 @@ project "PurrKatEngine-Editor"
     filter "system:windows"
         systemversion "latest"
 
-        defines {
-            "PKE_PLATFORM_WINDOWS"
-        }
+        defines { "PKE_PLATFORM_WINDOWS" }
 
     filter { "configurations:Debug" }
         defines { "PKE_DEBUG" }

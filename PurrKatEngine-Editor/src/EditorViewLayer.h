@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "EditorContext.h"
 #include "PurrKatEngine.h"
 #include "EditorPanels/SceneHierarchyPanel.h"
 
@@ -19,6 +20,8 @@ namespace PurrKatEngine
         void RenderEditorViewport() const;
         
     private:
+        EditorContext m_EditorContext;
+        
         glm::vec4 m_BackgroundColor{0.1f, 0.1f, 0.1f, 1.0f};
         glm::vec2 m_LastEditorViewportSize;
         bool m_IsEditorViewportFocused = false;

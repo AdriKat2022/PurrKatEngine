@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include <entt.h>
 #include "Components.h"
 #include "Scene.h"
 
@@ -15,6 +14,8 @@ namespace PurrKatEngine
         
         const std::string& GetName() const { return GetComponent<TagComponent>(); }
         
+        Scene* GetScene() const { return m_Scene; }
+        
         void Destroy() { m_Scene->DestroyEntity(*this); }
         
         template<typename T>
@@ -27,6 +28,7 @@ namespace PurrKatEngine
         T& AddComponent(Args&&... args)
         {
             auto& component = m_Scene->m_Registry.emplace<T>(m_EntityId, std::forward<Args>(args)...);
+            OnComponentAdded(component);
             return component;
         }
         
@@ -67,6 +69,13 @@ namespace PurrKatEngine
 
     private:
         void Invalidate() { m_EntityId = { entt::null }; }
+        
+        template<typename T>
+        void OnComponentAdded(T& component)
+        {
+            if constexpr (requires { component.OnMount(*this); })
+                component.OnMount(*this);
+        }
         
     private:
         entt::entity m_EntityId = {entt::null };

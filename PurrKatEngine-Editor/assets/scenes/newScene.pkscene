@@ -1,0 +1,40 @@
+Scene: Untitled
+Entities:
+  - Entity: 3
+    Tag: Game Entity
+    Transform:
+      Position: [1.4, 1.6, -2.8]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Sprite:
+      Color: [0.26334518, 0.6932791, 1, 1]
+  - Entity: 2
+    Tag: Game Entity
+    Transform:
+      Position: [-0.9, -1.4, -3.3]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Sprite:
+      Color: [1, 0.7640101, 0.13879001, 1]
+  - Entity: 1
+    Tag: Sqr
+    Transform:
+      Position: [0, 0, -5.5]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Sprite:
+      Color: [0.90866023, 0.3767176, 0.98932385, 1]
+  - Entity: 0
+    Tag: Camera
+    Transform:
+      Position: [0, 0, 5.2]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Camera:
+      ProjectionType: 0
+      PerspectiveFOV: 0.7853982
+      PerspectiveNear: 0.01
+      PerspectiveFar: 1000
+      OrthographicSize: 10
+      OrthographicNear: -1
+      OrthographicFar: 1

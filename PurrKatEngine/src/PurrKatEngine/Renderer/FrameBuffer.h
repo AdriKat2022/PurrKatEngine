@@ -2,14 +2,14 @@
 
 namespace PurrKatEngine
 {
-    enum class FilterType : unsigned char { Linear, Nearest };
+    enum class ImageFilterType : unsigned char { Linear, Nearest };
     
     struct FrameBufferSpecifications
     {
         uint32_t Width, Height;
         uint32_t Samples = 1;
         
-        FilterType UpscalingFilterType = FilterType::Linear;
+        ImageFilterType UpscalingFilterType = ImageFilterType::Linear;
         
         bool SwapChainTarget = false;
     };

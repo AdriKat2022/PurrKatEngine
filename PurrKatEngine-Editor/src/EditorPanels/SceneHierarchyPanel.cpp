@@ -115,12 +115,7 @@ namespace PurrKatEngine
             
             if (ImGui::BeginPopup("AddComponent"))
             {
-                DrawAddComponentItem<CameraComponent>("Camera Component", entityToInspect, [](const Entity& e, CameraComponent& component)
-                {
-                    component.Camera.SetProjectionType(SceneCamera::ProjectionType::Perspective);
-                    component.Camera.SetAspectRatioAdjustementMode(SceneCamera::AspectRatioAdjustmentMode::MatchHeight);
-                    component.Camera.SetPerspective(glm::radians(45.0f), 0.01f, 1000.0f);
-                });
+                DrawAddComponentItem<CameraComponent>("Camera Component", entityToInspect);
                 
                 DrawAddComponentItem<SpriteComponent>("Sprite Component", entityToInspect);
                 
@@ -259,7 +254,7 @@ namespace PurrKatEngine
 
         auto flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowOverlap | ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_SpanFullWidth;
         
-        bool opened = ImGui::TreeNodeEx((void*)typeid(Component).hash_code(), flags, componentName.c_str());
+        bool opened = ImGui::TreeNodeEx((void*)typeid(Component).hash_code(), flags, "%s", componentName.c_str());
         
         float lineHeight = GImGui->FontSize + GImGui->Style.FramePadding.y * 2.0f;
 
@@ -286,7 +281,7 @@ namespace PurrKatEngine
                 toRemove = true;
             ImGui::EndDisabled();
             if (!allowRemove)
-                ImGui::SetItemTooltip("Removing base '%s' is not allowed.", componentName.c_str());
+                ImGui::SetItemTooltip("Removing component '%s' is not allowed.", componentName.c_str());
 
             ImGui::EndPopup();
         }
