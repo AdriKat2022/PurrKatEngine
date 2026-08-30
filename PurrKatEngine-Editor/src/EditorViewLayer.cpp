@@ -267,15 +267,15 @@ namespace PurrKatEngine
                 glm::mat4 transformMatrix = transform;
 
                 // Snapping
-                // bool snap = Input::IsKeyPressed(KeyCode::LeftControl);
-                // float snapValue = 0.5f; // Snap to 0.5m for translation/scale
-                // if (m_CurrentGizmoOperation == ImGuizmo::OPERATION::ROTATE)
-                //     snapValue = 45.0f; // Snap to 45 degrees for rotation
-                // float snapValues[3] = {snapValue, snapValue, snapValue};
+                bool snap = Input::IsKeyPressed(KeyCode::LeftCtrl);
+                float snapValue = 0.5f; // Snap to 0.5m for translation/scale
+                if (m_GizmoOperation == ImGuizmo::OPERATION::ROTATE)
+                    snapValue = 45.0f; // Snap to 45 degrees for rotation
+                float snapValues[3] = {snapValue, snapValue, snapValue}; // Use the same snap value for all axes
 
                 ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
                                      m_GizmoOperation, ImGuizmo::LOCAL,
-                                     glm::value_ptr(transformMatrix));
+                                     glm::value_ptr(transformMatrix), nullptr, snap ? snapValues : nullptr);
                 
                 if (ImGuizmo::IsUsing())
                 {
