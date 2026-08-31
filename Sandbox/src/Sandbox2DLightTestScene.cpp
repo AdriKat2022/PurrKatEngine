@@ -44,7 +44,11 @@ Sandbox2DLightTestScene::Sandbox2DLightTestScene() :
     m_FrameBuffer = FrameBuffer::CreateRef({
         .Width = Application::Get().GetWindow().GetWidth()/m_Upscaling,
         .Height = Application::Get().GetWindow().GetHeight()/m_Upscaling,
-        .UpscalingFilterType = ImageFilterType::Nearest});
+        .AttachmentsSpecs = {
+            { FrameBufferTextureFormat::RGBA8, ImageFilterType::Nearest },
+            { FrameBufferTextureFormat::Depth, ImageFilterType::Nearest }
+        }
+    });
 }
 
 void Sandbox2DLightTestScene::OnAttach()

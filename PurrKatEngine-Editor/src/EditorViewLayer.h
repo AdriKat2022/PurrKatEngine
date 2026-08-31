@@ -38,7 +38,7 @@ namespace PurrKatEngine
         int m_UpScaleFactor = 1;
         
         Ref<FrameBuffer> m_FrameBuffer;
-        Ref<FrameBuffer> m_UpScaledFrameBuffer;
+        // Ref<FrameBuffer> m_UpScaledFrameBuffer;
 
         SpriteSheet m_DirtSpriteSheet;
         SpriteSheet m_GrassSpriteSheet;

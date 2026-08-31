@@ -251,6 +251,10 @@ namespace PurrKatEngine
         if (!entityToInspect.HasComponent<Component>())
             return;
         
+        // Add some spacing for all components after the TransformComponent to visually separate them.
+        if constexpr (!std::is_same_v<Component, TransformComponent>)
+            ImGui::Spacing();
+        
         ImGui::PushID((int)typeid(Component).hash_code());
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 4));
 

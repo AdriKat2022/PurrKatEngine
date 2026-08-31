@@ -1,18 +1,33 @@
 ﻿#include "EditorViewLayer.h"
 
 #include "PurrKatEngine/Serialization/SceneSerializer.h"
-#include "PurrKatEngine/Utility/ArrayUtility.h"
 #include "PurrKatEngine/Scene/Scene.h"
 
 namespace PurrKatEngine
 {
     EditorViewLayer::EditorViewLayer()
     {
-        m_GrassSpriteSheet.SetTexture(Texture2D::CreateRef("assets/textures/TileSets/Grass.png", {.Filter = Texture2D::FilterType::Nearest}));
-        m_GrassSpriteSheet.SetSpriteSheetOptions({.CellCount = {11, 7}});
-
-        m_UpScaledFrameBuffer = FrameBuffer::CreateRef({.Width = 1280, .Height = 720, .UpscalingFilterType = ImageFilterType::Nearest});
-        m_FrameBuffer = FrameBuffer::CreateRef({.Width = 1920, .Height = 1080, .UpscalingFilterType = ImageFilterType::Nearest});
+        // m_GrassSpriteSheet.SetTexture(Texture2D::CreateRef("assets/textures/TileSets/Grass.png", {.Filter = Texture2D::FilterType::Nearest}));
+        // m_GrassSpriteSheet.SetSpriteSheetOptions({.CellCount = {11, 7}});
+        
+        // m_UpScaledFrameBuffer = FrameBuffer::CreateRef({
+        //     .Width = 1280,
+        //     .Height = 720,
+        //     .AttachmentsSpecs = {
+        //         { FrameBufferTextureFormat::RGBA8, ImageFilterType::Nearest },
+        //         { FrameBufferTextureFormat::Depth, ImageFilterType::Nearest }
+        //     }
+        // });
+        
+        m_FrameBuffer = FrameBuffer::CreateRef({
+            .Width = 1920,
+            .Height = 1080,
+            .AttachmentsSpecs = {
+                { .TextureFormat = FrameBufferTextureFormat::RGBA8, .FilterType = ImageFilterType::Nearest },
+                { .TextureFormat = FrameBufferTextureFormat::Depth, .FilterType = ImageFilterType::Nearest }
+            }
+        });
+        
         m_Cpp = Texture2D::CreateRef("assets/textures/cpp.png", { .Filter = Texture2D::FilterType::Nearest});
 
         m_ActiveScene = m_EditorContext.GetScene();
@@ -178,7 +193,7 @@ namespace PurrKatEngine
             {
                 m_LastEditorViewportSize = viewportSize;
                 
-                m_UpScaledFrameBuffer->Resize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+                // m_UpScaledFrameBuffer->Resize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
                 m_FrameBuffer->Resize((uint32_t)(viewportSize.x/(float)m_UpScaleFactor), (uint32_t)(viewportSize.y/(float)m_UpScaleFactor));
                 m_ActiveScene->OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
                 m_EditorCamera.SetViewportSize(viewportSize.x, viewportSize.y);
@@ -186,9 +201,9 @@ namespace PurrKatEngine
             else
             {
                 // Rendering in the else branch helps decrease the flickering while resizing the viewport.
-                m_UpScaledFrameBuffer->ScaleFrom(*m_FrameBuffer);
+                // m_UpScaledFrameBuffer->ScaleFrom(*m_FrameBuffer);
             }
-            ImGui::Image(m_UpScaledFrameBuffer->GetColorAttachmentRendererID(), *(ImVec2*)&m_LastEditorViewportSize, {0, 1}, {1, 0});
+            ImGui::Image(m_FrameBuffer->GetColorAttachmentRendererID(), *(ImVec2*)&m_LastEditorViewportSize, {0, 1}, {1, 0});
             
             // ---------- GIZMOS ------------
             Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
