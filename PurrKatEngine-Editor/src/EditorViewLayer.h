@@ -33,6 +33,7 @@ namespace PurrKatEngine
         glm::vec2 m_LastEditorViewportSize;
         bool m_IsEditorViewportFocused = false;
         bool m_IsEditorViewportHovered = false;
+        bool m_IsEditorViewportUsingGizmo = false;
 
         int m_UpScaleFactor = 1;
         

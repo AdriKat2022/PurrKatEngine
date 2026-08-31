@@ -34,7 +34,7 @@ namespace PurrKatEngine
     {
         Layer::OnUpdate();
         
-        if (m_IsEditorViewportFocused || m_IsEditorViewportHovered)
+        if ((m_IsEditorViewportFocused || m_IsEditorViewportHovered) && !m_IsEditorViewportUsingGizmo)
         {
             m_EditorCamera.OnUpdate();
         }
@@ -152,17 +152,16 @@ namespace PurrKatEngine
         {
             Entity activeCamEntity = m_ActiveScene->GetMainCamera();
             
-            static int activeCamera = ArrayUtility::IndexOf(activeCamEntity, m_CameraList);
-            
             if (activeCamEntity.IsValid())
                 ImGui::TextColored({0.2f, 0.8f, 0.2f, 1.0f}, "Active Camera: %s", ENTITY_GET_NAME(activeCamEntity).c_str());
             
-            if (ImGui::Button("Switch Camera"))
-            {
-                activeCamera = (activeCamera + 1)%m_CameraList.size();
-                auto& newActiveCamEntity = m_CameraList[activeCamera%m_CameraList.size()];
-                m_ActiveScene->SetMainCamera(newActiveCamEntity);
-            }
+            // static int activeCamera = ArrayUtility::IndexOf(activeCamEntity, m_CameraList);
+            // if (ImGui::Button("Switch Camera"))
+            // {
+            //     activeCamera = (int)((activeCamera + 1)%m_CameraList.size());
+            //     auto& newActiveCamEntity = m_CameraList[activeCamera%m_CameraList.size()];
+            //     m_ActiveScene->SetMainCamera(newActiveCamEntity);
+            // }
         }
         ImGui::End();
         
@@ -226,8 +225,10 @@ namespace PurrKatEngine
                                      m_GizmoOperation, ImGuizmo::LOCAL,
                                      glm::value_ptr(transformMatrix), nullptr, snap ? snapValues : nullptr);
                 
+                m_IsEditorViewportUsingGizmo = false;
                 if (ImGuizmo::IsUsing())
                 {
+                    m_IsEditorViewportUsingGizmo = true;
                     glm::vec3 translation, rotation, scale;
                     
                     if (Math::DecomposeTransform(transformMatrix, translation, rotation, scale))

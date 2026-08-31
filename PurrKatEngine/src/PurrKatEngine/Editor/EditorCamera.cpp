@@ -20,7 +20,7 @@ namespace PurrKatEngine
     
     void EditorCamera::OnUpdate()
     {
-        if (Input::IsKeyPressed(KeyCode::LeftAlt))
+        // if (Input::IsKeyPressed(KeyCode::LeftAlt))
         {
             glm::vec2 mouse{Input::GetMouseX(), Input::GetMouseY()};
             glm::vec2 delta = (mouse - m_InitialMousePosition) * 0.003f;
