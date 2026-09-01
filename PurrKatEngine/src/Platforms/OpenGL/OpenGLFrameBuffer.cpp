@@ -37,6 +37,7 @@ namespace PurrKatEngine
             switch (textureFormat)
             {
                 case FrameBufferTextureFormat::RGBA8: return GL_RGBA8;
+                case FrameBufferTextureFormat::RED_INTEGER: return GL_R32I;
                     
                 default:
                     PKE_CORE_ERROR("Unknown FrameBufferTextureFormat for ColorTexture: {}", (int)textureFormat);
@@ -76,22 +77,21 @@ namespace PurrKatEngine
 
         static void BindTexture(uint32_t textureId, bool multiSample)
         {
-            PKE_CORE_CRITICAL("Binding texture {} with multiSample={}", textureId, multiSample);
             glBindTexture(TextureTarget(multiSample), textureId);
         }
         
         static void AttachColorTexture(uint32_t rendererId, uint32_t textureId, int samples, const FrameBufferTextureSpecifications& specs, GLsizei width, GLsizei height, int index)
         {
-            GLenum format = ColorTextureFormat(specs.TextureFormat);
+            GLenum internalFormat = ColorTextureFormat(specs.TextureFormat);
             
             bool multiSample = samples > 1;
             if (multiSample)
             {
-                glTextureStorage2DMultisample(textureId, samples, format, width, height, GL_FALSE);
+                glTextureStorage2DMultisample(textureId, samples, internalFormat, width, height, GL_FALSE);
             }
             else
             {
-                glTextureStorage2D(textureId, 1, format, width, height);
+                glTextureStorage2D(textureId, 1, internalFormat, width, height);
                 
                 auto filter = GLFilterType(specs.FilterType);
                 
@@ -244,13 +244,13 @@ namespace PurrKatEngine
         CheckFrameBufferIntegrity();
     }
 
-    void OpenGLFrameBuffer::Bind()
+    void OpenGLFrameBuffer::Bind() const
     {
         glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
         glViewport(0, 0, (GLsizei)m_FrameBufferSpecifications.Width, (GLsizei)m_FrameBufferSpecifications.Height);
     }
 
-    void OpenGLFrameBuffer::Unbind()
+    void OpenGLFrameBuffer::Unbind() const
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
@@ -286,6 +286,17 @@ namespace PurrKatEngine
 
     const FrameBufferSpecifications& OpenGLFrameBuffer::GetSpecifications() const { return m_FrameBufferSpecifications; }
     
+    int OpenGLFrameBuffer::ReadPixel(uint32_t attachmentIndex, int x, int y) const
+    {
+        PKE_CORE_ASSERT(attachmentIndex < m_ColorAttachments.size(), "Attachment index out of bounds.");
+     
+        // Dodgy way to read pixel data from a framebuffer. This assumes the framebuffer is bound and the correct attachment is selected.
+        glReadBuffer(GL_COLOR_ATTACHMENT0 + attachmentIndex);
+        int pixelData;
+        glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_INT, &pixelData);
+        return pixelData;
+    }
+
     void OpenGLFrameBuffer::CheckFrameBufferIntegrity()
     {
         GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);

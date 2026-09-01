@@ -24,6 +24,7 @@ namespace PurrKatEngine
             .Height = 1080,
             .AttachmentsSpecs = {
                 { .TextureFormat = FrameBufferTextureFormat::RGBA8, .FilterType = ImageFilterType::Nearest },
+                { .TextureFormat = FrameBufferTextureFormat::RED_INTEGER, .FilterType = ImageFilterType::Nearest },
                 { .TextureFormat = FrameBufferTextureFormat::Depth, .FilterType = ImageFilterType::Nearest }
             }
         });
@@ -111,6 +112,8 @@ namespace PurrKatEngine
         ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
         ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspaceFlags);
 
+        // ------------ Menu Bar ------------
+        
         if (ImGui::BeginMenuBar())
         {
             if (ImGui::BeginMenu("File"))
@@ -149,13 +152,15 @@ namespace PurrKatEngine
 
         if (ImGui::Begin("Editor Viewport Properties"))
         {
-            ImGui::Text("Editor Viewport Size: %.0f x %.0f", m_LastEditorViewportSize.x, m_LastEditorViewportSize.y);
+            ImGui::Text("Editor Viewport Size: %.0f x %.0f", m_EditorViewportSize.x, m_EditorViewportSize.y);
             ImGui::ColorEdit4("Background Color", glm::value_ptr(m_BackgroundColor));
             ImGui::Text("Editor Viewport Receiving Events: %s", (!m_IsEditorViewportHovered || !m_IsEditorViewportFocused) ? "No" : "Yes");
             if (ImGui::DragInt("Upscale Factor", &m_UpScaleFactor, 0.2f, 1, 40, "%i x"))
             {
-                m_FrameBuffer->Resize((uint32_t)(m_LastEditorViewportSize.x/(float)m_UpScaleFactor), (uint32_t)(m_LastEditorViewportSize.y/(float)m_UpScaleFactor));
+                // m_FrameBuffer->Resize((uint32_t)(m_EditorViewportSize.x/(float)m_UpScaleFactor), (uint32_t)(m_EditorViewportSize.y/(float)m_UpScaleFactor));
             }
+            
+            ImGuiUtility::ShowDebugControls();
         }
         ImGui::End();
 
@@ -184,17 +189,17 @@ namespace PurrKatEngine
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
         if (ImGui::Begin("Editor Viewport"))
         {
+            // Viewport Size State
             m_IsEditorViewportFocused = ImGui::IsWindowFocused();
             m_IsEditorViewportHovered = ImGui::IsWindowHovered();
-            // Application::Get().GetImGuiLayer().SetBlockEvents(!m_IsEditorViewportHovered || !m_IsEditorViewportFocused);
             contentSize = ImGui::GetContentRegionAvail();
             viewportSize = {contentSize.x, contentSize.y};
-            if (viewportSize != m_LastEditorViewportSize)
+            if (viewportSize != m_EditorViewportSize)
             {
-                m_LastEditorViewportSize = viewportSize;
+                m_EditorViewportSize = viewportSize;
                 
                 // m_UpScaledFrameBuffer->Resize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
-                m_FrameBuffer->Resize((uint32_t)(viewportSize.x/(float)m_UpScaleFactor), (uint32_t)(viewportSize.y/(float)m_UpScaleFactor));
+                // m_FrameBuffer->Resize((uint32_t)(viewportSize.x/(float)m_UpScaleFactor), (uint32_t)(viewportSize.y/(float)m_UpScaleFactor));
                 m_ActiveScene->OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
                 m_EditorCamera.SetViewportSize(viewportSize.x, viewportSize.y);
             }
@@ -203,7 +208,24 @@ namespace PurrKatEngine
                 // Rendering in the else branch helps decrease the flickering while resizing the viewport.
                 // m_UpScaledFrameBuffer->ScaleFrom(*m_FrameBuffer);
             }
-            ImGui::Image(m_FrameBuffer->GetColorAttachmentRendererID(), *(ImVec2*)&m_LastEditorViewportSize, {0, 1}, {1, 0});
+            ImGui::Image(m_FrameBuffer->GetColorAttachmentRendererID(), *(ImVec2*)&m_EditorViewportSize, {0, 1}, {1, 0});
+            
+            auto viewportOffset = ImGui::GetCursorPos();
+            auto windowSize = ImGui::GetWindowSize();
+            ImVec2 minBound = ImGui::GetWindowPos();
+
+            m_ViewportBounds[0] = {
+                minBound.x + viewportOffset.x,
+                minBound.y + viewportOffset.y
+            };
+            m_ViewportBounds[1] = {
+                m_ViewportBounds[0].x + windowSize.x,
+                m_ViewportBounds[0].y + windowSize.y
+            };
+            
+            // PKE_CORE_INFO("Editor Viewport Size: {:.2f}-{:.2f} x {:.2f}-{:.2f}", windowSize.x, m_EditorViewportSize.x, windowSize.y, m_EditorViewportSize.y);
+            // PKE_CORE_INFO("Editor Viewport Bounds: Min({:.2f}, {:.2f}), Max({:.2f}, {:.2f})", m_ViewportBounds[0].x, m_ViewportBounds[0].y, m_ViewportBounds[1].x, m_ViewportBounds[1].y);
+            
             
             // ---------- GIZMOS ------------
             Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
@@ -353,6 +375,26 @@ namespace PurrKatEngine
 
         m_ActiveScene->OnEditorUpdate(m_EditorCamera);
 
+        auto[mx, my] = ImGui::GetMousePos();
+        mx -= m_ViewportBounds[0].x;
+        my = m_ViewportBounds[0].y - my; // Flip Y coordinate to match OpenGL's coordinate system
+        
+        int mouseX = (int)mx;
+        int mouseY = (int)my;
+        
+        bool mouseInViewport = mouseX >= 0 && mouseY >= 0 && mouseX < (int)m_EditorViewportSize.x && mouseY < (int)m_EditorViewportSize.y;
+        if (mouseInViewport)
+        {
+            glm::vec2 pixelPos = { (float)1920*mouseX/m_EditorViewportSize.x, (float)1080*mouseY/m_EditorViewportSize.y };
+            // glm::vec2 pixelPos = { (float)1920*mouseX/m_EditorViewportSize.x, (float)1080*mouseY/m_EditorViewportSize.y };
+            
+            int pixelData = m_FrameBuffer->ReadPixel(1, pixelPos.x, pixelPos.y);
+            PKE_CORE_DEBUG("Mouse Position in Editor Viewport: ({}, {}) (pixel: {})", mouseX, mouseY, pixelData);
+            // PKE_CORE_DEBUG("READ: {}", pixelData);
+        }
+        // PKE_CORE_DEBUG("Mouse Position in Editor Viewport: ({}, {})", mouseX, mouseY);
+        
+        
         m_FrameBuffer->Unbind();
     }
 }

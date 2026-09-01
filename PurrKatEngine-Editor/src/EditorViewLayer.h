@@ -30,7 +30,8 @@ namespace PurrKatEngine
         ImGuizmo::OPERATION m_GizmoOperation = ImGuizmo::OPERATION::TRANSLATE;
         
         glm::vec4 m_BackgroundColor{0.1f, 0.1f, 0.1f, 1.0f};
-        glm::vec2 m_LastEditorViewportSize;
+        glm::vec2 m_ViewportBounds[2];
+        glm::vec2 m_EditorViewportSize;
         bool m_IsEditorViewportFocused = false;
         bool m_IsEditorViewportHovered = false;
         bool m_IsEditorViewportUsingGizmo = false;

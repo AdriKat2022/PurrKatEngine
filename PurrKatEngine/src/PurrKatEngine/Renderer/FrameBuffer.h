@@ -7,7 +7,10 @@ namespace PurrKatEngine
     enum class FrameBufferTextureFormat : unsigned char
     {
         None = 0,
+        // Color formats
         RGBA8,
+        RED_INTEGER, // Single int channel.
+        // Depth/stencil formats
         Depth24Stencil8,
         Depth = Depth24Stencil8,
     };
@@ -45,8 +48,8 @@ namespace PurrKatEngine
         
         virtual void Resize(uint32_t width, uint32_t height) = 0;
         virtual void Invalidate() = 0;
-        virtual void Bind() = 0;
-        virtual void Unbind() = 0;
+        virtual void Bind() const = 0;
+        virtual void Unbind() const = 0;
 
         virtual void ScaleFrom(const FrameBuffer& source) = 0;
         
@@ -54,6 +57,8 @@ namespace PurrKatEngine
         virtual uint32_t GetColorAttachmentRendererID(uint32_t index = 0) const = 0;
         virtual FrameBufferSpecifications& GetSpecifications() = 0;
         virtual const FrameBufferSpecifications& GetSpecifications() const = 0;
+        
+        virtual int ReadPixel(uint32_t attachmentIndex, int x, int y) const = 0;
 
         static void PrintTextureInfo(uint32_t textureID);
 

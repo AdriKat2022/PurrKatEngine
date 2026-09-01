@@ -11,8 +11,8 @@ namespace PurrKatEngine
         
         void Resize(uint32_t width, uint32_t height) override;
         void Invalidate() override;
-        void Bind() override;
-        void Unbind() override;
+        void Bind() const override;
+        void Unbind() const override;
 
         void EraseData();
         void ScaleFrom(const FrameBuffer& source) override;
@@ -21,7 +21,9 @@ namespace PurrKatEngine
         uint32_t GetColorAttachmentRendererID(uint32_t index = 0) const override;
         FrameBufferSpecifications& GetSpecifications() override;
         const FrameBufferSpecifications& GetSpecifications() const override;
-        
+
+        int ReadPixel(uint32_t attachmentIndex, int x, int y) const override;
+
     private:
         static void CheckFrameBufferIntegrity();
 
