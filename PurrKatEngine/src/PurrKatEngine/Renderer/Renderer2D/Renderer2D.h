@@ -2,6 +2,7 @@
 #include "PurrKatEngine/Components/Transform.h"
 #include "PurrKatEngine/Renderer/OrthographicCamera.h"
 #include "PurrKatEngine/Renderer/Tex2D.h"
+#include "PurrKatEngine/Scene/Components.h"
 
 namespace PurrKatEngine
 {
@@ -27,7 +28,7 @@ namespace PurrKatEngine
         static void BeginScene(const EditorCamera& camera, bool litScene = false);
         static void EndScene();
         static void FlushScene();
-        
+
         struct Statistics
         {
             uint32_t DrawCalls;
@@ -54,7 +55,10 @@ namespace PurrKatEngine
         
         // ########### DRAW FUNCTIONS ############
         
-        static void DrawQuad(const DrawOptions& drawOptions);
+        static void SetNextEntityID(int entityID = -1);
+        static void SetEntityID(int entityID = -1);
+        
+        static void DrawQuad(const glm::mat4& transform, const SpriteComponent& spriteComponent);
         
         static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color = {1.0f, 1.0f, 1.0f, 1.0f});
         static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color = {1.0f, 1.0f, 1.0f, 1.0f});
@@ -82,7 +86,6 @@ namespace PurrKatEngine
         static void IncreaseDrawCallMemoryIfNeeded(int countToFit);
         static void WriteToVertexBuffer(const glm::vec4& color, const glm::mat4& transform, float textureIndex, const glm::vec2& uvTiling, const glm::vec2* texCoords);
         static float GetOrCreateTextureIndex(const Tex2D& texture);
-        
     };
 }
 

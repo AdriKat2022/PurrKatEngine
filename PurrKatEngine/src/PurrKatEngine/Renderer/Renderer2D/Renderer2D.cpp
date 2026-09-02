@@ -23,6 +23,9 @@ namespace PurrKatEngine
         glm::vec2 TexCoord;
         glm::vec2 UVTiling;
         float TexIndex;
+        
+        // Editor Only
+        int EntityID = -1; // No entity by default
     };
     
     struct DrawCallData
@@ -41,6 +44,9 @@ namespace PurrKatEngine
     
     struct Renderer2DData
     {
+        static constexpr int POINT_COUNT_PER_QUAD = 4; // Number of different coordinates needed to draw a quad (1 quad = 4 points).
+        static constexpr int INDICES_COUNT_PER_QUAD = 6; // Number of indices needed to draw a quad (2 triangles = 6 points).
+        
         static constexpr uint32_t BUFFER_CAPACITY_PERSISTENCE = 144; // Frames until a draw call's allocated memory gets freed if unused.
         static constexpr uint32_t MAX_DRAW_CALLS = 1000;
         static constexpr uint32_t MAX_QUADS = 5000;
@@ -56,6 +62,7 @@ namespace PurrKatEngine
         uint32_t DrawCallsCapacity;
         DrawCallData* DrawCalls = nullptr; // All different draw calls that will occur.
         
+        Scope<Shader> SpriteColorShaderEditor;
         Scope<Shader> SpriteColorShader;
         Scope<Shader> SpriteColorShaderLit;
         
@@ -69,6 +76,9 @@ namespace PurrKatEngine
         Renderer2D::Statistics Stats;
         
         bool IsLitScene;
+        
+        bool IsEntityIdTemporary = false;
+        int CurrentEntityID = -1; // No entity by default
     };
     
     static Renderer2DData s_RendererData;
@@ -85,7 +95,8 @@ namespace PurrKatEngine
             { ShaderDataType::Float4, "a_Color" },
             { ShaderDataType::Float2, "a_TexCoord" },
             { ShaderDataType::Float2, "a_UVTiling" },
-            { ShaderDataType::Float, "a_TexIndex" }
+            { ShaderDataType::Float, "a_TexIndex" },
+            { ShaderDataType::Int, "a_EntityId" },
         });
         s_RendererData.QuadVertexArray = CreateRef(VertexArray::Create());
         s_RendererData.QuadVertexArray->AddVertexBuffer(s_RendererData.QuadVertexBuffer);
@@ -93,7 +104,7 @@ namespace PurrKatEngine
         uint32_t* quadIndices = new uint32_t[Renderer2DData::MAX_INDICES];
         
         uint32_t offset = 0;
-        for (uint32_t i = 0; i < Renderer2DData::MAX_INDICES; i += 6)
+        for (uint32_t i = 0; i < Renderer2DData::MAX_INDICES; i += Renderer2DData::INDICES_COUNT_PER_QUAD)
         {
             quadIndices[i + 0] = offset + 0;
             quadIndices[i + 1] = offset + 1;
@@ -103,7 +114,7 @@ namespace PurrKatEngine
             quadIndices[i + 4] = offset + 3;
             quadIndices[i + 5] = offset + 0;
             
-            offset += 4;
+            offset += Renderer2DData::POINT_COUNT_PER_QUAD;
         }
         
         Ref<IndexBuffer> quadIB = CreateRef(IndexBuffer::Create(quadIndices, Renderer2DData::MAX_INDICES));
@@ -120,6 +131,10 @@ namespace PurrKatEngine
         {
             samplers[i] = (int)i;
         }
+        
+        s_RendererData.SpriteColorShaderEditor = CreateScope(Shader::Create("assets/shaders/EditorTexture.glsl"));
+        s_RendererData.SpriteColorShaderEditor->Bind();
+        s_RendererData.SpriteColorShaderEditor->SetUniformIntArray("u_Textures", samplers, Renderer2DData::MAX_TEXTURE_SLOTS);
         
         s_RendererData.SpriteColorShader = CreateScope(Shader::Create("assets/shaders/Texture.glsl"));
         s_RendererData.SpriteColorShader->Bind();
@@ -180,15 +195,15 @@ namespace PurrKatEngine
     {
         s_RendererData.IsLitScene = litScene;
         
-        if (litScene)
+        // if (litScene)
+        // {
+        //     s_RendererData.SpriteColorShaderLit->Bind();
+        //     s_RendererData.SpriteColorShaderLit->SetUniformMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
+        // }
+        // else
         {
-            s_RendererData.SpriteColorShaderLit->Bind();
-            s_RendererData.SpriteColorShaderLit->SetUniformMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
-        }
-        else
-        {
-            s_RendererData.SpriteColorShader->Bind();
-            s_RendererData.SpriteColorShader->SetUniformMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
+            s_RendererData.SpriteColorShaderEditor->Bind();
+            s_RendererData.SpriteColorShaderEditor->SetUniformMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
         }
     }
 
@@ -228,10 +243,21 @@ namespace PurrKatEngine
     
     // ################## DRAW FUNCTIONS ##################
 
-    void Renderer2D::DrawQuad(const DrawOptions& drawOptions)
+    void Renderer2D::SetEntityID(int entityID)
     {
-        const glm::mat4 transform = Transform::CalculateTransformMatrix2D(drawOptions.Position, drawOptions.Size);
-        DrawQuadInternal(transform, drawOptions.Texture, drawOptions.UVTiling, drawOptions.Color);
+        s_RendererData.IsEntityIdTemporary = false;
+        s_RendererData.CurrentEntityID = entityID;
+    }
+
+    void Renderer2D::SetNextEntityID(int entityID)
+    {
+        s_RendererData.IsEntityIdTemporary = true;
+        s_RendererData.CurrentEntityID = entityID;
+    }
+
+    void Renderer2D::DrawQuad(const glm::mat4& transform, const SpriteComponent& spriteComponent)
+    {
+        DrawQuadInternal(transform, spriteComponent.Texture, spriteComponent.UVTiling, spriteComponent.Color);
     }
 
     void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
@@ -391,21 +417,33 @@ namespace PurrKatEngine
 
     void Renderer2D::WriteToVertexBuffer(const glm::vec4& color, const glm::mat4& transform, float textureIndex, const glm::vec2& uvTiling, const glm::vec2* texCoords)
     {
-        IncreaseDrawCallMemoryIfNeeded(6);
+        IncreaseDrawCallMemoryIfNeeded(Renderer2DData::INDICES_COUNT_PER_QUAD);
      
         auto& drawCallData = s_RendererData.DrawCalls[s_RendererData.DrawCallsCount-1];
         
-        for (int i = 0; i < 4; ++i)
+        for (int i = 0; i < Renderer2DData::POINT_COUNT_PER_QUAD; ++i)
         {
             drawCallData.QuadVertexBufferPtr->Position = transform * s_RendererData.QuadVertexPositions[i];
             drawCallData.QuadVertexBufferPtr->Color = color;
             drawCallData.QuadVertexBufferPtr->TexCoord = texCoords[i];
             drawCallData.QuadVertexBufferPtr->UVTiling = uvTiling;
             drawCallData.QuadVertexBufferPtr->TexIndex = textureIndex;
+#if true
+            drawCallData.QuadVertexBufferPtr->EntityID = s_RendererData.CurrentEntityID; // Editor Only
             drawCallData.QuadVertexBufferPtr++;
+#endif
         }
         
-        drawCallData.QuadIndexCount += 6;
+#if true
+        // Editor Only
+        if (s_RendererData.IsEntityIdTemporary)
+        {
+            s_RendererData.CurrentEntityID = -1; // Reset to no entity.
+            s_RendererData.IsEntityIdTemporary = false;
+        }
+#endif
+        
+        drawCallData.QuadIndexCount += Renderer2DData::INDICES_COUNT_PER_QUAD;
         s_RendererData.Stats.QuadCount++;
     }
     

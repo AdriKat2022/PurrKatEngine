@@ -372,6 +372,8 @@ namespace PurrKatEngine
         
         RenderCommand::SetClearColor(m_BackgroundColor);
         RenderCommand::Clear();
+        
+        m_FrameBuffer->ClearAttachment(1, -1); // Clear the entity ID attachment to -1 (no entity)
 
         m_ActiveScene->OnEditorUpdate(m_EditorCamera);
 
@@ -388,7 +390,7 @@ namespace PurrKatEngine
             glm::vec2 pixelPos = { (float)1920*mouseX/m_EditorViewportSize.x, (float)1080*mouseY/m_EditorViewportSize.y };
             // glm::vec2 pixelPos = { (float)1920*mouseX/m_EditorViewportSize.x, (float)1080*mouseY/m_EditorViewportSize.y };
             
-            int pixelData = m_FrameBuffer->ReadPixel(1, pixelPos.x, pixelPos.y);
+            int pixelData = m_FrameBuffer->ReadPixel(1, (int)pixelPos.x, (int)pixelPos.y);
             PKE_CORE_DEBUG("Mouse Position in Editor Viewport: ({}, {}) (pixel: {})", mouseX, mouseY, pixelData);
             // PKE_CORE_DEBUG("READ: {}", pixelData);
         }

@@ -8,9 +8,9 @@ namespace PurrKatEngine
     {
         None,
         Bool,
+        Int, Int2, Int3, Int4,
         Float, Float2, Float3, Float4,
         Mat3, Mat4,
-        Int, Int2, Int3, Int4,
     };
     
     static uint32_t ShaderDataTypeSize(ShaderDataType type)
@@ -66,8 +66,8 @@ namespace PurrKatEngine
         ShaderDataType type;
 
         BufferElement() {}
-        BufferElement(ShaderDataType type, const std::string& name, bool normalized = false)
-        : name(name), offset(0), size(ShaderDataTypeSize(type)), normalized(normalized), type(type) {}
+        BufferElement(ShaderDataType type, std::string name, bool normalized = false)
+        : name(std::move(name)), offset(0), size(ShaderDataTypeSize(type)), normalized(normalized), type(type) {}
 
         uint32_t GetElementCount() const { return ShaderDataTypeCount(type); }
     };

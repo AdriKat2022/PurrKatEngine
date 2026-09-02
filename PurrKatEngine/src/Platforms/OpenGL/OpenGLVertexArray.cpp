@@ -50,7 +50,7 @@ namespace PurrKatEngine
 
     void OpenGLVertexArray::AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer)
     {
-        PKE_CORE_ASSERT(vertexBuffer->GetLayout().GetElements().size(), "Vertex Buffer has no layout.")
+        PKE_CORE_ASSERT(!vertexBuffer->GetLayout().GetElements().empty(), "Vertex Buffer has no layout.")
         
         glBindVertexArray(m_RendererID);
         vertexBuffer->Bind();
@@ -61,14 +61,52 @@ namespace PurrKatEngine
 
         for (const auto& element : bufferLayout)
         {
-            glEnableVertexAttribArray(index);
-            glVertexAttribPointer(index,
-                element.GetElementCount(),
-                ShaderDataTypeToOpenGL(element.type),
-                element.normalized ? GL_TRUE : GL_FALSE,
-                bufferLayout.GetStride(),
-                (const void*)element.offset);
-            index++;
+            switch (element.type)
+            {
+                case ShaderDataType::None:
+                case ShaderDataType::Bool:
+                case ShaderDataType::Int:
+                case ShaderDataType::Int2:
+                case ShaderDataType::Int3:
+                case ShaderDataType::Int4:
+                    glEnableVertexAttribArray(index);
+                    glVertexAttribIPointer(index,
+                        (GLint)element.GetElementCount(),
+                        ShaderDataTypeToOpenGL(element.type),
+                        (GLsizei)bufferLayout.GetStride(),
+                        (const void*)element.offset);
+                    index++;
+                    break;
+                case ShaderDataType::Float:
+                case ShaderDataType::Float2:
+                case ShaderDataType::Float3:
+                case ShaderDataType::Float4:
+                    glEnableVertexAttribArray(index);
+                    glVertexAttribPointer(index,
+                        (GLint)element.GetElementCount(),
+                        ShaderDataTypeToOpenGL(element.type),
+                        element.normalized ? GL_TRUE : GL_FALSE,
+                        (GLsizei)bufferLayout.GetStride(),
+                        (const void*)element.offset);
+                    index++;
+                    break;
+                case ShaderDataType::Mat3:
+                case ShaderDataType::Mat4:
+                    uint32_t count = element.GetElementCount();
+                    for (uint32_t i = 0; i < count; i++)
+                    {
+                        glEnableVertexAttribArray(index);
+                        glVertexAttribPointer(index,
+                            (GLint)count,
+                            ShaderDataTypeToOpenGL(element.type),
+                            element.normalized ? GL_TRUE : GL_FALSE,
+                            (GLsizei)bufferLayout.GetStride(),
+                            (const void*)(element.offset + sizeof(float) * count * i));
+                        glVertexAttribDivisor(index, 1);
+                        index++;
+                    }
+                    break;
+            }
         }
 
         m_VertexBuffers.push_back(vertexBuffer);

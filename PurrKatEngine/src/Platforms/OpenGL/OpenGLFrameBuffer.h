@@ -23,9 +23,14 @@ namespace PurrKatEngine
         const FrameBufferSpecifications& GetSpecifications() const override;
 
         int ReadPixel(uint32_t attachmentIndex, int x, int y) const override;
+        
+    protected:
+        void ClearAttachmentImpl(uint32_t attachmentIndex, AttachmentClearValue value) override;
 
     private:
         static void CheckFrameBufferIntegrity();
+        
+        template<class T> void ClearAttachmentOpenGL(uint32_t attachmentIndex, T value);
 
     private:
         uint32_t m_RendererID = 0; // Main object ID for the framebuffer

@@ -8,6 +8,7 @@
 
 namespace PurrKatEngine
 {
+    class Texture2D;
     class Entity;
     class ScriptableEntity;
 
@@ -45,9 +46,8 @@ namespace PurrKatEngine
     struct SpriteComponent
     {
         glm::vec4 Color = {1.0f, 1.0f, 1.0f, 1.0f};
-        
-        SpriteComponent() = default;
-        SpriteComponent(const glm::vec4& color) : Color(color) {}
+        glm::vec2 UVTiling = {1.0f, 1.0f};
+        Texture2D* Texture = nullptr;
         
         operator glm::vec4& () { return Color; }
         operator const glm::vec4& () const { return Color; }

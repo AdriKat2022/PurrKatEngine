@@ -123,8 +123,8 @@ void Sandbox2DLightTestScene::OnUpdate()
     if (m_LightOn)
         Renderer2D::AddLightSource(mouseLightSource);
  
-    Renderer2D::DrawQuad({ .Position = {0.0f, 0.0f, 0.5f}, .Size = {2,2} });
-    Renderer2D::DrawQuad({ .Position = {-1.0f, 0.0f, 0.5f}, .Size = {2,2} });
+    // Renderer2D::DrawQuad({ .Position = {0.0f, 0.0f, 0.5f}, .Size = {2,2} });
+    // Renderer2D::DrawQuad({ .Position = {-1.0f, 0.0f, 0.5f}, .Size = {2,2} });
     
     Renderer2D::DrawQuad({0.0f, 0.0f}, SET_WIDTH(m_BackgroundTexture, 20), m_BackgroundTexture);
     Renderer2D::DrawQuad({3.8f, -2.2f}, {1, 1}, m_MobTexture);

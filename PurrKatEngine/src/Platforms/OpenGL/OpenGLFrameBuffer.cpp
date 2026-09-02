@@ -27,12 +27,12 @@ namespace PurrKatEngine
 
     namespace Utils
     {
-        static GLenum TextureTarget(bool isMultiSample)
+        static constexpr GLenum TextureTarget(bool isMultiSample)
         {
             return isMultiSample ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
         }
         
-        static GLenum ColorTextureFormat(FrameBufferTextureFormat textureFormat)
+        static constexpr GLenum ColorTextureFormat(FrameBufferTextureFormat textureFormat)
         {
             switch (textureFormat)
             {
@@ -45,7 +45,7 @@ namespace PurrKatEngine
             }
         }
         
-        static GLenum DepthTextureFormat(FrameBufferTextureFormat textureFormat)
+        static constexpr GLenum DepthTextureFormat(FrameBufferTextureFormat textureFormat)
         {
             switch (textureFormat)
             {
@@ -57,7 +57,33 @@ namespace PurrKatEngine
             }
         }
         
-        static int GLFilterType(ImageFilterType filterType)
+        static constexpr int TextureFormatToGL(FrameBufferTextureFormat textureFormat)
+        {
+            switch (textureFormat)
+            {
+                case FrameBufferTextureFormat::None: break;
+                case FrameBufferTextureFormat::RGBA8: return GL_RGBA8;
+                case FrameBufferTextureFormat::RED_INTEGER: return GL_RED_INTEGER;
+                case FrameBufferTextureFormat::Depth24Stencil8: return GL_DEPTH24_STENCIL8;
+            }
+            
+            return NULL;
+        }
+        
+        static constexpr int TextureFormatToGLType(FrameBufferTextureFormat textureFormat)
+        {
+            switch (textureFormat)
+            {
+                case FrameBufferTextureFormat::None: break;
+                case FrameBufferTextureFormat::RGBA8: return GL_FLOAT;
+                case FrameBufferTextureFormat::RED_INTEGER: return GL_INT;
+                case FrameBufferTextureFormat::Depth24Stencil8: return GL_FLOAT;
+            }
+            
+            return NULL;
+        }
+        
+        static constexpr int GLFilterType(ImageFilterType filterType)
         {
             switch (filterType)
             {
@@ -177,19 +203,6 @@ namespace PurrKatEngine
         Invalidate();
     }
 
-    void OpenGLFrameBuffer::EraseData()
-    {
-        if (m_RendererID)
-        {
-            // Delete previous state
-            glDeleteFramebuffers(1, &m_RendererID); m_RendererID = 0;
-            glDeleteTextures(1, &m_DepthAttachment); m_DepthAttachment = 0;
-            if (!m_ColorAttachments.empty())
-                glDeleteTextures((GLsizei)m_ColorAttachments.size(), m_ColorAttachments.data());
-            m_ColorAttachments.clear();
-        }
-    }
-
     void OpenGLFrameBuffer::Invalidate()
     {
         // Recreate the whole state.
@@ -214,7 +227,7 @@ namespace PurrKatEngine
             for (size_t i = 0; i < m_ColorAttachmentSpecs.size(); i++)
             {
                 Utils::BindTexture(m_ColorAttachments[i], multiSample);
-                Utils::AttachColorTexture(m_RendererID, m_ColorAttachments[i], samples, m_ColorAttachmentSpecs[i], frameBufferWidth, frameBufferHeight, i);
+                Utils::AttachColorTexture(m_RendererID, m_ColorAttachments[i], samples, m_ColorAttachmentSpecs[i], frameBufferWidth, frameBufferHeight, (int)i);
             }
         }
         
@@ -254,6 +267,19 @@ namespace PurrKatEngine
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
+
+    void OpenGLFrameBuffer::EraseData()
+    {
+        if (m_RendererID)
+        {
+            // Delete previous state
+            glDeleteFramebuffers(1, &m_RendererID); m_RendererID = 0;
+            glDeleteTextures(1, &m_DepthAttachment); m_DepthAttachment = 0;
+            if (!m_ColorAttachments.empty())
+                glDeleteTextures((GLsizei)m_ColorAttachments.size(), m_ColorAttachments.data());
+            m_ColorAttachments.clear();
+        }
+    }
     
     void OpenGLFrameBuffer::ScaleFrom(const FrameBuffer& source)
     {
@@ -288,7 +314,7 @@ namespace PurrKatEngine
     
     int OpenGLFrameBuffer::ReadPixel(uint32_t attachmentIndex, int x, int y) const
     {
-        PKE_CORE_ASSERT(attachmentIndex < m_ColorAttachments.size(), "Attachment index out of bounds.");
+        PKE_CORE_ASSERT(attachmentIndex < m_ColorAttachments.size(), "Attachment index out of bounds.")
      
         // Dodgy way to read pixel data from a framebuffer. This assumes the framebuffer is bound and the correct attachment is selected.
         glReadBuffer(GL_COLOR_ATTACHMENT0 + attachmentIndex);
@@ -297,6 +323,14 @@ namespace PurrKatEngine
         return pixelData;
     }
 
+    void OpenGLFrameBuffer::ClearAttachmentImpl(uint32_t attachmentIndex, AttachmentClearValue value)
+    {
+        std::visit([&](auto&& val)
+        {
+            ClearAttachmentOpenGL(attachmentIndex, val);
+        }, value);
+    }
+    
     void OpenGLFrameBuffer::CheckFrameBufferIntegrity()
     {
         GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -334,5 +368,24 @@ namespace PurrKatEngine
                 PKE_CORE_ERROR("Unknown framebuffer error: {}", status);
                 break;
         }
+    }
+
+    template<typename T>
+    void OpenGLFrameBuffer::ClearAttachmentOpenGL(uint32_t attachmentIndex, T value)
+    {
+        PKE_CORE_ASSERT(attachmentIndex < m_ColorAttachments.size(), "Attachment index out of bounds.")
+        
+        const auto& specs = m_ColorAttachmentSpecs[attachmentIndex];
+        GLenum attachmentType = GL_COLOR_ATTACHMENT0 + attachmentIndex;
+        
+        int type = Utils::TextureFormatToGLType(specs.TextureFormat);
+        int format = Utils::TextureFormatToGL(specs.TextureFormat);
+        
+        if (std::is_same_v<T, int> || std::is_same_v<T, uint32_t>)
+            PKE_CORE_ASSERT(type == GL_INT || type == GL_UNSIGNED_INT, "Type mismatch for ClearAttachmentOpenGL")
+        else if (std::is_same_v<T, float> || std::is_same_v<T, glm::vec4>)
+            PKE_CORE_ASSERT(type == GL_FLOAT, "Type mismatch for ClearAttachmentOpenGL")
+        
+        glClearTexImage(m_ColorAttachments[attachmentIndex], 0, format, type, &value);
     }
 }
