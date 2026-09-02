@@ -31,28 +31,33 @@ namespace PurrKatEngine {
         GamepadRStickRight, GamepadRStickUp, GamepadRStickDown,
     };
 
-    enum class MouseButtonCode : unsigned char
+    const char* to_string(KeyCode keyCode);
+    
+    enum class MouseButtonCode : int8_t
     {
-        MouseLeft         = 0,
-        MouseRight        = 1,
-        MouseMiddle       = 2,
-        MouseButton4      = 3,
-        MouseButton5      = 4,
-        MouseButton6      = 5,
-        MouseButton7      = 6,
-        MouseButton8      = 7,
+        None = -1,
+        MouseLeft,
+        MouseRight,
+        MouseMiddle,
+        MouseButton4,
+        MouseButton5,
+        MouseButton6,
+        MouseButton7,
+        MouseButton8,
     };
     
-    const char* to_string(KeyCode keyCode);
+    const char* to_string(MouseButtonCode mouseButtonCode);
 
     // Low-level helpers used by the platform and ImGui integration. These
     // functions intentionally avoid exposing ImGui types in the public
     // header. `GlfwCharCodeToImGuiKey` returns the integer value that
     // corresponds to ImGui's ImGuiKey enum; callers that need the actual
     // ImGuiKey should include ImGui headers and cast the returned int.
-    int GlfwCharCodeToImGuiKey(int charCode);
-    KeyCode GlfwCharCodeToKeyCode(int charCode);
-    int KeyCodeToGlfwCharCode(KeyCode keyCode);
+    int ToImGuiKey(int glfwCharCode);
+    KeyCode ToKeyCode(int glfwCharCode);
+    int ToGlfwCharCode(KeyCode keyCode);
+    
+    MouseButtonCode ToMouseButtonCode(int glfwMouseCode);
 }
 
 

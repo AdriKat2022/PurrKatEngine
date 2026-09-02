@@ -1,5 +1,9 @@
 ﻿#pragma once
 
+#define PKE_CONVERT_VEC2(vec) {vec.x, vec.y}
+#define PKE_CONVERT_VEC3(vec) {vec.x, vec.y, vec.z}
+#define PKE_CONVERT_VEC4(vec) {vec.x, vec.y, vec.z, vec.w}
+
 namespace PurrKatEngine
 {
     class ArrayUtility

@@ -10,7 +10,7 @@ namespace PurrKatEngine
     public:
         explicit MouseButtonEvent(int mouseButtonCode) : m_MouseButtonCode(mouseButtonCode) {}
 
-        int GetMouseButton() const { return m_MouseButtonCode; }
+        MouseButtonCode GetMouseButton() const { return ToMouseButtonCode(m_MouseButtonCode); }
         
         EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryMouse)
 

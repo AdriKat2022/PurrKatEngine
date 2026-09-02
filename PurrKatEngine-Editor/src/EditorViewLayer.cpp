@@ -147,14 +147,14 @@ namespace PurrKatEngine
 
         m_SceneHierarchyPanel.OnImGuiRender();
 
-        static ImVec2 contentSize = {};
-        static glm::vec2 viewportSize = {};
-
         if (ImGui::Begin("Editor Viewport Properties"))
         {
-            ImGui::Text("Editor Viewport Size: %.0f x %.0f", m_EditorViewportSize.x, m_EditorViewportSize.y);
+            // ImGui::Text("Editor Viewport Size: %.0f x %.0f", ImGui::GetContentRegionMax(), m_ViewportBounds.GetHeight());
+            ImGui::Text("Editor Viewport Size: %.0f x %.0f", m_ViewportBounds.GetWidth(), m_ViewportBounds.GetHeight());
+            ImGuiUtility::DrawBoundsControl("Editor Viewport Bounds", m_ViewportBounds);
             ImGui::ColorEdit4("Background Color", glm::value_ptr(m_BackgroundColor));
-            ImGui::Text("Editor Viewport Receiving Events: %s", (!m_IsEditorViewportHovered || !m_IsEditorViewportFocused) ? "No" : "Yes");
+            ImGui::Text("Editor Viewport Hovered: %s", m_IsEditorViewportHovered ? "Yes" : "No");
+            ImGui::Text("Editor Viewport Focused: %s", m_IsEditorViewportFocused ? "Yes" : "No");
             if (ImGui::DragInt("Upscale Factor", &m_UpScaleFactor, 0.2f, 1, 40, "%i x"))
             {
                 // m_FrameBuffer->Resize((uint32_t)(m_EditorViewportSize.x/(float)m_UpScaleFactor), (uint32_t)(m_EditorViewportSize.y/(float)m_UpScaleFactor));
@@ -168,20 +168,13 @@ namespace PurrKatEngine
         ImGuiUtility::ShowRendererStatistics(true);
         
         static bool inspector = true;
-        if (ImGui::Begin("Camera Switcher", &inspector, ImGuiWindowFlags_AlwaysAutoResize))
+        if (ImGui::Begin("Editor Infos", &inspector, ImGuiWindowFlags_AlwaysAutoResize))
         {
             Entity activeCamEntity = m_ActiveScene->GetMainCamera();
-            
             if (activeCamEntity.IsValid())
                 ImGui::TextColored({0.2f, 0.8f, 0.2f, 1.0f}, "Active Camera: %s", ENTITY_GET_NAME(activeCamEntity).c_str());
             
-            // static int activeCamera = ArrayUtility::IndexOf(activeCamEntity, m_CameraList);
-            // if (ImGui::Button("Switch Camera"))
-            // {
-            //     activeCamera = (int)((activeCamera + 1)%m_CameraList.size());
-            //     auto& newActiveCamEntity = m_CameraList[activeCamera%m_CameraList.size()];
-            //     m_ActiveScene->SetMainCamera(newActiveCamEntity);
-            // }
+            ImGui::Text("Hovered Entity: %s", m_HoveredEntity.IsValid() ? ENTITY_GET_NAME(m_HoveredEntity).c_str() : "None");
         }
         ImGui::End();
         
@@ -189,43 +182,38 @@ namespace PurrKatEngine
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
         if (ImGui::Begin("Editor Viewport"))
         {
-            // Viewport Size State
+            // ---------- Viewport State Update ------------
             m_IsEditorViewportFocused = ImGui::IsWindowFocused();
             m_IsEditorViewportHovered = ImGui::IsWindowHovered();
-            contentSize = ImGui::GetContentRegionAvail();
-            viewportSize = {contentSize.x, contentSize.y};
-            if (viewportSize != m_EditorViewportSize)
+            
+            auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
+            auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
+            auto viewportOffset = ImGui::GetWindowPos();
+            Bounds newViewportBounds = {
+            { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y },
+            { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y }
+            };
+            
+            MAKE_DEBUG_CONTROL(bool, updateViewportBounds, true);
+            
+            if (updateViewportBounds && m_ViewportBounds.GetSize() != newViewportBounds.GetSize())
             {
-                m_EditorViewportSize = viewportSize;
+                m_ViewportBounds = newViewportBounds;
                 
                 // m_UpScaledFrameBuffer->Resize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
                 // m_FrameBuffer->Resize((uint32_t)(viewportSize.x/(float)m_UpScaleFactor), (uint32_t)(viewportSize.y/(float)m_UpScaleFactor));
-                m_ActiveScene->OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
-                m_EditorCamera.SetViewportSize(viewportSize.x, viewportSize.y);
+                m_ActiveScene->OnViewportResize((uint32_t)m_ViewportBounds.GetWidth(), (uint32_t)m_ViewportBounds.GetHeight());
+                m_EditorCamera.SetViewportSize(m_ViewportBounds.GetWidth(), m_ViewportBounds.GetHeight());
             }
-            else
-            {
+            // else
+            // {
                 // Rendering in the else branch helps decrease the flickering while resizing the viewport.
                 // m_UpScaledFrameBuffer->ScaleFrom(*m_FrameBuffer);
-            }
-            ImGui::Image(m_FrameBuffer->GetColorAttachmentRendererID(), *(ImVec2*)&m_EditorViewportSize, {0, 1}, {1, 0});
+            // }
             
-            auto viewportOffset = ImGui::GetCursorPos();
-            auto windowSize = ImGui::GetWindowSize();
-            ImVec2 minBound = ImGui::GetWindowPos();
-
-            m_ViewportBounds[0] = {
-                minBound.x + viewportOffset.x,
-                minBound.y + viewportOffset.y
-            };
-            m_ViewportBounds[1] = {
-                m_ViewportBounds[0].x + windowSize.x,
-                m_ViewportBounds[0].y + windowSize.y
-            };
             
-            // PKE_CORE_INFO("Editor Viewport Size: {:.2f}-{:.2f} x {:.2f}-{:.2f}", windowSize.x, m_EditorViewportSize.x, windowSize.y, m_EditorViewportSize.y);
-            // PKE_CORE_INFO("Editor Viewport Bounds: Min({:.2f}, {:.2f}), Max({:.2f}, {:.2f})", m_ViewportBounds[0].x, m_ViewportBounds[0].y, m_ViewportBounds[1].x, m_ViewportBounds[1].y);
             
+            ImGui::Image(m_FrameBuffer->GetColorAttachmentRendererID(), m_ViewportBounds.GetSize(), {0, 1}, {1, 0});
             
             // ---------- GIZMOS ------------
             Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
@@ -236,16 +224,11 @@ namespace PurrKatEngine
                 ImGuizmo::SetDrawlist();
                 float windowWidth = ImGui::GetWindowWidth();
                 float windowHeight = ImGui::GetWindowHeight();
-                ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+                ImGuizmo::SetRect(m_ViewportBounds.Min.x, m_ViewportBounds.Min.y, windowWidth, windowHeight);
 
                 // Camera
-                // Entity cameraEntity = m_ActiveScene->GetMainCamera();
-                // CameraComponent& mainCamera = cameraEntity.GetComponent<CameraComponent>();
-                // glm::mat4 cameraProjection = mainCamera.Camera.GetProjectionMatrix();
-                // glm::mat4 cameraView = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransformMatrix());
                 glm::mat4 cameraProjection = m_EditorCamera.GetProjectionMatrix();
                 glm::mat4 cameraView = m_EditorCamera.GetViewMatrix();
-                
                 
                 // Entity transform
                 TransformComponent& transform = selectedEntity.GetComponent<TransformComponent>();
@@ -262,10 +245,9 @@ namespace PurrKatEngine
                                      m_GizmoOperation, ImGuizmo::LOCAL,
                                      glm::value_ptr(transformMatrix), nullptr, snap ? snapValues : nullptr);
                 
-                m_IsEditorViewportUsingGizmo = false;
-                if (ImGuizmo::IsUsing())
+                m_IsEditorViewportUsingGizmo = ImGuizmo::IsUsing();
+                if (m_IsEditorViewportUsingGizmo)
                 {
-                    m_IsEditorViewportUsingGizmo = true;
                     glm::vec3 translation, rotation, scale;
                     
                     if (Math::DecomposeTransform(transformMatrix, translation, rotation, scale))
@@ -277,6 +259,15 @@ namespace PurrKatEngine
                         transform.Rotation += deltaRotation;
                         transform.Scale = scale;
                     }
+                }
+            }
+            
+            // --------- Mouse Picking ------------
+            if (!m_IsEditorViewportUsingGizmo)
+            {
+                if (Input::IsMouseButtonPressed(MouseButtonCode::MouseLeft) && m_IsEditorViewportHovered)
+                {
+                    m_SceneHierarchyPanel.SetSelectedEntity(m_HoveredEntity);
                 }
             }
         }
@@ -363,9 +354,16 @@ namespace PurrKatEngine
             
             return false;
         });
+        
+        // Selection
+        // dispatcher.Dispatch<MouseButtonPressedEvent>([this](MouseButtonPressedEvent& e)
+        // {
+        //     // Moved to OnImGuiRender()
+        //     return false;
+        // });
     }
 
-    void EditorViewLayer::RenderEditorViewport() const
+    void EditorViewLayer::RenderEditorViewport()
     {
         // Render in Frame Buffer
         m_FrameBuffer->Bind();
@@ -377,25 +375,28 @@ namespace PurrKatEngine
 
         m_ActiveScene->OnEditorUpdate(m_EditorCamera);
 
+        int viewportWidth = (int)m_ViewportBounds.GetWidth();
+        int viewportHeight = (int)m_ViewportBounds.GetHeight();
         auto[mx, my] = ImGui::GetMousePos();
-        mx -= m_ViewportBounds[0].x;
-        my = m_ViewportBounds[0].y - my; // Flip Y coordinate to match OpenGL's coordinate system
+        mx -= m_ViewportBounds.Min.x;
+        my -= m_ViewportBounds.Min.y; // Flip Y coordinate to match OpenGL's coordinate system
+        my = (float)viewportHeight - my; // Flip Y coordinate to match OpenGL's coordinate system
         
         int mouseX = (int)mx;
         int mouseY = (int)my;
-        
-        bool mouseInViewport = mouseX >= 0 && mouseY >= 0 && mouseX < (int)m_EditorViewportSize.x && mouseY < (int)m_EditorViewportSize.y;
+
+
+        bool mouseInViewport = mouseX >= 0 && mouseY >= 0 && mouseX < viewportWidth && mouseY < viewportHeight;
         if (mouseInViewport)
         {
-            glm::vec2 pixelPos = { (float)1920*mouseX/m_EditorViewportSize.x, (float)1080*mouseY/m_EditorViewportSize.y };
-            // glm::vec2 pixelPos = { (float)1920*mouseX/m_EditorViewportSize.x, (float)1080*mouseY/m_EditorViewportSize.y };
+            // Base resolution is 1920x1080, so we need to scale the mouse position to match the framebuffer size.
+            glm::vec2 pixelPos = { 1920.0f*(float)mouseX/(float)viewportWidth, 1080.0f*(float)mouseY/(float)viewportHeight };
             
             int pixelData = m_FrameBuffer->ReadPixel(1, (int)pixelPos.x, (int)pixelPos.y);
-            PKE_CORE_DEBUG("Mouse Position in Editor Viewport: ({}, {}) (pixel: {})", mouseX, mouseY, pixelData);
-            // PKE_CORE_DEBUG("READ: {}", pixelData);
+            m_HoveredEntity = Entity((entt::entity)pixelData, m_ActiveScene.get());
+            PKE_CORE_DEBUG("READ: {}", pixelData);
         }
-        // PKE_CORE_DEBUG("Mouse Position in Editor Viewport: ({}, {})", mouseX, mouseY);
-        
+        PKE_CORE_DEBUG("Mouse Position: {}, {}", mouseX, mouseY);
         
         m_FrameBuffer->Unbind();
     }

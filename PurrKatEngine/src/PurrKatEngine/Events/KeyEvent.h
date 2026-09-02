@@ -12,7 +12,7 @@ namespace PurrKatEngine
         explicit KeyEvent(int keyCode) : m_KeyCode(keyCode) {}
 
         int GetCharCode() const { return m_KeyCode; }
-        KeyCode GetKeyCode() const { return GlfwCharCodeToKeyCode(m_KeyCode); }
+        KeyCode GetKeyCode() const { return ToKeyCode(m_KeyCode); }
         
         EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
 

@@ -5,6 +5,16 @@
 
 namespace PurrKatEngine
 {
+    glm::vec2 ImGuiUtility::ToVec2(const ImVec2& vec)
+    {
+        return {vec.x, vec.y};
+    }
+
+    glm::vec4 ImGuiUtility::ToVec4(const ImVec4& vec)
+    {
+        return {vec.x, vec.y, vec.z, vec.w};
+    }
+
     bool ImGuiUtility::DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue, float labelWidth)
     {
         bool changed = false;
@@ -76,6 +86,35 @@ namespace PurrKatEngine
         
         ImGui::PopID();
         
+        return changed;
+    }
+
+    bool ImGuiUtility::DrawBoundsControl(const char* label, Bounds& bounds)
+    {
+        bool changed = false;
+        if (!ImGui::BeginTable(label, 4, ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_BordersOuter))
+            return false;
+        
+        ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed, 20);
+        ImGui::TableSetupColumn("Min");
+        ImGui::TableSetupColumn("Max");
+        ImGui::TableSetupColumn("Size");
+        
+        // X
+        ImGui::TableHeadersRow();
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0); ImGui::TextUnformatted("X");
+        ImGui::TableSetColumnIndex(1); changed |= ImGui::DragFloat("##MinX", &bounds.Min.x, 0.1f);
+        ImGui::TableSetColumnIndex(2); changed |= ImGui::DragFloat("##MaxX", &bounds.Max.x, 0.1f);
+        ImGui::TableSetColumnIndex(3); ImGui::Text("%.3f", bounds.GetWidth());
+        ImGui::TableNextRow();
+        
+        // Y
+        ImGui::TableSetColumnIndex(0); ImGui::TextUnformatted("Y"); 
+        ImGui::TableSetColumnIndex(1); changed |= ImGui::DragFloat("##MinY", &bounds.Min.y, 0.1f);
+        ImGui::TableSetColumnIndex(2); changed |= ImGui::DragFloat("##MaxY", &bounds.Max.y, 0.1f);
+        ImGui::TableSetColumnIndex(3); ImGui::Text("%.3f", bounds.GetHeight());
+        ImGui::EndTable();
         return changed;
     }
 

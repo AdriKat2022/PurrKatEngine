@@ -9,7 +9,7 @@ namespace PurrKatEngine
     bool Input::IsKeyPressed(KeyCode keyCode)
     {
         GLFWwindow* window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
-        auto state = glfwGetKey(window, KeyCodeToGlfwCharCode(keyCode));
+        auto state = glfwGetKey(window, ToGlfwCharCode(keyCode));
         return state == GLFW_PRESS || state == GLFW_REPEAT;
     }
 

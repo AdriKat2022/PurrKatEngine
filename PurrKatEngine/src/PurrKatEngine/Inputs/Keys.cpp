@@ -159,9 +159,26 @@ namespace PurrKatEngine
         return "Unknown KeyCode";
     }
     
-    int GlfwCharCodeToImGuiKey(int charCode)
+    const char* to_string(MouseButtonCode mouseButtonCode)
     {
-        switch (charCode)
+        switch (mouseButtonCode)
+        {
+            case MouseButtonCode::MouseLeft: return "MouseLeft";
+            case MouseButtonCode::MouseRight: return "MouseRight";
+            case MouseButtonCode::MouseMiddle: return "MouseMiddle";
+            case MouseButtonCode::MouseButton4: return "MouseButton4";
+            case MouseButtonCode::MouseButton5: return "MouseButton5";
+            case MouseButtonCode::MouseButton6: return "MouseButton6";
+            case MouseButtonCode::MouseButton7: return "MouseButton7";
+            case MouseButtonCode::MouseButton8: return "MouseButton8";
+        }
+        
+        return "Unknown MouseButtonCode";
+    }
+    
+    int ToImGuiKey(int glfwCharCode)
+    {
+        switch (glfwCharCode)
         {
             case GLFW_KEY_TAB: return ImGuiKey_Tab;
             case GLFW_KEY_LEFT: return ImGuiKey_LeftArrow;
@@ -286,9 +303,9 @@ namespace PurrKatEngine
         }
     }
     
-    KeyCode GlfwCharCodeToKeyCode(int charCode)
+    KeyCode ToKeyCode(int glfwCharCode)
     {
-        switch (charCode)
+        switch (glfwCharCode)
         {
             case GLFW_KEY_UNKNOWN: return KeyCode::None;
 
@@ -434,7 +451,7 @@ namespace PurrKatEngine
         }
     }
     
-    int KeyCodeToGlfwCharCode(KeyCode keyCode)
+    int ToGlfwCharCode(KeyCode keyCode)
     {
         switch (keyCode)
         {
@@ -607,5 +624,22 @@ namespace PurrKatEngine
         }
 
         return GLFW_KEY_UNKNOWN;
+    }
+
+    MouseButtonCode ToMouseButtonCode(int glfwMouseCode)
+    {
+        switch (glfwMouseCode)
+        {
+            case GLFW_MOUSE_BUTTON_LEFT: return MouseButtonCode::MouseLeft;
+            case GLFW_MOUSE_BUTTON_RIGHT: return MouseButtonCode::MouseRight;
+            case GLFW_MOUSE_BUTTON_MIDDLE: return MouseButtonCode::MouseMiddle;
+            case GLFW_MOUSE_BUTTON_4: return MouseButtonCode::MouseButton4;
+            case GLFW_MOUSE_BUTTON_5: return MouseButtonCode::MouseButton5;
+            case GLFW_MOUSE_BUTTON_6: return MouseButtonCode::MouseButton6;
+            case GLFW_MOUSE_BUTTON_7: return MouseButtonCode::MouseButton7;
+            case GLFW_MOUSE_BUTTON_8: return MouseButtonCode::MouseButton8;
+                
+            default: return MouseButtonCode::None;
+        }
     }
 }

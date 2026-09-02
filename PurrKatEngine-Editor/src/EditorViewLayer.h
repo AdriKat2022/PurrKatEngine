@@ -4,6 +4,7 @@
 #include "EditorPanels/SceneHierarchyPanel.h"
 #include "ImGuizmo.h"
 #include "PurrKatEngine/Editor/EditorCamera.h"
+#include "PurrKatEngine/Utility/Bounds.h"
 
 namespace PurrKatEngine
 {
@@ -19,7 +20,7 @@ namespace PurrKatEngine
         void OnEvent(Event& event) override;
 
     private:
-        void RenderEditorViewport() const;
+        void RenderEditorViewport();
         
     private:
         EditorContext m_EditorContext;
@@ -30,12 +31,13 @@ namespace PurrKatEngine
         ImGuizmo::OPERATION m_GizmoOperation = ImGuizmo::OPERATION::TRANSLATE;
         
         glm::vec4 m_BackgroundColor{0.1f, 0.1f, 0.1f, 1.0f};
-        glm::vec2 m_ViewportBounds[2];
-        glm::vec2 m_EditorViewportSize;
+        Bounds m_ViewportBounds;
         bool m_IsEditorViewportFocused = false;
         bool m_IsEditorViewportHovered = false;
         bool m_IsEditorViewportUsingGizmo = false;
 
+        Entity m_HoveredEntity;
+        
         int m_UpScaleFactor = 1;
         
         Ref<FrameBuffer> m_FrameBuffer;

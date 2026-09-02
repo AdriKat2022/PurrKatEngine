@@ -6,6 +6,7 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/detail/type_quat.hpp>
 #include <glm/gtx/quaternion.hpp>
+#include "PurrKatEngine/Inputs/Time.h"
 
 namespace PurrKatEngine
 {
@@ -28,9 +29,9 @@ namespace PurrKatEngine
             
             if (Input::IsMouseButtonPressed(MouseButtonCode::MouseMiddle))
                 MousePan(delta);
-            else if (Input::IsMouseButtonPressed(MouseButtonCode::MouseLeft))
-                MouseRotate(delta);
             else if (Input::IsMouseButtonPressed(MouseButtonCode::MouseRight))
+                MouseRotate(delta);
+            else if (Input::IsMouseButtonPressed(MouseButtonCode::MouseLeft))
                 MouseZoom(delta.y);
         }
         
@@ -40,6 +41,18 @@ namespace PurrKatEngine
         //     m_FocalPoint = glm::vec3(0.0f, 0.0f, 0.0f);
         //     m_Distance = 10.0f;
         // }
+        
+        // Movement
+        if (false)
+        {
+            glm::vec2 movementInput = Input::GetAxis2D(KeyCode::W, KeyCode::A, KeyCode::S, KeyCode::D);
+            float verticalInput = Input::GetAxis(KeyCode::E, KeyCode::Q);
+            float speed = 5.0f; // Movement speed
+            glm::vec3 forward = GetForwardDirection();
+            glm::vec3 right = GetRightDirection();
+            glm::vec3 up = GetUpDirection();
+            m_FocalPoint += (forward * movementInput.y + right * movementInput.x + up * verticalInput) * speed * (float)Time::deltaTime;
+        }
         
         UpdateView();
     }

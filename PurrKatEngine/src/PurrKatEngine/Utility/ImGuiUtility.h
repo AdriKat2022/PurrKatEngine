@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "Bounds.h"
 #include "imgui.h"
 #include "PurrKatEngine/Application.h"
 #include "PurrKatEngine/Components/Transform.h"
@@ -39,9 +40,14 @@ namespace PurrKatEngine
         };
         
     public:
+        // ----------- Conversions -----------
+        static glm::vec2 ToVec2(const ImVec2& vec);
+        static glm::vec4 ToVec4(const ImVec4& vec);
         
+        // ----------- ImGui Draw Functions -----------
         static bool DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float labelWidth = 100.0f);
-                
+        static bool DrawBoundsControl(const char* label, Bounds& bounds);
+        
         static void ShowApplicationInfoWindow();
         static void ShowDisplayMouseAndWorldPosition(const OrthographicCamera* cam = nullptr);
         static void ShowTransform(const std::string& name, const Transform& transform);
