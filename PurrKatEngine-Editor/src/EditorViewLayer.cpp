@@ -1,5 +1,6 @@
 ﻿#include "EditorViewLayer.h"
 
+#include "PurrKatEngine/Controls/Controls.h"
 #include "PurrKatEngine/Serialization/SceneSerializer.h"
 #include "PurrKatEngine/Scene/Scene.h"
 
@@ -137,7 +138,15 @@ namespace PurrKatEngine
                 if (ImGui::MenuItem("Save Scene As...", "Ctrl + Shift + S"))
                     m_EditorContext.SaveSceneAs();
 
-                if (ImGui::MenuItem("Exit without saving", "Alt + F4"))
+                if (ImGui::MenuItem("Save & Exit"))
+                {
+                    if (m_EditorContext.SaveScene())
+                        Application::Get().QuitApplication();
+                    else
+                        PKE_CORE_WARN("Failed to save scene before exiting.");
+                }
+
+                if (ImGui::MenuItem("Exit", "Alt + F4"))
                     Application::Get().QuitApplication();
 
                 ImGui::EndMenu();
@@ -261,15 +270,6 @@ namespace PurrKatEngine
                     }
                 }
             }
-            
-            // --------- Mouse Picking ------------
-            if (!m_IsEditorViewportUsingGizmo)
-            {
-                if (Input::IsMouseButtonPressed(MouseButtonCode::MouseLeft) && m_IsEditorViewportHovered)
-                {
-                    m_SceneHierarchyPanel.SetSelectedEntity(m_HoveredEntity);
-                }
-            }
         }
         ImGui::End();
         ImGui::PopStyleVar();
@@ -326,18 +326,18 @@ namespace PurrKatEngine
                 // case KeyCode::Q:
                 //     m_GizmoOperation = -1;
                 //     return true;
-                case KeyCode::W:
+                case Controls::GIZMOS_TRANSLATE_KEY:
                     m_GizmoOperation = ImGuizmo::OPERATION::TRANSLATE;
                     return true;
-                case KeyCode::E:
+                case Controls::GIZMOS_ROTATE_KEY:
                     m_GizmoOperation = ImGuizmo::OPERATION::ROTATE;
                     return true;
-                case KeyCode::R:
+                case Controls::GIZMOS_SCALE_KEY:
                     m_GizmoOperation = ImGuizmo::OPERATION::SCALE;
                     return true;
                     
                 // ------- CAMERA FOCUS --------
-                case KeyCode::F:
+                case Controls::CAMERA_REFOCUS_KEY:
                 {
                     // TODO: The selected entity should belong to the EditorContext instead of the SceneHierarchyPanel.
                     // TODO: Create event for when the selected entity changes.
@@ -356,11 +356,16 @@ namespace PurrKatEngine
         });
         
         // Selection
-        // dispatcher.Dispatch<MouseButtonPressedEvent>([this](MouseButtonPressedEvent& e)
-        // {
-        //     // Moved to OnImGuiRender()
-        //     return false;
-        // });
+        dispatcher.Dispatch<MouseButtonPressedEvent>([this](MouseButtonPressedEvent& e)
+        {
+            // --------- Mouse Picking ------------
+            if (e.GetMouseButton() == Controls::MOUSE_PICK_BUTTON && m_IsEditorViewportHovered && !ImGuizmo::IsOver() && !Input::IsKeyPressed(Controls::CAMERA_MODIFIER_KEY))
+            {
+                m_SceneHierarchyPanel.SetSelectedEntity(m_HoveredEntity);
+                return true;
+            }
+            return false;
+        });
     }
 
     void EditorViewLayer::RenderEditorViewport()
@@ -394,9 +399,7 @@ namespace PurrKatEngine
             
             int pixelData = m_FrameBuffer->ReadPixel(1, (int)pixelPos.x, (int)pixelPos.y);
             m_HoveredEntity = Entity((entt::entity)pixelData, m_ActiveScene.get());
-            PKE_CORE_DEBUG("READ: {}", pixelData);
         }
-        PKE_CORE_DEBUG("Mouse Position: {}, {}", mouseX, mouseY);
         
         m_FrameBuffer->Unbind();
     }

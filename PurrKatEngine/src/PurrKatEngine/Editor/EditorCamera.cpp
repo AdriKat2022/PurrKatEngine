@@ -6,6 +6,7 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/detail/type_quat.hpp>
 #include <glm/gtx/quaternion.hpp>
+#include "PurrKatEngine/Controls/Controls.h"
 #include "PurrKatEngine/Inputs/Time.h"
 
 namespace PurrKatEngine
@@ -21,17 +22,17 @@ namespace PurrKatEngine
     
     void EditorCamera::OnUpdate()
     {
-        // if (Input::IsKeyPressed(KeyCode::LeftAlt))
+        if (Input::IsKeyPressedOrNone(Controls::CAMERA_MODIFIER_KEY))
         {
             glm::vec2 mouse{Input::GetMouseX(), Input::GetMouseY()};
             glm::vec2 delta = (mouse - m_InitialMousePosition) * 0.003f;
             m_InitialMousePosition = mouse;
             
-            if (Input::IsMouseButtonPressed(MouseButtonCode::MouseMiddle))
+            if (Input::IsMouseButtonPressed(Controls::CAMERA_PAN_BUTTON))
                 MousePan(delta);
-            else if (Input::IsMouseButtonPressed(MouseButtonCode::MouseRight))
+            else if (Input::IsMouseButtonPressed(Controls::CAMERA_ROTATE_BUTTON))
                 MouseRotate(delta);
-            else if (Input::IsMouseButtonPressed(MouseButtonCode::MouseLeft))
+            else if (Input::IsMouseButtonPressed(Controls::CAMERA_ZOOM_BUTTON))
                 MouseZoom(delta.y);
         }
         
@@ -43,10 +44,10 @@ namespace PurrKatEngine
         // }
         
         // Movement
-        if (false)
+        if (Controls::CAMERA_ENABLE_MOVEMENT)
         {
-            glm::vec2 movementInput = Input::GetAxis2D(KeyCode::W, KeyCode::A, KeyCode::S, KeyCode::D);
-            float verticalInput = Input::GetAxis(KeyCode::E, KeyCode::Q);
+            glm::vec2 movementInput = Input::GetAxis2D(Controls::CAMERA_FORWARD_KEY, Controls::CAMERA_LEFT_KEY, Controls::CAMERA_BACK_KEY, Controls::CAMERA_RIGHT_KEY);
+            float verticalInput = Input::GetAxis(Controls::CAMERA_DOWN_KEY, Controls::CAMERA_UP_KEY);
             float speed = 5.0f; // Movement speed
             glm::vec3 forward = GetForwardDirection();
             glm::vec3 right = GetRightDirection();

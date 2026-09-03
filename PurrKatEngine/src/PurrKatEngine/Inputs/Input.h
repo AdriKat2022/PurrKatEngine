@@ -7,6 +7,7 @@ namespace PurrKatEngine
     class PKE_API Input
     {
     public:
+        static bool IsKeyPressedOrNone(KeyCode keyCode) { return keyCode == KeyCode::None || IsKeyPressed(keyCode); }
         static bool IsKeyPressed(KeyCode keyCode);
         static bool IsMouseButtonPressed(MouseButtonCode mouseButtonCode);
         
