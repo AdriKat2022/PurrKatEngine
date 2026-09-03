@@ -34,14 +34,14 @@
 // QUICK START
 // The application launches an instance of the provided class that extends PKE::Application.
 // Ex: RUN_CLASS(MyClassThatExtendsPKEApplication)
-#define PKE_RUN_CLASS(class) ::PurrKatEngine::Application* ::PurrKatEngine::CreateApplication() { return new class(); }
+#define PKE_RUN_CLASS(class) ::PurrKatEngine::Application* ::PurrKatEngine::CreateApplication(ApplicationCommandLineArgs args) { return new class(args); }
 
 // --- OR ---
 
 // CUSTOM START
 // The application launches an instance of the returned class that extends PKE::Application.
 // Ex: RUN_APPLICATION { auto app = new MyClassThatExtendsPKEApplication(); // You optional prep... ; return app; }
-#define PKE_PREPARE_APPLICATION() ::PurrKatEngine::Application* ::PurrKatEngine::CreateApplication()
+#define PKE_PREPARE_APPLICATION() ::PurrKatEngine::Application* ::PurrKatEngine::CreateApplication(ApplicationCommandLineArgs args)
 
 // -------------------------------
 

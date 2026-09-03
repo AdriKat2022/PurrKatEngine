@@ -6,7 +6,9 @@ namespace PurrKatEngine
     {
     public:
         // Scenes
-        static constexpr const char* DefaultSceneName = "Untitled";
+        static constexpr const char* SCENE_EXTENSION = ".pkscene";
+        static constexpr const char* DEFAULT_SCENE_NAME = "Untitled";
+        static constexpr const char* NO_ACTIVE_SCENE_NAME = "Untitled*";
         
         // File Types
         enum class FileType

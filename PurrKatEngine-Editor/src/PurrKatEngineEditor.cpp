@@ -7,7 +7,7 @@ namespace PurrKatEngine
     class PurrKatEngineEditor : public Application
     {
     public:
-        PurrKatEngineEditor() : Application("PurrKatEngine Editor v" PKE_VERSION_STR)
+        PurrKatEngineEditor(ApplicationCommandLineArgs args) : Application("PurrKatEngine Editor v" PKE_VERSION_STR, args)
         {
             PushLayer(new EditorViewLayer());
         }

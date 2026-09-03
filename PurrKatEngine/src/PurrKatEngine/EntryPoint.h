@@ -12,7 +12,7 @@ inline int main(int argc, char** argv)
     
     PurrKatEngine::InternalLog::Init();
     PKE_CORE_TRACE("Using PurrKatEngine version <{}>", PKE_VERSION_STR);
-    auto app = PurrKatEngine::CreateApplication();
+    auto app = PurrKatEngine::CreateApplication({.Count = argc, .Args = argv});
     
     PROFILE_SESSION_END();
     PROFILE_SESSION_BEGIN("Runtime", "Profiling-Runtime.json");

@@ -3,7 +3,6 @@
 
 namespace PurrKatEngine
 {
-    // doesn't want to initialize, to check
      const std::unordered_map<Constants::FileType, const Constants::FileFilterType> Constants::FileFilters = {
         {FileType::AllFiles, {.Extension = "*.*", .Description = "All Files (*.*)"}},
         {FileType::TextFiles, {.Extension = "*.txt", .Description = "Text Files (*.txt)"}},

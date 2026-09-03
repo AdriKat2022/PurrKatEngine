@@ -7,7 +7,7 @@
 class SandboxApp : public PKE::Application
 {
 public:
-    SandboxApp()
+    SandboxApp(PurrKatEngine::ApplicationCommandLineArgs args) : Application("PurrKatEngine Sandbox v" PKE_VERSION_STR, args)
     {
         PKE_LOG_TRACE("Sandbox application start. Hey, that's me! A log from the client!");
         PushLayer(new Sandbox2DLightTestScene());

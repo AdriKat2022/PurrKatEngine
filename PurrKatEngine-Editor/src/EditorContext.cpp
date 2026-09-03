@@ -4,6 +4,7 @@
 #include "PurrKatEngine/PlatformUtils.h"
 #include "PurrKatEngine/Logs/InternalLog.h"
 #include "PurrKatEngine/Serialization/SceneSerializer.h"
+#include "PurrKatEngine/Utility/FileUtility.h"
 
 namespace PurrKatEngine
 {
@@ -20,18 +21,9 @@ namespace PurrKatEngine
 
     std::string EditorContext::GetActiveSceneName() const
     {
-        if (m_ActiveSceneFilePath.empty())
-            return Constants::DefaultSceneName;
+        if (m_ActiveSceneFilePath.empty()) return {};
         
-        size_t lastSlashPos = m_ActiveSceneFilePath.find_last_of("/\\");
-        size_t lastDotPos = m_ActiveSceneFilePath.find_last_of('.');
-        
-        if (lastDotPos == std::string::npos || lastDotPos < lastSlashPos)
-            return Constants::DefaultSceneName;
-        
-        static std::string sceneName;
-        sceneName = m_ActiveSceneFilePath.substr(lastSlashPos + 1, lastDotPos - lastSlashPos - 1);
-        return sceneName;
+        return FileUtility::GetFileNameWithoutExtension(m_ActiveSceneFilePath);
     }
 
     void EditorContext::NewScene()
@@ -40,21 +32,28 @@ namespace PurrKatEngine
         m_ActiveScene->EmptyScene();
     }
 
+    /**
+     * Prompts the user to select a scene file to open. If a scene file path is provided, it will bypass the dialog prompt and open that scene directly.
+     * @param sceneToOpen Scene to open (if provided, bypasses the dialog prompt).
+     * @return Whether the operation was completed (true) or cancelled/failed (false).
+     */
     bool EditorContext::OpenScene(const std::string& sceneToOpen)
     {
         // Open the dialog to select a scene file with the optional preselected scene to open.
         std::string file;
-        if (!sceneToOpen.empty())
-            file = FileDialogs::OpenFile(Constants::FileType::SceneFiles, nullptr, sceneToOpen.c_str());
-        else
+        if (sceneToOpen.empty())
+        {
             if (m_ActiveSceneFilePath.empty())
                 file = FileDialogs::OpenFile(Constants::FileType::SceneFiles);
             else
-                file = FileDialogs::OpenFile(Constants::FileType::SceneFiles, nullptr, m_ActiveSceneFilePath.c_str());
-        
+                file = FileDialogs::OpenFile(Constants::FileType::SceneFiles, m_ActiveSceneFilePath.c_str());
+        }
+        else
+            file = sceneToOpen;
+
         if (file.empty())
         {
-            PKE_CORE_WARN("Invalid scene file.");
+            PKE_CORE_WARN("Invalid scene file (sceneToOpen='{}').", sceneToOpen);
             return false;
         }
         

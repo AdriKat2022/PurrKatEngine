@@ -13,7 +13,8 @@ namespace PurrKatEngine
 {
     Application* Application::s_Instance = nullptr;
 
-    Application::Application(const std::string& appName)
+    Application::Application(const std::string& appName, ApplicationCommandLineArgs args)
+        : m_CommandLineArgs(args)
     {
         PROFILE_FUNCTION();
         

@@ -33,8 +33,14 @@ namespace PurrKatEngine
         m_Cpp = Texture2D::CreateRef("assets/textures/cpp.png", { .Filter = Texture2D::FilterType::Nearest});
 
         m_ActiveScene = m_EditorContext.GetScene();
-        
         m_SceneHierarchyPanel.SetScene(m_ActiveScene.get());
+        
+        auto commandLineArgs = Application::Get().GetCommandLineArgs();
+        if (commandLineArgs.Count > 1)
+        {
+            std::string sceneFilePath = commandLineArgs[1];
+            m_EditorContext.OpenScene(sceneFilePath);
+        }
     }
 
     void EditorViewLayer::OnAttach()

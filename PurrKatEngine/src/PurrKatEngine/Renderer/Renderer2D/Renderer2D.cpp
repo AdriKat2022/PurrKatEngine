@@ -359,8 +359,6 @@ namespace PurrKatEngine
             s_RendererData.TextureSlots[i]->Bind(i);
         }
         
-        RenderCommand::DisableDepthTest();
-        
         for (uint32_t drawCallIndex = 0; drawCallIndex < s_RendererData.DrawCallsCount; drawCallIndex++)
         {
             const DrawCallData& drawCallData = s_RendererData.DrawCalls[drawCallIndex];
