@@ -161,6 +161,7 @@ namespace PurrKatEngine
         }
 
         m_SceneHierarchyPanel.OnImGuiRender();
+        m_ContentBrowserPanel.OnImGuiRender();
 
         if (ImGui::Begin("Editor Viewport Properties"))
         {
@@ -287,7 +288,8 @@ namespace PurrKatEngine
     {
         Layer::OnEvent(event);
         
-        m_EditorCamera.OnEvent(event);
+        if (m_IsEditorViewportFocused || m_IsEditorViewportHovered)
+            m_EditorCamera.OnEvent(event);
         
         // Shortcuts
         EventDispatcher dispatcher(event);

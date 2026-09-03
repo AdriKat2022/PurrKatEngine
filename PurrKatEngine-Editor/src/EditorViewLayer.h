@@ -3,6 +3,7 @@
 #include "PurrKatEngine.h"
 #include "EditorPanels/SceneHierarchyPanel.h"
 #include "ImGuizmo.h"
+#include "EditorPanels/ContentBrowserPanel.h"
 #include "PurrKatEngine/Editor/EditorCamera.h"
 #include "PurrKatEngine/Utility/Bounds.h"
 
@@ -24,7 +25,7 @@ namespace PurrKatEngine
         
     private:
         EditorContext m_EditorContext;
-        
+        ContentBrowserPanel m_ContentBrowserPanel;
         EditorCamera m_EditorCamera;
         
         // GIZMO
