@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <glm/glm.hpp>
+
 namespace PurrKatEngine
 {
     class Texture2D;

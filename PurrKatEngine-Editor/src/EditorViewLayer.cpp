@@ -8,18 +8,6 @@ namespace PurrKatEngine
 {
     EditorViewLayer::EditorViewLayer()
     {
-        // m_GrassSpriteSheet.SetTexture(Texture2D::CreateRef("assets/textures/TileSets/Grass.png", {.Filter = Texture2D::FilterType::Nearest}));
-        // m_GrassSpriteSheet.SetSpriteSheetOptions({.CellCount = {11, 7}});
-        
-        // m_UpScaledFrameBuffer = FrameBuffer::CreateRef({
-        //     .Width = 1280,
-        //     .Height = 720,
-        //     .AttachmentsSpecs = {
-        //         { FrameBufferTextureFormat::RGBA8, ImageFilterType::Nearest },
-        //         { FrameBufferTextureFormat::Depth, ImageFilterType::Nearest }
-        //     }
-        // });
-        
         m_FrameBuffer = FrameBuffer::CreateRef({
             .Width = 1920,
             .Height = 1080,
@@ -34,6 +22,11 @@ namespace PurrKatEngine
 
         m_ActiveScene = m_EditorContext.GetScene();
         m_SceneHierarchyPanel.SetScene(m_ActiveScene.get());
+        
+        m_ContentBrowserPanel.OnSceneOpenRequest.AddListener([this](const std::string& sceneFilePath)
+        {
+            m_EditorContext.OpenScene(sceneFilePath);
+        });
         
         auto commandLineArgs = Application::Get().GetCommandLineArgs();
         if (commandLineArgs.Count > 1)
@@ -243,15 +236,15 @@ namespace PurrKatEngine
                 ImGuizmo::SetRect(m_ViewportBounds.Min.x, m_ViewportBounds.Min.y, windowWidth, windowHeight);
 
                 // Camera
-                glm::mat4 cameraProjection = m_EditorCamera.GetProjectionMatrix();
                 glm::mat4 cameraView = m_EditorCamera.GetViewMatrix();
+                glm::mat4 cameraProjection = m_EditorCamera.GetProjectionMatrix();
                 
                 // Entity transform
                 TransformComponent& transform = selectedEntity.GetComponent<TransformComponent>();
                 glm::mat4 transformMatrix = transform;
 
                 // Snapping
-                bool snap = Input::IsKeyPressed(KeyCode::LeftCtrl);
+                bool snap = Input::IsKeyPressed(Controls::GIZMOS_SNAP_KEY);
                 float snapValue = 0.5f; // Snap to 0.5m for translation/scale
                 if (m_GizmoOperation == ImGuizmo::OPERATION::ROTATE)
                     snapValue = 45.0f; // Snap to 45 degrees for rotation

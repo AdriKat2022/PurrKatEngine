@@ -25,6 +25,9 @@ namespace PurrKatEngine::Controls
     // Mouse picking
     inline constexpr MouseButtonCode MOUSE_PICK_BUTTON = MouseButtonCode::MouseLeft;
     
+    // Gizmos Controls
+    inline constexpr KeyCode GIZMOS_SNAP_KEY = KeyCode::LeftCtrl;
+    
     // Gizmos Shortcuts
     inline constexpr KeyCode GIZMOS_TRANSLATE_KEY = KeyCode::W;
     inline constexpr KeyCode GIZMOS_ROTATE_KEY = KeyCode::E;

@@ -27,6 +27,7 @@
 #include "PurrKatEngine/Utility/EventAction.h"
 #include "PurrKatEngine/Utility/ImGuiUtility.h"
 #include "PurrKatEngine/Utility/Random.h"
+#include "PurrKatEngine/Utility/Math.h"
 
 // --- USER ENTRY POINT MACROS --- 
 // You will need to separately include the "EntryPoint.h" header file in your main.cpp file, preferably where you use these macros.

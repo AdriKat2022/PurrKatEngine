@@ -1,6 +1,38 @@
 Scene: Untitled
 Entities:
-  - Entity: 1048580
+  - Entity: 18874372
+    Tag: Game Entity
+    Transform:
+      Position: [0.1, 5, -11.6]
+      Rotation: [1.0035644, 0.5742133, 0]
+      Scale: [1, 1, 1]
+    Sprite:
+      Color: [0, 0.88256216, 1, 1]
+  - Entity: 26214403
+    Tag: Sqr
+    Transform:
+      Position: [2.8, 0, -12.4]
+      Rotation: [-0.3228859, -0.47996554, -0.4066617]
+      Scale: [1, 3.5, 1]
+    Sprite:
+      Color: [1, 1, 1, 1]
+  - Entity: 26214402
+    Tag: Square
+    Transform:
+      Position: [0, 7.450581e-09, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Sprite:
+      Color: [1, 0, 0, 1]
+  - Entity: 26214401
+    Tag: Square Behind
+    Transform:
+      Position: [4.6005163, 1, -5]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Sprite:
+      Color: [0.2, 0.8, 0, 1]
+  - Entity: 26214400
     Tag: Camera
     Transform:
       Position: [0, 0, 5]
@@ -14,35 +46,3 @@ Entities:
       OrthographicSize: 10
       OrthographicNear: -1
       OrthographicFar: 1
-  - Entity: 1048579
-    Tag: Square Behind
-    Transform:
-      Position: [-1, 1, -5]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    Sprite:
-      Color: [0.2, 0.8, 0, 1]
-  - Entity: 1048578
-    Tag: Square
-    Transform:
-      Position: [0, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    Sprite:
-      Color: [1, 0, 0, 1]
-  - Entity: 1048577
-    Tag: Sqr
-    Transform:
-      Position: [2.8, 0, -12.4]
-      Rotation: [-0.3228859, -0.47996554, -0.4066617]
-      Scale: [1, 3.5, 1]
-    Sprite:
-      Color: [1, 1, 1, 1]
-  - Entity: 1048576
-    Tag: Game Entity
-    Transform:
-      Position: [0.1, 5, -11.6]
-      Rotation: [1.0035644, 0.5742133, 0]
-      Scale: [1, 1, 1]
-    Sprite:
-      Color: [0, 0.88256216, 1, 1]

@@ -7,6 +7,15 @@
 
 namespace PurrKatEngine
 {
+    int Math::Max(int a, int b) { return (a > b) ? a : b; }
+    int Math::Min(int a, int b) { return (a < b) ? a : b; }
+    
+    float Math::Max(float a, float b) { return (a > b) ? a : b; }
+    float Math::Min(float a, float b) { return (a < b) ? a : b; }
+
+    double Math::Max(double a, double b) { return (a > b) ? a : b; }
+    double Math::Min(double a, double b) { return (a < b) ? a : b; }
+
     bool Math::DecomposeTransform(const glm::mat4& transform, glm::vec3& translation, glm::vec3& rotation, glm::vec3& scale)
     {
         glm::mat4 localMatrix(transform);
